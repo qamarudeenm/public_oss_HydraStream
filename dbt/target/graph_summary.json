@@ -1,0 +1,1 @@
+{"_invocation_id": "727d184e-da5a-4ef5-96da-fe93edad693d", "linked": {"0": {"name": "operation.clickstream.clickstream-on-run-start-0", "type": "operation"}, "1": {"name": "model.clickstream.clickstream_raw", "type": "model", "succ": [2]}, "2": {"name": "model.clickstream.clickstream_summary", "type": "model"}}}

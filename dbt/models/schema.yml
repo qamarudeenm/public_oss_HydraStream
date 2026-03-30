@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: clickstream_summary
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: event_type
+        data_type: STRING
+      - name: session_id
+        data_type: STRING
+      - name: product_id
+        data_type: STRING
+      - name: event_count
+        data_type: BIGINT
+      - name: window_start
+        data_type: TIMESTAMP(3)
+      - name: window_end
+        data_type: TIMESTAMP(3)

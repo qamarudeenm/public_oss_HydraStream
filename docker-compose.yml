@@ -1,0 +1,164 @@
+name: clickstream
+
+services:
+  # ──────────────────────────────────────────────
+  # Infrastructure
+  # ──────────────────────────────────────────────
+  kafka:
+    image: apache/kafka:3.9.0
+    ports:
+      - "9092:9092"
+    environment:
+      # KRaft mode (no Zookeeper required)
+      KAFKA_NODE_ID: 0
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:29092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  # ──────────────────────────────────────────────
+  # NOTE: Using LOCAL ClickHouse (host machine)
+  # To re-enable Docker ClickHouse, uncomment below:
+  # clickhouse:
+  #   image: clickhouse/clickhouse-server:latest
+  #   ports:
+  #     - "8123:8123"
+  #     - "9000:9000"
+  #   ulimits:
+  #     nofile:
+  #       soft: 262144
+  #       hard: 262144
+  #   volumes:
+  #     - clickhouse_data:/var/lib/clickhouse
+
+  # ──────────────────────────────────────────────
+  # Application Services
+  # ──────────────────────────────────────────────
+  website:
+    build:
+      context: ./website
+    ports:
+      - "3000:3000"
+    depends_on:
+      - collector
+
+  collector:
+    build:
+      context: ./collector
+    ports:
+      - "5000:5000"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_TOPIC: clickstream
+    depends_on:
+      kafka:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # ──────────────────────────────────────────────
+  # Transformation Layer (Flink 1.19.1 in Docker)
+  # ──────────────────────────────────────────────
+  flink-jobmanager:
+    build: ./flink
+    command: jobmanager
+    ports:
+      - "8081:8081"
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+    volumes:
+      - ./flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar:/opt/flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar
+
+  flink-taskmanager:
+    build: ./flink
+    command: taskmanager
+    depends_on:
+      - flink-jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        taskmanager.memory.process.size: 2048m
+    volumes:
+      - ./flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar:/opt/flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar
+
+  flink-sql-gateway:
+    build: ./flink
+    command: /opt/flink/bin/sql-gateway.sh start-foreground
+    ports:
+      - "8083:8083"
+    depends_on:
+      - flink-jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        sql-gateway.endpoint.rest.address: 0.0.0.0
+    volumes:
+      - ./flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar:/opt/flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar
+
+  flink-proxy-gateway:
+    build:
+      context: ./infra/flink-proxy-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      PROXY_FLINK_GATEWAY_URL: ${FLINK_GATEWAY_URL:-http://flink-sql-gateway:8083}
+      PROXY_LISTEN_HOST: 0.0.0.0
+      PROXY_LISTEN_PORT: 8080
+    command: ["python", "-m", "uvicorn", "flink_gateway_proxy.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload", "--reload-dir", "/app/src"]
+    volumes:
+      - ./infra/flink-proxy-gateway/src:/app/src
+    depends_on:
+      - flink-sql-gateway
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  dbt:
+    build:
+      context: ./dbt
+    volumes:
+      - ./dbt:/app
+    environment:
+      DBT_PROFILES_DIR: /app
+      FLINK_PROXY_HOST: flink-proxy-gateway
+      FLINK_PROXY_PORT: 8080
+    depends_on:
+      - flink-proxy-gateway
+
+  # ──────────────────────────────────────────────
+  # Traffic Simulator (on-demand)
+  # Usage: docker compose run simulator --users 50
+  # ──────────────────────────────────────────────
+  simulator:
+    build:
+      context: ./simulator
+    environment:
+      SIMULATOR_USERS: ${SIMULATOR_USERS:-20}
+      SIMULATOR_COLLECTOR_URL: http://collector:5000/events
+      SIMULATOR_PACE: ${SIMULATOR_PACE:-0.3}
+    depends_on:
+      - collector
+    profiles:
+      - simulate
+
+volumes:
+  kafka_data:

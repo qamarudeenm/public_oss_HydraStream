@@ -1,0 +1,16 @@
+clickstream:
+  outputs:
+    dev:
+      type: confluent
+      host: flink-proxy-gateway
+      port: 8080
+      cloud_provider: kubernetes
+      cloud_region: local
+      compute_pool_id: default
+      organization_id: nexus-org
+      environment_id: default_catalog
+      flink_api_key: "any"
+      flink_api_secret: "any"
+      dbname: default_database
+      threads: 1
+  target: dev

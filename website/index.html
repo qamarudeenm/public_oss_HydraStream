@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Market | Premium Digital Shop</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <nav class="glass-nav">
+            <div class="logo">Nexus<span>Market</span></div>
+            <div class="nav-links">
+                <a href="#" class="nav-item active" data-page="home">Marketplace</a>
+                <a href="#" class="nav-item" data-page="cart">Cart <span id="cart-count">0</span></a>
+            </div>
+        </nav>
+
+        <main id="main-content">
+            <!-- Marketplace View -->
+            <section id="home" class="page active">
+                <header class="hero">
+                    <h1>Explore the <span>Future</span></h1>
+                    <p>Discover premium tech and lifestyle products curated for the modern individual.</p>
+                </header>
+                <div class="product-grid" id="product-list">
+                    <!-- Products will be injected here -->
+                </div>
+            </section>
+
+            <!-- Cart View -->
+            <section id="cart" class="page">
+                <h2>Your Shopping Cart</h2>
+                <div class="cart-container">
+                    <div id="cart-items" class="cart-items">
+                        <!-- Cart items will be injected here -->
+                    </div>
+                    <div class="cart-summary glass-card">
+                        <h3>Order Summary</h3>
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal">$0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span>FREE</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Total</span>
+                            <span id="total">$0.00</span>
+                        </div>
+                        <button id="checkout-btn" class="btn-primary">Proceed to Checkout</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Checkout Flow View -->
+            <section id="checkout" class="page">
+                <h2>Secure Checkout</h2>
+                <div class="checkout-steps">
+                    <div class="step glass-card" id="step-info">
+                        <h3>Shipping Information</h3>
+                        <form id="shipping-form">
+                            <input type="text" placeholder="Full Name" required>
+                            <input type="email" placeholder="Email Address" required>
+                            <input type="text" placeholder="Address" required>
+                            <button type="submit" class="btn-primary">Continue to Payment</button>
+                        </form>
+                    </div>
+                    <div class="step glass-card hidden" id="step-payment">
+                        <h3>Payment Details</h3>
+                        <div class="payment-mock">
+                            <div class="card-chip"></div>
+                            <div class="card-number">**** **** **** 4242</div>
+                        </div>
+                        <div class="payment-actions">
+                            <button id="complete-purchase" class="btn-primary">Pay Now</button>
+                            <button id="fail-purchase" class="btn-secondary">Simulate Failure</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Success/Failure Messages -->
+            <section id="status-success" class="page">
+                <div class="status-card glass-card success">
+                    <div class="icon">✓</div>
+                    <h2>Payment Successful!</h2>
+                    <p>Your order #NX-12345 has been placed.</p>
+                    <button class="btn-primary nav-item" data-page="home">Back to Market</button>
+                </div>
+            </section>
+
+            <section id="status-failure" class="page">
+                <div class="status-card glass-card failure">
+                    <div class="icon">⚠</div>
+                    <h2>Payment Failed</h2>
+                    <p>There was an issue processing your transaction.</p>
+                    <button id="retry-payment" class="btn-primary">Retry Payment</button>
+                    <button class="btn-secondary nav-item" data-page="home">Return to Shopping</button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="glass-footer">
+            <p>&copy; 2026 Nexus Market Clickstream Demo</p>
+        </footer>
+    </div>
+    <script src="tracker.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

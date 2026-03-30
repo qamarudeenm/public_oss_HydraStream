@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+aiokafka
+pydantic
+pydantic-settings
+httpx

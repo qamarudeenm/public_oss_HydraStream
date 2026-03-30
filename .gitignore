@@ -1,0 +1,16 @@
+.env
+venv/
+__pycache__/
+.pytest_cache/
+.venv/
+.vscode/
+.idea/
+.DS_Store
+.gemini/
+.antigravity/
+.cursor/
+.claude/
+.agent/
+.env.local
+.env.prod
+.env.dev

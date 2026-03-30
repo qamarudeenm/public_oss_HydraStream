@@ -1,0 +1,23 @@
+name: 'clickstream'
+version: '1.0.0'
+config-version: 2
+
+profile: 'clickstream'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+on-run-start:
+  - "CREATE DATABASE IF NOT EXISTS clickstream"
+
+models:
+  clickstream:
+    +materialized: table # In Flink context, this often maps to CREATE TABLE
