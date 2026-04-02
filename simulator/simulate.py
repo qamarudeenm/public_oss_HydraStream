@@ -71,12 +71,16 @@ class MockUser:
         self.journey_name = JOURNEY_NAMES[journey_idx]
         self.steps = JOURNEY_STEPS[journey_idx]
 
-    async def send_event(self, client: httpx.AsyncClient, event_type: str, data: dict = None):
+    async def send_event(self, client: httpx.AsyncClient, event_type: str, data: dict = None, 
+                         product_id: str = None, element_id: str = None, element_text: str = None):
         payload = {
             "event_type": event_type,
             "page_url": f"http://localhost:3000/#{event_type}",
             "user_id": self.user_id,
             "session_id": self.session_id,
+            "product_id": product_id,
+            "element_id": element_id,
+            "element_text": element_text,
             "data": data or {},
             "timestamp": datetime.utcnow().isoformat(timespec='milliseconds') + "Z",
         }
@@ -102,10 +106,8 @@ class MockUser:
                 for _ in range(random.randint(1, 3)):
                     product = random.choice(PRODUCTS)
                     await self.send_event(client, "click", {
-                        "element_id": f"product-{product['id']}",
-                        "element_text": product["name"],
                         "classes": "product-card"
-                    })
+                    }, element_id=f"product-{product['id']}", element_text=product["name"])
                     await asyncio.sleep(random.uniform(0.1, self.pace))
 
             elif step == "browse_more":
@@ -126,16 +128,15 @@ class MockUser:
                     product = random.choice(PRODUCTS)
                     self.cart.append(product)
                     await self.send_event(client, "add_to_cart", {
-                        "product_id": product["id"],
                         "product_name": product["name"],
                         "price": product["price"]
-                    })
+                    }, product_id=product["id"])
                     await asyncio.sleep(random.uniform(0.05, 0.2))
 
                 # Maybe remove one item
                 if len(self.cart) > 1 and random.random() < 0.3:
                     removed = self.cart.pop(random.randint(0, len(self.cart) - 1))
-                    await self.send_event(client, "remove_from_cart", {"product_id": removed["id"]})
+                    await self.send_event(client, "remove_from_cart", {}, product_id=removed["id"])
 
                 # View cart page
                 await self.send_event(client, "page_view", {"page": "cart"})
