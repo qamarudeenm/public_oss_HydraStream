@@ -33,6 +33,7 @@ manage_jar() {
     local jar=$1
     local maven_path=$2
     local target="$FLINK_DIR/lib/$jar"
+    local expected_path="./flink/lib"
 
     # Step A: Check if already in target lib
     if [ -f "$target" ]; then
@@ -42,7 +43,7 @@ manage_jar() {
 
     # Step B: Check project-local locations
     # (Current dir and project-specific flink/lib)
-    for loc in "." "./flink/lib"; do
+    for loc in "." "$expected_path"; do
         if [ -f "$loc/$jar" ]; then
             echo "[LOCAL] Found $jar in $loc. Copying to Flink lib..."
             cp -v "$loc/$jar" "$target"
@@ -52,8 +53,10 @@ manage_jar() {
 
     # Step C: Download if Maven path provided
     if [ -n "$maven_path" ]; then
-        echo "[REMOTE] Downloading $jar from Maven..."
-        wget -q "$MAVEN_REPO/$maven_path" -P "$FLINK_DIR/lib/"
+        echo "[REMOTE] Downloading $jar from Maven to $expected_path..."
+        mkdir -p "$expected_path"
+        wget -q "$MAVEN_REPO/$maven_path" -P "$expected_path/"
+        cp -v "$expected_path/$jar" "$target"
         return 0
     fi
 
@@ -90,6 +93,12 @@ echo "Flink services are starting. Check logs in $FLINK_DIR/log/"
 
 # Ensure Postgres is running (host-based)
 echo "Ensuring PostgreSQL is active..."
-sudo systemctl start postgresql 2>/dev/null || echo "PostgreSQL service management might require manual intervention."
+if ! pg_isready -h localhost -p 5414 -q; then
+    echo "PostgreSQL is not responding on port 5414. Attempting to start service..."
+    # Attempt restart without prompting if possible, otherwise skip with a warning
+    timeout 2 sudo -n systemctl start postgresql 2>/dev/null || echo "PostgreSQL service management required sudo password or failed. Please ensure it is running on port 5414."
+else
+    echo "[OK] PostgreSQL is already running on port 5414."
+fi
 
 echo "--- Startup Sequence Complete ---"
