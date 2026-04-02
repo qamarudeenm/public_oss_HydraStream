@@ -64,6 +64,14 @@ class ClickEvent(BaseModel):
 async def collect_event(event: ClickEvent):
     if not event.timestamp:
         event.timestamp = datetime.utcnow().isoformat() + "Z"
+
+    # Promote fields from data to top-level if missing
+    if not event.product_id and "product_id" in event.data:
+        event.product_id = str(event.data["product_id"])
+    if not event.element_id and "element_id" in event.data:
+        event.element_id = str(event.data["element_id"])
+    if not event.element_text and "element_text" in event.data:
+        event.element_text = str(event.data["element_text"])
     
     event_dict = event.dict()
     
