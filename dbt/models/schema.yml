@@ -12,6 +12,7 @@ models:
         data_type: STRING
       - name: product_id
         data_type: STRING
+        description: "The unique identifier for the product, extracted from the top-level event field or coalesced from the legacy 'data' map."
       - name: event_count
         data_type: BIGINT
       - name: window_start
