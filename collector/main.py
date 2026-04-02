@@ -3,7 +3,7 @@ import json
 import logging
 import os
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from aiokafka import AIOKafkaProducer
 from fastapi import FastAPI, HTTPException, Request
@@ -54,11 +54,11 @@ class ClickEvent(BaseModel):
     page_url: str
     user_id: str
     session_id: str
-    element_id: str = None
-    element_text: str = None
-    product_id: str = None
+    element_id: Optional[str] = None
+    element_text: Optional[str] = None
+    product_id: Optional[str] = None
     data: Dict[str, Any] = {}
-    timestamp: str = None
+    timestamp: Optional[str] = None
 
 @app.post("/events")
 async def collect_event(event: ClickEvent):
