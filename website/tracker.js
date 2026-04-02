@@ -5,11 +5,22 @@
 
     const NexusTracker = {
         track: function(eventType, data = {}) {
+            // Extract common fields for top-level placement
+            const productId = data.product_id || null;
+            const elementId = data.element_id || null;
+            const elementText = data.element_text || null;
+
+            // Remove from data object to avoid duplication if desired, 
+            // but keeping them for now for safety/legacy.
+            
             const event = {
                 event_type: eventType,
                 page_url: window.location.href,
                 user_id: USER_ID,
                 session_id: SESSION_ID,
+                product_id: productId,
+                element_id: elementId,
+                element_text: elementText,
                 data: data,
                 timestamp: new Date().toISOString()
             };
