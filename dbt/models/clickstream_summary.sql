@@ -2,11 +2,11 @@
     materialized='streaming_table',
     with={
         'connector': 'jdbc',
-        'url': 'jdbc:postgresql://localhost:5414/postgres?currentSchema=clickstream',
-        'table-name': 'clickstream_analytics',
-        'driver': 'org.postgresql.Driver',
-        'username': 'data_eng',
-        'password': '12345pP'
+        'url': 'jdbc:mysql://host.docker.internal:9004/clickstream',
+        'table-name': 'clickstream_summary',
+        'driver': 'com.mysql.jdbc.Driver',
+        'username': env_var("CLICKHOUSE_USER"),
+        'password': env_var("CLICKHOUSE_PASSWORD"),
     }
 ) }}
 

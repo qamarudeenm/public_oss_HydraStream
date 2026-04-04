@@ -13,4 +13,4 @@ product_id STRING,
 event_time AS TO_TIMESTAMP(REPLACE(REPLACE(`timestamp`, 'T', ' '), 'Z', '')),
 WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND)
     WITH (
-      'connector' = 'kafka', 'scan.startup.mode' = 'latest-offset', 'properties.bootstrap.servers' = 'kafka:29092', 'topic' = 'clickstream', 'format' = 'json', 'properties.group.id' = 'clickstream-consumer-group')
+      'connector' = 'kafka', 'scan.startup.mode' = 'earliest-offset', 'format' = 'json', 'properties.bootstrap.servers' = 'kafka:29092', 'topic' = 'clickstream', 'properties.group.id' = 'clickstream-consumer-group')

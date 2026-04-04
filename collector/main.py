@@ -77,7 +77,7 @@ async def collect_event(event: ClickEvent):
     
     try:
         logger.info(f"Producing event: {event_dict['event_type']} from {event_dict['session_id']}")
-        await producer.send_and_wait(KAFKA_TOPIC, event_dict)
+        await producer.send(KAFKA_TOPIC, event_dict)
         return {"status": "ok", "message": "Event collected"}
     except Exception as e:
         logger.error(f"Failed to produce event: {e}")

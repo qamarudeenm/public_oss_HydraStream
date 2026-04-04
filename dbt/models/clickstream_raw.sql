@@ -5,7 +5,7 @@
         'topic': 'clickstream',
         'properties.bootstrap.servers': 'kafka:29092',
         'properties.group.id': 'clickstream-consumer-group',
-        'scan.startup.mode': 'latest-offset',
+        'scan.startup.mode': 'earliest-offset',
         'format': 'json'
     }
 ) }}

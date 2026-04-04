@@ -57,5 +57,5 @@ create table `default_catalog`.`default_database`.`clickstream_summary`
     `window_end` TIMESTAMP(3))
 
     
-    WITH ('password' = '12345pP','connector' = 'jdbc','table-name' = 'clickstream_analytics','url' = 'jdbc:postgresql://host.docker.internal:5414/postgres?currentSchema=clickstream','username' = 'data_eng','driver' = 'org.postgresql.Driver')
+    WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/clickstream','table-name' = 'clickstream_summary','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
     

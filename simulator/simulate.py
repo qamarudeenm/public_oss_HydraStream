@@ -82,7 +82,7 @@ class MockUser:
             "element_id": element_id,
             "element_text": element_text,
             "data": data or {},
-            "timestamp": datetime.utcnow().isoformat(timespec='milliseconds') + "Z",
+            "timestamp": datetime.now().isoformat(timespec='milliseconds'),
         }
         try:
             resp = await client.post(self.collector_url, json=payload, timeout=5.0)
@@ -91,7 +91,7 @@ class MockUser:
             else:
                 logger.warning(f"  [{self.user_id}] {event_type} → HTTP {resp.status_code}")
         except Exception as e:
-            logger.error(f"  [{self.user_id}] {event_type} → ERROR: {e}")
+            logger.error(f"  [{self.user_id}] {event_type} → ERROR: {repr(e)}")
 
     async def run(self, client: httpx.AsyncClient):
         logger.info(f"👤 {self.user_id} starting journey: {self.journey_name} ({len(self.steps)} steps)")
@@ -201,31 +201,23 @@ async def run_simulation(num_users: int, collector_url: str, pace: float):
             logger.error("❌ Collector not available after 60s. Exiting.")
             sys.exit(1)
 
-    # Create and run all users concurrently
-    users = [MockUser(collector_url, pace) for _ in range(num_users)]
-
-    # Log journey distribution
-    journey_counts = {}
-    for u in users:
-        journey_counts[u.journey_name] = journey_counts.get(u.journey_name, 0) + 1
-    logger.info(f"📊 Journey distribution: {json.dumps(journey_counts, indent=2)}")
-
-    start = time.time()
-    async with httpx.AsyncClient() as client:
-        tasks = [user.run(client) for user in users]
-        await asyncio.gather(*tasks)
-    elapsed = time.time() - start
-
-    total_events = sum(
-        len(u.steps) * 2  # rough estimate (each step ~2 events)
-        for u in users
-    )
-    logger.info(f"{'='*60}")
-    logger.info(f"🏁 Simulation complete")
-    logger.info(f"   Users:        {num_users}")
-    logger.info(f"   Duration:     {elapsed:.1f}s")
-    logger.info(f"   ~Events sent: {total_events}")
-    logger.info(f"{'='*60}")
+    while True:
+        # Create and run a batch of users
+        users = [MockUser(collector_url, pace) for _ in range(num_users)]
+        
+        # Log journey distribution for this batch
+        journey_counts = {}
+        for u in users:
+            journey_counts[u.journey_name] = journey_counts.get(u.journey_name, 0) + 1
+        logger.info(f"📊 Starting new batch of {num_users} users...")
+        
+        limits = httpx.Limits(max_connections=num_users + 50, max_keepalive_connections=num_users + 50)
+        async with httpx.AsyncClient(limits=limits) as client:
+            tasks = [user.run(client) for user in users]
+            await asyncio.gather(*tasks)
+        
+        logger.info(f"😴 Batch complete. Waiting before starting next batch...")
+        await asyncio.sleep(pace * 2)
 
 
 def main():
