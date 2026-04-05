@@ -302,6 +302,65 @@ In the `dbt-flink` world, we split logic into **Sources** and **Transformation/S
 
 ---
 
+### 2. ⚠️ Required: Define Your Raw Data Schema (Flink DDL)
+
+> [!IMPORTANT]
+> Unlike standard dbt batch models, **Flink cannot infer schema from your data**. You must explicitly declare every column, its SQL data type, and a watermark strategy in your **Source Model**. This is a hard requirement — without it, the DDL statement sent to Flink will fail.
+
+The source model is a pure **Flink DDL definition**. It tells Flink:
+- What fields exist in the Kafka JSON payload
+- What SQL type each field is
+- Which field represents event time (for windowed aggregations)
+- How long to wait for late-arriving events (watermark)
+
+#### Example Source Model (`models/raw_kafka_datasource.sql`)
+
+```sql
+{{ config(
+    materialized='streaming_source',
+    connector='kafka',
+    with={
+        'topic':                          env_var('KAFKA_TOPIC', 'clickstream'),
+        'properties.bootstrap.servers':   env_var('KAFKA_BOOTSTRAP_SERVERS', 'kafka:29092'),
+        'properties.group.id':            'hydrastream-group',
+        'scan.startup.mode':              'earliest-offset',
+        'format':                         'json'
+    }
+) }}
+
+-- ⚠️ Every field in your Kafka JSON payload must be declared here.
+-- Flink uses this as the DDL for the source table — it does NOT infer schema.
+SELECT
+    session_id          STRING,           -- unique session identifier
+    user_id             STRING,           -- anonymised user ID
+    page_url            STRING,           -- page the event was fired on
+    event_type          STRING,           -- e.g. 'click', 'view', 'purchase'
+    product_id          STRING,           -- optional: item involved
+    revenue             DOUBLE,           -- optional: monetary value
+    event_time          TIMESTAMP(3),     -- ⚠️ MUST match the field name used in WATERMARK below
+    WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND  -- tolerate 5s late arrivals
+```
+
+> [!WARNING]
+> **Common mistakes to avoid:**
+> - **Missing fields**: If a field exists in your Kafka payload but is not declared here, it will be silently dropped. Any downstream model that references it will fail.
+> - **Wrong types**: Flink is strict. A JSON number field mapped to `STRING` will cause a runtime deserialization error. Always match the JSON payload type exactly.
+> - **No `WATERMARK`**: Without a watermark declaration, time-windowed aggregations (`TUMBLE`, `HOP`, `SESSION`) will never emit results.
+> - **Field name mismatch**: The field used in `WATERMARK FOR <field>` must be declared in the same `SELECT` list with type `TIMESTAMP(3)`.
+
+#### Matching Your Kafka Payload to SQL Types
+
+| JSON Payload Type | Recommended Flink SQL Type |
+| :--- | :--- |
+| `"value": "text"` | `STRING` |
+| `"value": 42` | `BIGINT` or `INT` |
+| `"value": 3.14` | `DOUBLE` or `DECIMAL(10, 2)` |
+| `"value": true` | `BOOLEAN` |
+| `"value": "2024-01-01T12:00:00"` | `TIMESTAMP(3)` (parsed via `json.timestamp-format.standard: 'ISO-8601'`) |
+| `"value": 1704067200000` (epoch ms) | `BIGINT` → cast to `TIMESTAMP(3)` using `TO_TIMESTAMP_LTZ(value, 3)` |
+
+---
+
 ### 2. Kafka Configuration Deep-Dive
 
 In your `streaming_source` models, you'll see a `with` block. Here is what those parameters do:
