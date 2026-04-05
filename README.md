@@ -424,7 +424,77 @@ Ensure the **Flink TaskManager** container can reach your Kafka endpoint.
 
 ## 🏁 Deploying to Production
 
+For production deployments, the recommended approach is to use the **pre-built Docker Hub images** rather than building locally. This ensures a reproducible, versioned environment that matches what was tested in CI.
+
+### Option A: Docker Compose (Single Node)
+
+The simplest production setup. Best for small-to-medium workloads on a single server.
+
+1.  **Pull the latest images:**
+    ```bash
+    docker pull blue2berry/hydrastream:engine-flink1.19.1
+    docker pull blue2berry/hydrastream:proxy-latest
+    docker pull blue2berry/hydrastream:dbt-latest
+    ```
+
+2.  **Prepare your production `.env`:**
+    ```env
+    KAFKA_TOPIC=your_production_topic
+    KAFKA_BOOTSTRAP_SERVERS=your.kafka.host:9092
+    CLICKHOUSE_JDBC_URL=jdbc:mysql://your.clickhouse.host:9004/your_db
+    CLICKHOUSE_USER=your_user
+    CLICKHOUSE_PASSWORD=your_password
+    CLICKHOUSE_TARGET_TABLE=your_sink_table
+    ```
+
+3.  **Start using the pre-built `docker-compose.yml`** from the [Quick Start: Using Pre-Built Images](#-quick-start-using-pre-built-images) section above, with your production `.env` file in place.
+
+4.  **Run your dbt models once on startup:**
+    ```bash
+    docker compose run --rm dbt dbt run
+    ```
+    Once the Flink jobs are submitted, they run continuously — you do **not** need to keep the `dbt` container running.
+
+> [!IMPORTANT]
+> **Create your sink table first.** Flink does not create the physical destination table in ClickHouse or PostgreSQL. Before running `dbt run`, ensure the target table exists in your warehouse with the correct schema.
+
 ---
+
+### Option B: Kubernetes (Multi-Node / High Availability)
+
+For large-scale or HA production deployments, use the Flink Kubernetes Operator or Helm charts. The pre-built images are fully compatible.
+
+**Key considerations:**
+- Set `taskmanager.numberOfTaskSlots` and replica counts based on your throughput requirements.
+- Use Kubernetes `Secrets` to inject `CLICKHOUSE_PASSWORD`, `DOCKERHUB_TOKEN`, and other sensitive values — never bake them into your image.
+- Mount your `models/` directory via a `ConfigMap` or persistent volume so models can be updated without rebuilding the image.
+
+Example resource recommendations for the Flink cluster:
+
+| Component | Min CPU | Min Memory |
+| :--- | :--- | :--- |
+| JobManager | 0.5 vCPU | 512 Mi |
+| TaskManager (per slot) | 1 vCPU | 2 Gi |
+| Proxy Gateway | 0.25 vCPU | 256 Mi |
+
+---
+
+### Monitoring
+
+| Endpoint | Default Port | Purpose |
+| :--- | :--- | :--- |
+| Flink Dashboard | `8022` | View running jobs, task managers, checkpoints |
+| Flink SQL Gateway | `8083` | Submit SQL directly to verify connectivity |
+| Proxy API | `8080` | Health: `GET /health` |
+
+> [!TIP]
+> **Checkpoint your Flink jobs.** In production, configure Flink checkpointing to S3 or a persistent volume so jobs can recover from failures without losing state:
+> ```
+> state.backend: filesystem
+> state.checkpoints.dir: s3://your-bucket/flink-checkpoints
+> execution.checkpointing.interval: 60000
+> ```
+> Add these to the `FLINK_PROPERTIES` block in your `docker-compose.yml` or Kubernetes config.
 
 ## 📜 Legal & Trademarks
 
