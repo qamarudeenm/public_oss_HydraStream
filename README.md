@@ -256,6 +256,25 @@ This submits your SQL models as long-running Flink jobs. You can monitor them li
 
 ---
 
+---
+
+## 🏛️ Supported Data Warehouses
+
+HydraStream is optimized for real-time ingestion into historical data warehouses.
+
+| Database | Support Status | Notes |
+| :--- | :--- | :--- |
+| **ClickHouse** | ✅ **Standard** | Supported "out-of-the-box" using the Flink JDBC connector + MySQL driver bridge (port 9004). |
+| **PostgreSQL** | 🛠️ *WIP* | Requires adding the Postgres JDBC JAR to the image. |
+| **Snowflake** | 🛠️ *WIP* | Planned. Requires Snowflake's specific JDBC driver and Flink dialect. |
+| **BigQuery / Redshift** | 🛠️ *WIP* | Roadmap. |
+
+> [!NOTE]
+> **Why MySQL Driver for ClickHouse?**
+> ClickHouse provides a [MySQL-compatible wire protocol](https://clickhouse.com/docs/en/interfaces/mysql). HydraStream leverages this by using the standard Flink JDBC connector combined with the MySQL 5.1.49 driver. This allows for high-performance streaming without requiring specialized native connectors that can be unstable in Flink.
+
+---
+
 ## 🛠️ Components Deep-Dive
 
 ### 1. Streaming Infrastructure (`streaming_infra/`)
