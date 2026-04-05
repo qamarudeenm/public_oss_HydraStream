@@ -302,6 +302,65 @@ In the `dbt-flink` world, we split logic into **Sources** and **Transformation/S
 
 ---
 
+### 2. ⚠️ Required: Define Your Raw Data Schema (Flink DDL)
+
+> [!IMPORTANT]
+> Unlike standard dbt batch models, **Flink cannot infer schema from your data**. You must explicitly declare every column, its SQL data type, and a watermark strategy in your **Source Model**. This is a hard requirement — without it, the DDL statement sent to Flink will fail.
+
+The source model is a pure **Flink DDL definition**. It tells Flink:
+- What fields exist in the Kafka JSON payload
+- What SQL type each field is
+- Which field represents event time (for windowed aggregations)
+- How long to wait for late-arriving events (watermark)
+
+#### Example Source Model (`models/raw_kafka_datasource.sql`)
+
+```sql
+{{ config(
+    materialized='streaming_source',
+    connector='kafka',
+    with={
+        'topic':                          env_var('KAFKA_TOPIC', 'clickstream'),
+        'properties.bootstrap.servers':   env_var('KAFKA_BOOTSTRAP_SERVERS', 'kafka:29092'),
+        'properties.group.id':            'hydrastream-group',
+        'scan.startup.mode':              'earliest-offset',
+        'format':                         'json'
+    }
+) }}
+
+-- ⚠️ Every field in your Kafka JSON payload must be declared here.
+-- Flink uses this as the DDL for the source table — it does NOT infer schema.
+SELECT
+    session_id          STRING,           -- unique session identifier
+    user_id             STRING,           -- anonymised user ID
+    page_url            STRING,           -- page the event was fired on
+    event_type          STRING,           -- e.g. 'click', 'view', 'purchase'
+    product_id          STRING,           -- optional: item involved
+    revenue             DOUBLE,           -- optional: monetary value
+    event_time          TIMESTAMP(3),     -- ⚠️ MUST match the field name used in WATERMARK below
+    WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND  -- tolerate 5s late arrivals
+```
+
+> [!WARNING]
+> **Common mistakes to avoid:**
+> - **Missing fields**: If a field exists in your Kafka payload but is not declared here, it will be silently dropped. Any downstream model that references it will fail.
+> - **Wrong types**: Flink is strict. A JSON number field mapped to `STRING` will cause a runtime deserialization error. Always match the JSON payload type exactly.
+> - **No `WATERMARK`**: Without a watermark declaration, time-windowed aggregations (`TUMBLE`, `HOP`, `SESSION`) will never emit results.
+> - **Field name mismatch**: The field used in `WATERMARK FOR <field>` must be declared in the same `SELECT` list with type `TIMESTAMP(3)`.
+
+#### Matching Your Kafka Payload to SQL Types
+
+| JSON Payload Type | Recommended Flink SQL Type |
+| :--- | :--- |
+| `"value": "text"` | `STRING` |
+| `"value": 42` | `BIGINT` or `INT` |
+| `"value": 3.14` | `DOUBLE` or `DECIMAL(10, 2)` |
+| `"value": true` | `BOOLEAN` |
+| `"value": "2024-01-01T12:00:00"` | `TIMESTAMP(3)` (parsed via `json.timestamp-format.standard: 'ISO-8601'`) |
+| `"value": 1704067200000` (epoch ms) | `BIGINT` → cast to `TIMESTAMP(3)` using `TO_TIMESTAMP_LTZ(value, 3)` |
+
+---
+
 ### 2. Kafka Configuration Deep-Dive
 
 In your `streaming_source` models, you'll see a `with` block. Here is what those parameters do:
@@ -365,7 +424,77 @@ Ensure the **Flink TaskManager** container can reach your Kafka endpoint.
 
 ## 🏁 Deploying to Production
 
+For production deployments, the recommended approach is to use the **pre-built Docker Hub images** rather than building locally. This ensures a reproducible, versioned environment that matches what was tested in CI.
+
+### Option A: Docker Compose (Single Node)
+
+The simplest production setup. Best for small-to-medium workloads on a single server.
+
+1.  **Pull the latest images:**
+    ```bash
+    docker pull blue2berry/hydrastream:engine-flink1.19.1
+    docker pull blue2berry/hydrastream:proxy-latest
+    docker pull blue2berry/hydrastream:dbt-latest
+    ```
+
+2.  **Prepare your production `.env`:**
+    ```env
+    KAFKA_TOPIC=your_production_topic
+    KAFKA_BOOTSTRAP_SERVERS=your.kafka.host:9092
+    CLICKHOUSE_JDBC_URL=jdbc:mysql://your.clickhouse.host:9004/your_db
+    CLICKHOUSE_USER=your_user
+    CLICKHOUSE_PASSWORD=your_password
+    CLICKHOUSE_TARGET_TABLE=your_sink_table
+    ```
+
+3.  **Start using the pre-built `docker-compose.yml`** from the [Quick Start: Using Pre-Built Images](#-quick-start-using-pre-built-images) section above, with your production `.env` file in place.
+
+4.  **Run your dbt models once on startup:**
+    ```bash
+    docker compose run --rm dbt dbt run
+    ```
+    Once the Flink jobs are submitted, they run continuously — you do **not** need to keep the `dbt` container running.
+
+> [!IMPORTANT]
+> **Create your sink table first.** Flink does not create the physical destination table in ClickHouse or PostgreSQL. Before running `dbt run`, ensure the target table exists in your warehouse with the correct schema.
+
 ---
+
+### Option B: Kubernetes (Multi-Node / High Availability)
+
+For large-scale or HA production deployments, use the Flink Kubernetes Operator or Helm charts. The pre-built images are fully compatible.
+
+**Key considerations:**
+- Set `taskmanager.numberOfTaskSlots` and replica counts based on your throughput requirements.
+- Use Kubernetes `Secrets` to inject `CLICKHOUSE_PASSWORD`, `DOCKERHUB_TOKEN`, and other sensitive values — never bake them into your image.
+- Mount your `models/` directory via a `ConfigMap` or persistent volume so models can be updated without rebuilding the image.
+
+Example resource recommendations for the Flink cluster:
+
+| Component | Min CPU | Min Memory |
+| :--- | :--- | :--- |
+| JobManager | 0.5 vCPU | 512 Mi |
+| TaskManager (per slot) | 1 vCPU | 2 Gi |
+| Proxy Gateway | 0.25 vCPU | 256 Mi |
+
+---
+
+### Monitoring
+
+| Endpoint | Default Port | Purpose |
+| :--- | :--- | :--- |
+| Flink Dashboard | `8022` | View running jobs, task managers, checkpoints |
+| Flink SQL Gateway | `8083` | Submit SQL directly to verify connectivity |
+| Proxy API | `8080` | Health: `GET /health` |
+
+> [!TIP]
+> **Checkpoint your Flink jobs.** In production, configure Flink checkpointing to S3 or a persistent volume so jobs can recover from failures without losing state:
+> ```
+> state.backend: filesystem
+> state.checkpoints.dir: s3://your-bucket/flink-checkpoints
+> execution.checkpointing.interval: 60000
+> ```
+> Add these to the `FLINK_PROPERTIES` block in your `docker-compose.yml` or Kubernetes config.
 
 ## 📜 Legal & Trademarks
 
