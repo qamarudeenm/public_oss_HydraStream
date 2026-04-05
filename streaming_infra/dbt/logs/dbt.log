@@ -18991,3 +18991,1989 @@ GROUP BY event_type, session_id, COALESCE(product_id, `data`['product_id']), win
 [0m10:31:33.411787 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f180cecf010>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f180cecee50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f180d1f2c90>]}
 [0m10:31:33.413278 [debug] [MainThread]: Flushing usage events
 [0m10:31:36.189250 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m08:11:04.231919 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fb1c735b8d0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fb1c7358110>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fb1c735aed0>]}
+
+
+============================== 08:11:04.240939 | 08db7c10-18bd-4b82-8185-fa9b75f51b6c ==============================
+[0m08:11:04.240939 [info ] [MainThread]: Running with dbt=1.11.7
+[0m08:11:04.241978 [debug] [MainThread]: running dbt with arguments {'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'invocation_command': 'dbt run', 'quiet': 'False', 'static_parser': 'True', 'introspect': 'True', 'printer_width': '80', 'warn_error': 'None', 'log_cache_events': 'False', 'profiles_dir': '/app', 'empty': 'False', 'version_check': 'True', 'send_anonymous_usage_stats': 'True', 'log_format': 'default', 'partial_parse': 'True', 'cache_selected_only': 'False', 'fail_fast': 'False', 'log_path': '/app/logs', 'no_print': 'None', 'use_colors': 'True', 'target_path': 'None', 'use_experimental_parser': 'False', 'write_json': 'True', 'indirect_selection': 'eager', 'debug': 'False'}
+[0m08:11:04.454461 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '08db7c10-18bd-4b82-8185-fa9b75f51b6c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fb1c72b50d0>]}
+[0m08:11:04.519417 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '08db7c10-18bd-4b82-8185-fa9b75f51b6c', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fb1ca472c50>]}
+[0m08:11:04.520461 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m08:11:04.629362 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m08:11:04.776257 [debug] [MainThread]: Partial parsing enabled: 3 files deleted, 2 files added, 0 files changed.
+[0m08:11:04.777130 [debug] [MainThread]: Partial parsing: added file: clickstream://models/transformed_clickstream_metrics.sql
+[0m08:11:04.778053 [debug] [MainThread]: Partial parsing: added file: clickstream://models/raw_kafka_datasource.sql
+[0m08:11:04.778576 [debug] [MainThread]: Partial parsing: deleted file: clickstream://models/clickstream_raw.sql
+[0m08:11:04.779155 [debug] [MainThread]: Partial parsing: deleted file: clickstream://models/clickstream_summary.sql
+[0m08:11:05.020204 [error] [MainThread]: Encountered an error:
+Parsing Error
+  Env var required but not provided: 'CLICKHOUSE_JDBC_URL'
+[0m08:11:05.022584 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": false, "command_wall_clock_time": 0.8528891, "process_in_blocks": "80696", "process_kernel_time": 0.403375, "process_mem_max_rss": "118120", "process_out_blocks": "3349", "process_user_time": 2.352224}
+[0m08:11:05.023770 [debug] [MainThread]: Command `dbt run` failed at 08:11:05.023609 after 0.85 seconds
+[0m08:11:05.024630 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fb1c7350590>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fb1c8375610>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fb1c7032450>]}
+[0m08:11:05.025538 [debug] [MainThread]: Flushing usage events
+[0m08:11:06.769454 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m08:12:38.359678 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f2f3baab790>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f2f3bdd54d0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f2f3bdd5710>]}
+
+
+============================== 08:12:38.365781 | 4cf1d45d-1328-44eb-aeeb-f8ca849e9cf4 ==============================
+[0m08:12:38.365781 [info ] [MainThread]: Running with dbt=1.11.7
+[0m08:12:38.367077 [debug] [MainThread]: running dbt with arguments {'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'version_check': 'True', 'debug': 'False', 'use_colors': 'True', 'warn_error': 'None', 'quiet': 'False', 'invocation_command': 'dbt run', 'printer_width': '80', 'send_anonymous_usage_stats': 'True', 'partial_parse': 'True', 'log_format': 'default', 'fail_fast': 'False', 'introspect': 'True', 'log_cache_events': 'False', 'log_path': '/app/logs', 'profiles_dir': '/app', 'target_path': 'None', 'static_parser': 'True', 'write_json': 'True', 'cache_selected_only': 'False', 'use_experimental_parser': 'False', 'empty': 'False', 'indirect_selection': 'eager', 'no_print': 'None'}
+[0m08:12:38.566761 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '4cf1d45d-1328-44eb-aeeb-f8ca849e9cf4', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f2f3ba56dd0>]}
+[0m08:12:38.632654 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '4cf1d45d-1328-44eb-aeeb-f8ca849e9cf4', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f2f3ebc4f50>]}
+[0m08:12:38.633724 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m08:12:38.717476 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m08:12:38.837844 [debug] [MainThread]: Partial parsing enabled: 3 files deleted, 2 files added, 0 files changed.
+[0m08:12:38.838629 [debug] [MainThread]: Partial parsing: added file: clickstream://models/raw_kafka_datasource.sql
+[0m08:12:38.839167 [debug] [MainThread]: Partial parsing: added file: clickstream://models/transformed_clickstream_metrics.sql
+[0m08:12:38.839850 [debug] [MainThread]: Partial parsing: deleted file: clickstream://models/clickstream_raw.sql
+[0m08:12:38.840447 [debug] [MainThread]: Partial parsing: deleted file: clickstream://models/clickstream_summary.sql
+[0m08:12:39.049949 [error] [MainThread]: Encountered an error:
+Parsing Error
+  Env var required but not provided: 'CLICKHOUSE_JDBC_URL'
+[0m08:12:39.051274 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": false, "command_wall_clock_time": 0.75199884, "process_in_blocks": "0", "process_kernel_time": 0.226687, "process_mem_max_rss": "117916", "process_out_blocks": "3349", "process_user_time": 2.14435}
+[0m08:12:39.052098 [debug] [MainThread]: Command `dbt run` failed at 08:12:39.051994 after 0.75 seconds
+[0m08:12:39.052658 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f2f3baa0450>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f2f3b3cc310>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f2f3baa9510>]}
+[0m08:12:39.053229 [debug] [MainThread]: Flushing usage events
+[0m08:12:41.622130 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m08:24:16.657616 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c8297ebd0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c8292fed0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c8292f410>]}
+
+
+============================== 08:24:16.662795 | e2a9e721-4a41-48f6-98dd-7223b1bc71aa ==============================
+[0m08:24:16.662795 [info ] [MainThread]: Running with dbt=1.11.7
+[0m08:24:16.663717 [debug] [MainThread]: running dbt with arguments {'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'partial_parse': 'True', 'quiet': 'False', 'log_format': 'default', 'static_parser': 'True', 'warn_error': 'None', 'log_cache_events': 'False', 'send_anonymous_usage_stats': 'True', 'fail_fast': 'False', 'log_path': '/app/logs', 'indirect_selection': 'eager', 'invocation_command': 'dbt run', 'use_experimental_parser': 'False', 'target_path': 'None', 'no_print': 'None', 'profiles_dir': '/app', 'use_colors': 'True', 'debug': 'False', 'cache_selected_only': 'False', 'printer_width': '80', 'empty': 'False', 'write_json': 'True', 'version_check': 'True', 'introspect': 'True'}
+[0m08:24:16.841590 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': 'e2a9e721-4a41-48f6-98dd-7223b1bc71aa', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c827e3510>]}
+[0m08:24:16.903026 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': 'e2a9e721-4a41-48f6-98dd-7223b1bc71aa', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c85a96f50>]}
+[0m08:24:16.904000 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m08:24:16.990144 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m08:24:17.096803 [debug] [MainThread]: Partial parsing enabled: 3 files deleted, 2 files added, 0 files changed.
+[0m08:24:17.097664 [debug] [MainThread]: Partial parsing: added file: clickstream://models/transformed_clickstream_metrics.sql
+[0m08:24:17.098220 [debug] [MainThread]: Partial parsing: added file: clickstream://models/raw_kafka_datasource.sql
+[0m08:24:17.098849 [debug] [MainThread]: Partial parsing: deleted file: clickstream://models/clickstream_raw.sql
+[0m08:24:17.099506 [debug] [MainThread]: Partial parsing: deleted file: clickstream://models/clickstream_summary.sql
+[0m08:24:17.359763 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': 'e2a9e721-4a41-48f6-98dd-7223b1bc71aa', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c827da7d0>]}
+[0m08:24:17.489074 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m08:24:17.504579 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m08:24:17.538978 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': 'e2a9e721-4a41-48f6-98dd-7223b1bc71aa', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c822c9a90>]}
+[0m08:24:17.539705 [info ] [MainThread]: Found 1 operation, 2 models, 448 macros
+[0m08:24:17.540359 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'e2a9e721-4a41-48f6-98dd-7223b1bc71aa', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c82405210>]}
+[0m08:24:17.542237 [info ] [MainThread]: 
+[0m08:24:17.542846 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m08:24:17.543480 [info ] [MainThread]: 
+[0m08:24:17.544250 [debug] [MainThread]: Acquiring new confluent connection 'master'
+[0m08:24:17.550196 [debug] [ThreadPool]: Acquiring new confluent connection 'list_default_catalog'
+[0m08:24:17.611906 [debug] [ThreadPool]: Using confluent connection "list_default_catalog"
+[0m08:24:17.612868 [debug] [ThreadPool]: On list_default_catalog: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog"} */
+SELECT
+      SCHEMA_NAME as schema
+    FROM
+      `default_catalog`.`INFORMATION_SCHEMA`.`SCHEMATA`
+    WHERE
+      `SCHEMA_NAME` <> 'INFORMATION_SCHEMA'
+  
+[0m08:24:17.613687 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m08:24:17.969222 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.356 seconds
+[0m08:24:17.974804 [debug] [ThreadPool]: On list_default_catalog: Close
+[0m08:24:17.976970 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_default_catalog, now list_default_catalog_default_database)
+[0m08:24:17.986946 [debug] [ThreadPool]: Using confluent connection "list_default_catalog_default_database"
+[0m08:24:17.987925 [debug] [ThreadPool]: On list_default_catalog_default_database: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog_default_database"} */
+SELECT
+      TABLE_CATALOG_ID as database,
+      TABLE_NAME as name,
+      TABLE_SCHEMA as schema,
+      TABLE_TYPE as type
+    FROM
+      INFORMATION_SCHEMA.`TABLES`
+    WHERE
+      TABLE_CATALOG_ID = 'default_catalog'
+      AND TABLE_SCHEMA = 'default_database'
+  
+[0m08:24:17.988747 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m08:24:18.010320 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.022 seconds
+[0m08:24:18.017731 [debug] [ThreadPool]: On list_default_catalog_default_database: Close
+[0m08:24:18.020521 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'e2a9e721-4a41-48f6-98dd-7223b1bc71aa', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c80c0e9d0>]}
+[0m08:24:18.030686 [debug] [MainThread]: Writing injected SQL for node "operation.clickstream.clickstream-on-run-start-0"
+[0m08:24:18.040202 [info ] [MainThread]: 1 of 1 START hook: clickstream.on-run-start.0 .................................. [RUN]
+[0m08:24:18.041390 [debug] [MainThread]: Using confluent connection "master"
+[0m08:24:18.042199 [debug] [MainThread]: On master: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "master"} */
+CREATE DATABASE IF NOT EXISTS clickstream
+[0m08:24:18.043102 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m08:24:18.141958 [debug] [MainThread]: SQL status: Phase.RUNNING in 0.099 seconds
+[0m08:24:18.144084 [info ] [MainThread]: 1 of 1 OK hook: clickstream.on-run-start.0 ..................................... [[32mOK[0m in 0.12s]
+[0m08:24:18.145251 [info ] [MainThread]: 
+[0m08:24:18.146363 [debug] [MainThread]: On master: Close
+[0m08:24:18.156157 [debug] [Thread-1 (]: Began running node model.clickstream.raw_kafka_datasource
+[0m08:24:18.157340 [info ] [Thread-1 (]: 1 of 2 START sql streaming_source model default_database.raw_kafka_datasource .. [RUN]
+[0m08:24:18.160513 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_default_catalog_default_database, now model.clickstream.raw_kafka_datasource)
+[0m08:24:18.163808 [debug] [Thread-1 (]: Began compiling node model.clickstream.raw_kafka_datasource
+[0m08:24:18.173733 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.raw_kafka_datasource"
+[0m08:24:18.183500 [debug] [Thread-1 (]: Began executing node model.clickstream.raw_kafka_datasource
+[0m08:24:18.225676 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.raw_kafka_datasource"
+[0m08:24:18.228046 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.raw_kafka_datasource"
+[0m08:24:18.229332 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.raw_kafka_datasource"} */
+CREATE TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`
+    ( -- example_source.sql
+
+
+-- Define your source schema here according to what your Kafka topic produces.
+-- This uses Flink SQL DDL syntax.
+user_id STRING,
+event_type STRING,
+session_id STRING,
+`timestamp` STRING,
+-- Add a conceptual event_time field extracted from a timestamp to handle windowing
+event_time AS TO_TIMESTAMP(REPLACE(REPLACE(`timestamp`, 'T', ' '), 'Z', '')),
+WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND)
+    WITH (
+      'connector' = 'kafka', 'topic' = 'your_topic_here', 'properties.bootstrap.servers' = 'kafka:29092', 'properties.group.id' = 'flink-consumer-group', 'scan.startup.mode' = 'earliest-offset', 'format' = 'json')
+[0m08:24:18.232457 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m08:24:19.236419 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 1.005 seconds
+[0m08:24:19.248054 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: Close
+[0m08:24:19.250527 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'e2a9e721-4a41-48f6-98dd-7223b1bc71aa', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c85934250>]}
+[0m08:24:19.251569 [info ] [Thread-1 (]: 1 of 2 OK created sql streaming_source model default_database.raw_kafka_datasource  [[32mPhase.RUNNING[0m in 1.09s]
+[0m08:24:19.252652 [debug] [Thread-1 (]: Finished running node model.clickstream.raw_kafka_datasource
+[0m08:24:19.254295 [debug] [Thread-1 (]: Began running node model.clickstream.transformed_clickstream_metrics
+[0m08:24:19.255445 [info ] [Thread-1 (]: 2 of 2 START sql streaming_table model default_database.transformed_clickstream_metrics  [RUN]
+[0m08:24:19.257565 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.clickstream.raw_kafka_datasource, now model.clickstream.transformed_clickstream_metrics)
+[0m08:24:19.258680 [debug] [Thread-1 (]: Began compiling node model.clickstream.transformed_clickstream_metrics
+[0m08:24:19.265149 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.transformed_clickstream_metrics"
+[0m08:24:19.266751 [debug] [Thread-1 (]: Began executing node model.clickstream.transformed_clickstream_metrics
+[0m08:24:19.288364 [info ] [Thread-1 (]: DEBUG_COLS_KEYS: []
+[0m08:24:19.290790 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.transformed_clickstream_metrics"
+[0m08:24:19.293566 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m08:24:19.294898 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+    
+    
+  
+  
+  
+  
+  
+  
+  ()
+
+    
+    WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/default','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+    
+[0m08:24:19.298455 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m08:24:19.451032 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.153 seconds
+[0m08:24:19.452762 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m08:24:19.453452 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+INSERT INTO `default_catalog`.`default_database`.`transformed_clickstream_metrics` -- example_sink.sql
+
+
+-- Define your transformation query here.
+-- This query will continuously consume the streaming source and emit results to the sink.
+SELECT 
+    user_id,
+    event_type,
+    session_id,
+    COUNT(*) as event_count,
+    window_start,
+    window_end
+FROM TABLE(
+    -- Using the source model we defined in example_source.sql
+    TUMBLE(TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`, DESCRIPTOR(event_time), INTERVAL '1' MINUTE)
+)
+GROUP BY event_type, session_id, window_start, window_end
+[0m08:24:19.501787 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.048 seconds
+[0m08:24:19.504640 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: Close
+[0m08:24:19.506240 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'e2a9e721-4a41-48f6-98dd-7223b1bc71aa', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c8305db10>]}
+[0m08:24:19.507380 [info ] [Thread-1 (]: 2 of 2 OK created sql streaming_table model default_database.transformed_clickstream_metrics  [[32mPhase.RUNNING[0m in 0.25s]
+[0m08:24:19.508523 [debug] [Thread-1 (]: Finished running node model.clickstream.transformed_clickstream_metrics
+[0m08:24:19.512187 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m08:24:19.512891 [debug] [MainThread]: Connection 'model.clickstream.transformed_clickstream_metrics' was properly closed.
+[0m08:24:19.513890 [info ] [MainThread]: 
+[0m08:24:19.514733 [info ] [MainThread]: Finished running 1 project hook, 1 streaming source model, 1 streaming table model in 0 hours 0 minutes and 1.97 seconds (1.97s).
+[0m08:24:19.516735 [debug] [MainThread]: Command end result
+[0m08:24:19.609606 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m08:24:19.615598 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m08:24:19.631027 [debug] [MainThread]: Wrote artifact RunExecutionResult to /app/target/run_results.json
+[0m08:24:19.632008 [info ] [MainThread]: 
+[0m08:24:19.633095 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m08:24:19.633939 [info ] [MainThread]: 
+[0m08:24:19.634839 [info ] [MainThread]: Done. PASS=3 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=3
+[0m08:24:19.636770 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 3.030675, "process_in_blocks": "5288", "process_kernel_time": 0.3356, "process_mem_max_rss": "128952", "process_out_blocks": "6129", "process_user_time": 2.847604}
+[0m08:24:19.637984 [debug] [MainThread]: Command `dbt run` succeeded at 08:24:19.637711 after 3.03 seconds
+[0m08:24:19.639100 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c874d93d0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c874d8890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f0c874d9850>]}
+[0m08:24:19.640102 [debug] [MainThread]: Flushing usage events
+[0m08:24:21.948860 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m08:27:04.094479 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b1018b950>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b1019b1d0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b101881d0>]}
+
+
+============================== 08:27:04.101057 | ea39a863-bb4c-4330-90a7-6a2a941ec75e ==============================
+[0m08:27:04.101057 [info ] [MainThread]: Running with dbt=1.11.7
+[0m08:27:04.102040 [debug] [MainThread]: running dbt with arguments {'log_format': 'default', 'profiles_dir': '/app', 'use_colors': 'True', 'invocation_command': 'dbt run', 'send_anonymous_usage_stats': 'True', 'static_parser': 'True', 'write_json': 'True', 'cache_selected_only': 'False', 'target_path': 'None', 'partial_parse': 'True', 'quiet': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'empty': 'False', 'fail_fast': 'False', 'debug': 'False', 'version_check': 'True', 'printer_width': '80', 'warn_error': 'None', 'use_experimental_parser': 'False', 'introspect': 'True', 'indirect_selection': 'eager', 'log_path': '/app/logs', 'no_print': 'None', 'log_cache_events': 'False'}
+[0m08:27:04.321622 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': 'ea39a863-bb4c-4330-90a7-6a2a941ec75e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b0ff64050>]}
+[0m08:27:04.399673 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': 'ea39a863-bb4c-4330-90a7-6a2a941ec75e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b132a0f50>]}
+[0m08:27:04.401026 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m08:27:04.509721 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m08:27:04.622138 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 1 files changed.
+[0m08:27:04.623221 [debug] [MainThread]: Partial parsing: updated file: clickstream://models/transformed_clickstream_metrics.sql
+[0m08:27:04.906306 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': 'ea39a863-bb4c-4330-90a7-6a2a941ec75e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b0ff88710>]}
+[0m08:27:05.046183 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m08:27:05.048952 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m08:27:05.073485 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': 'ea39a863-bb4c-4330-90a7-6a2a941ec75e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b0fccf150>]}
+[0m08:27:05.075254 [info ] [MainThread]: Found 1 operation, 2 models, 448 macros
+[0m08:27:05.076182 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'ea39a863-bb4c-4330-90a7-6a2a941ec75e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b0fdccd10>]}
+[0m08:27:05.079783 [info ] [MainThread]: 
+[0m08:27:05.080902 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m08:27:05.081806 [info ] [MainThread]: 
+[0m08:27:05.083077 [debug] [MainThread]: Acquiring new confluent connection 'master'
+[0m08:27:05.089384 [debug] [ThreadPool]: Acquiring new confluent connection 'list_default_catalog'
+[0m08:27:05.152583 [debug] [ThreadPool]: Using confluent connection "list_default_catalog"
+[0m08:27:05.153486 [debug] [ThreadPool]: On list_default_catalog: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog"} */
+SELECT
+      SCHEMA_NAME as schema
+    FROM
+      `default_catalog`.`INFORMATION_SCHEMA`.`SCHEMATA`
+    WHERE
+      `SCHEMA_NAME` <> 'INFORMATION_SCHEMA'
+  
+[0m08:27:05.154097 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m08:27:05.225321 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.071 seconds
+[0m08:27:05.230035 [debug] [ThreadPool]: On list_default_catalog: Close
+[0m08:27:05.231960 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_default_catalog, now list_default_catalog_default_database)
+[0m08:27:05.241288 [debug] [ThreadPool]: Using confluent connection "list_default_catalog_default_database"
+[0m08:27:05.242278 [debug] [ThreadPool]: On list_default_catalog_default_database: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog_default_database"} */
+SELECT
+      TABLE_CATALOG_ID as database,
+      TABLE_NAME as name,
+      TABLE_SCHEMA as schema,
+      TABLE_TYPE as type
+    FROM
+      INFORMATION_SCHEMA.`TABLES`
+    WHERE
+      TABLE_CATALOG_ID = 'default_catalog'
+      AND TABLE_SCHEMA = 'default_database'
+  
+[0m08:27:05.243295 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m08:27:05.264114 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.021 seconds
+[0m08:27:05.268277 [debug] [ThreadPool]: On list_default_catalog_default_database: Close
+[0m08:27:05.269508 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'ea39a863-bb4c-4330-90a7-6a2a941ec75e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b0fdcb550>]}
+[0m08:27:05.279922 [debug] [MainThread]: Writing injected SQL for node "operation.clickstream.clickstream-on-run-start-0"
+[0m08:27:05.286201 [info ] [MainThread]: 1 of 1 START hook: clickstream.on-run-start.0 .................................. [RUN]
+[0m08:27:05.287307 [debug] [MainThread]: Using confluent connection "master"
+[0m08:27:05.288469 [debug] [MainThread]: On master: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "master"} */
+CREATE DATABASE IF NOT EXISTS clickstream
+[0m08:27:05.289737 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m08:27:05.409132 [debug] [MainThread]: SQL status: Phase.COMPLETED in 0.120 seconds
+[0m08:27:05.435096 [info ] [MainThread]: 1 of 1 OK hook: clickstream.on-run-start.0 ..................................... [[32mOK[0m in 0.16s]
+[0m08:27:05.436132 [info ] [MainThread]: 
+[0m08:27:05.437196 [debug] [MainThread]: On master: Close
+[0m08:27:05.445709 [debug] [Thread-1 (]: Began running node model.clickstream.raw_kafka_datasource
+[0m08:27:05.447054 [info ] [Thread-1 (]: 1 of 2 START sql streaming_source model default_database.raw_kafka_datasource .. [RUN]
+[0m08:27:05.449318 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_default_catalog_default_database, now model.clickstream.raw_kafka_datasource)
+[0m08:27:05.450229 [debug] [Thread-1 (]: Began compiling node model.clickstream.raw_kafka_datasource
+[0m08:27:05.455848 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.raw_kafka_datasource"
+[0m08:27:05.466825 [debug] [Thread-1 (]: Began executing node model.clickstream.raw_kafka_datasource
+[0m08:27:05.499716 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.raw_kafka_datasource"
+[0m08:27:05.502113 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.raw_kafka_datasource"
+[0m08:27:05.503245 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.raw_kafka_datasource"} */
+CREATE TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`
+    ( -- example_source.sql
+
+
+-- Define your source schema here according to what your Kafka topic produces.
+-- This uses Flink SQL DDL syntax.
+user_id STRING,
+event_type STRING,
+session_id STRING,
+`timestamp` STRING,
+-- Add a conceptual event_time field extracted from a timestamp to handle windowing
+event_time AS TO_TIMESTAMP(REPLACE(REPLACE(`timestamp`, 'T', ' '), 'Z', '')),
+WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND)
+    WITH (
+      'connector' = 'kafka', 'topic' = 'your_topic_here', 'properties.bootstrap.servers' = 'kafka:29092', 'properties.group.id' = 'flink-consumer-group', 'scan.startup.mode' = 'earliest-offset', 'format' = 'json')
+[0m08:27:05.504241 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m08:27:05.552047 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.048 seconds
+[0m08:27:05.564543 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: Close
+[0m08:27:05.567630 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'ea39a863-bb4c-4330-90a7-6a2a941ec75e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b0e3b2110>]}
+[0m08:27:05.569178 [info ] [Thread-1 (]: 1 of 2 OK created sql streaming_source model default_database.raw_kafka_datasource  [[32mPhase.RUNNING[0m in 0.12s]
+[0m08:27:05.570701 [debug] [Thread-1 (]: Finished running node model.clickstream.raw_kafka_datasource
+[0m08:27:05.572454 [debug] [Thread-1 (]: Began running node model.clickstream.transformed_clickstream_metrics
+[0m08:27:05.573406 [info ] [Thread-1 (]: 2 of 2 START sql streaming_table model default_database.transformed_clickstream_metrics  [RUN]
+[0m08:27:05.576218 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.clickstream.raw_kafka_datasource, now model.clickstream.transformed_clickstream_metrics)
+[0m08:27:05.577496 [debug] [Thread-1 (]: Began compiling node model.clickstream.transformed_clickstream_metrics
+[0m08:27:05.583820 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.transformed_clickstream_metrics"
+[0m08:27:05.585259 [debug] [Thread-1 (]: Began executing node model.clickstream.transformed_clickstream_metrics
+[0m08:27:05.608918 [info ] [Thread-1 (]: DEBUG_COLS_KEYS: []
+[0m08:27:05.611647 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.transformed_clickstream_metrics"
+[0m08:27:05.614269 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m08:27:05.615152 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+    
+    
+  
+  
+  
+  
+  
+  
+  ()
+
+    
+    WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/default','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+    
+[0m08:27:05.616129 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m08:27:05.670051 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.054 seconds
+[0m08:27:05.672638 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m08:27:05.673634 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+INSERT INTO `default_catalog`.`default_database`.`transformed_clickstream_metrics` -- example_sink.sql
+
+
+-- Define your transformation query here.
+-- This query will continuously consume the streaming source and emit results to the sink.
+SELECT 
+    user_id,
+    event_type,
+    session_id,
+    COUNT(*) as event_count,
+    window_start,
+    window_end
+FROM TABLE(
+    -- Using the source model we defined in example_source.sql
+    TUMBLE(TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`, DESCRIPTOR(event_time), INTERVAL '1' MINUTE)
+)
+GROUP BY user_id, event_type, session_id, window_start, window_end
+[0m08:27:05.693375 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.019 seconds
+[0m08:27:05.696472 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: Close
+[0m08:27:05.697530 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'ea39a863-bb4c-4330-90a7-6a2a941ec75e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b0e21ba50>]}
+[0m08:27:05.698579 [info ] [Thread-1 (]: 2 of 2 OK created sql streaming_table model default_database.transformed_clickstream_metrics  [[32mPhase.RUNNING[0m in 0.12s]
+[0m08:27:05.700041 [debug] [Thread-1 (]: Finished running node model.clickstream.transformed_clickstream_metrics
+[0m08:27:05.704812 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m08:27:05.707265 [debug] [MainThread]: Connection 'model.clickstream.transformed_clickstream_metrics' was properly closed.
+[0m08:27:05.708247 [info ] [MainThread]: 
+[0m08:27:05.709187 [info ] [MainThread]: Finished running 1 project hook, 1 streaming source model, 1 streaming table model in 0 hours 0 minutes and 0.63 seconds (0.63s).
+[0m08:27:05.712196 [debug] [MainThread]: Command end result
+[0m08:27:05.778568 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m08:27:05.782416 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m08:27:05.792418 [debug] [MainThread]: Wrote artifact RunExecutionResult to /app/target/run_results.json
+[0m08:27:05.793120 [info ] [MainThread]: 
+[0m08:27:05.794000 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m08:27:05.794778 [info ] [MainThread]: 
+[0m08:27:05.795579 [info ] [MainThread]: Done. PASS=3 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=3
+[0m08:27:05.797255 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 1.773244, "process_in_blocks": "248", "process_kernel_time": 0.453186, "process_mem_max_rss": "129232", "process_out_blocks": "6129", "process_user_time": 3.04409}
+[0m08:27:05.798173 [debug] [MainThread]: Command `dbt run` succeeded at 08:27:05.798025 after 1.77 seconds
+[0m08:27:05.799023 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b10116790>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b10116dd0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7b10591bd0>]}
+[0m08:27:05.799876 [debug] [MainThread]: Flushing usage events
+[0m08:27:07.643736 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m08:31:25.513720 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca3f63610>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca3f63210>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca3f57090>]}
+
+
+============================== 08:31:25.519821 | 7246b0ff-8dfe-4bcb-86bb-9c2678840286 ==============================
+[0m08:31:25.519821 [info ] [MainThread]: Running with dbt=1.11.7
+[0m08:31:25.520542 [debug] [MainThread]: running dbt with arguments {'profiles_dir': '/app', 'partial_parse': 'True', 'indirect_selection': 'eager', 'static_parser': 'True', 'invocation_command': 'dbt run', 'debug': 'False', 'write_json': 'True', 'empty': 'False', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'printer_width': '80', 'introspect': 'True', 'quiet': 'False', 'version_check': 'True', 'use_colors': 'True', 'fail_fast': 'False', 'warn_error': 'None', 'log_path': '/app/logs', 'log_format': 'default', 'no_print': 'None', 'log_cache_events': 'False', 'cache_selected_only': 'False', 'send_anonymous_usage_stats': 'True', 'use_experimental_parser': 'False'}
+[0m08:31:25.717375 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '7246b0ff-8dfe-4bcb-86bb-9c2678840286', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca3f07b50>]}
+[0m08:31:25.786303 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '7246b0ff-8dfe-4bcb-86bb-9c2678840286', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca7072ad0>]}
+[0m08:31:25.787286 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m08:31:25.884489 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m08:31:26.003566 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 0 files changed.
+[0m08:31:26.004649 [debug] [MainThread]: Nothing changed, skipping partial parsing.
+[0m08:31:26.005403 [debug] [MainThread]: Partial parsing enabled, no changes found, skipping parsing
+[0m08:31:26.086248 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '7246b0ff-8dfe-4bcb-86bb-9c2678840286', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca3f9f2d0>]}
+[0m08:31:26.244301 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m08:31:26.248140 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m08:31:26.273888 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '7246b0ff-8dfe-4bcb-86bb-9c2678840286', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca39eb550>]}
+[0m08:31:26.274989 [info ] [MainThread]: Found 1 operation, 2 models, 448 macros
+[0m08:31:26.275812 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '7246b0ff-8dfe-4bcb-86bb-9c2678840286', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca39c29d0>]}
+[0m08:31:26.278452 [info ] [MainThread]: 
+[0m08:31:26.279171 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m08:31:26.280308 [info ] [MainThread]: 
+[0m08:31:26.281534 [debug] [MainThread]: Acquiring new confluent connection 'master'
+[0m08:31:26.287676 [debug] [ThreadPool]: Acquiring new confluent connection 'list_default_catalog'
+[0m08:31:26.402985 [debug] [ThreadPool]: Using confluent connection "list_default_catalog"
+[0m08:31:26.405457 [debug] [ThreadPool]: On list_default_catalog: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog"} */
+SELECT
+      SCHEMA_NAME as schema
+    FROM
+      `default_catalog`.`INFORMATION_SCHEMA`.`SCHEMATA`
+    WHERE
+      `SCHEMA_NAME` <> 'INFORMATION_SCHEMA'
+  
+[0m08:31:26.407100 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m08:31:26.782431 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.375 seconds
+[0m08:31:26.788089 [debug] [ThreadPool]: On list_default_catalog: Close
+[0m08:31:26.790631 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_default_catalog, now list_default_catalog_default_database)
+[0m08:31:26.800123 [debug] [ThreadPool]: Using confluent connection "list_default_catalog_default_database"
+[0m08:31:26.801165 [debug] [ThreadPool]: On list_default_catalog_default_database: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog_default_database"} */
+SELECT
+      TABLE_CATALOG_ID as database,
+      TABLE_NAME as name,
+      TABLE_SCHEMA as schema,
+      TABLE_TYPE as type
+    FROM
+      INFORMATION_SCHEMA.`TABLES`
+    WHERE
+      TABLE_CATALOG_ID = 'default_catalog'
+      AND TABLE_SCHEMA = 'default_database'
+  
+[0m08:31:26.802096 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m08:31:26.821432 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.019 seconds
+[0m08:31:26.827643 [debug] [ThreadPool]: On list_default_catalog_default_database: Close
+[0m08:31:26.830233 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '7246b0ff-8dfe-4bcb-86bb-9c2678840286', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca2d62a50>]}
+[0m08:31:26.841962 [debug] [MainThread]: Writing injected SQL for node "operation.clickstream.clickstream-on-run-start-0"
+[0m08:31:26.852805 [info ] [MainThread]: 1 of 1 START hook: clickstream.on-run-start.0 .................................. [RUN]
+[0m08:31:26.854371 [debug] [MainThread]: Using confluent connection "master"
+[0m08:31:26.855684 [debug] [MainThread]: On master: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "master"} */
+CREATE DATABASE IF NOT EXISTS clickstream
+[0m08:31:26.856738 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m08:31:26.993914 [debug] [MainThread]: SQL status: Phase.RUNNING in 0.137 seconds
+[0m08:31:26.998685 [info ] [MainThread]: 1 of 1 OK hook: clickstream.on-run-start.0 ..................................... [[32mOK[0m in 0.16s]
+[0m08:31:27.000816 [info ] [MainThread]: 
+[0m08:31:27.006285 [debug] [MainThread]: On master: Close
+[0m08:31:27.031902 [debug] [Thread-1 (]: Began running node model.clickstream.raw_kafka_datasource
+[0m08:31:27.033628 [info ] [Thread-1 (]: 1 of 2 START sql streaming_source model default_database.raw_kafka_datasource .. [RUN]
+[0m08:31:27.037776 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_default_catalog_default_database, now model.clickstream.raw_kafka_datasource)
+[0m08:31:27.040646 [debug] [Thread-1 (]: Began compiling node model.clickstream.raw_kafka_datasource
+[0m08:31:27.055054 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.raw_kafka_datasource"
+[0m08:31:27.057055 [debug] [Thread-1 (]: Began executing node model.clickstream.raw_kafka_datasource
+[0m08:31:27.088316 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.raw_kafka_datasource"
+[0m08:31:27.090205 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.raw_kafka_datasource"
+[0m08:31:27.091249 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.raw_kafka_datasource"} */
+CREATE TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`
+    ( -- example_source.sql
+
+
+-- Define your source schema here according to what your Kafka topic produces.
+-- This uses Flink SQL DDL syntax.
+user_id STRING,
+event_type STRING,
+session_id STRING,
+`timestamp` STRING,
+-- Add a conceptual event_time field extracted from a timestamp to handle windowing
+event_time AS TO_TIMESTAMP(REPLACE(REPLACE(`timestamp`, 'T', ' '), 'Z', '')),
+WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND)
+    WITH (
+      'connector' = 'kafka', 'topic' = 'your_topic_here', 'properties.bootstrap.servers' = 'kafka:29092', 'properties.group.id' = 'flink-consumer-group', 'scan.startup.mode' = 'earliest-offset', 'format' = 'json')
+[0m08:31:27.092122 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m08:31:28.113629 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 1.022 seconds
+[0m08:31:28.126435 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: Close
+[0m08:31:28.129616 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '7246b0ff-8dfe-4bcb-86bb-9c2678840286', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca2b2ba10>]}
+[0m08:31:28.131790 [info ] [Thread-1 (]: 1 of 2 OK created sql streaming_source model default_database.raw_kafka_datasource  [[32mPhase.RUNNING[0m in 1.09s]
+[0m08:31:28.133223 [debug] [Thread-1 (]: Finished running node model.clickstream.raw_kafka_datasource
+[0m08:31:28.135100 [debug] [Thread-1 (]: Began running node model.clickstream.transformed_clickstream_metrics
+[0m08:31:28.136429 [info ] [Thread-1 (]: 2 of 2 START sql streaming_table model default_database.transformed_clickstream_metrics  [RUN]
+[0m08:31:28.139463 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.clickstream.raw_kafka_datasource, now model.clickstream.transformed_clickstream_metrics)
+[0m08:31:28.140822 [debug] [Thread-1 (]: Began compiling node model.clickstream.transformed_clickstream_metrics
+[0m08:31:28.148197 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.transformed_clickstream_metrics"
+[0m08:31:28.150489 [debug] [Thread-1 (]: Began executing node model.clickstream.transformed_clickstream_metrics
+[0m08:31:28.186994 [info ] [Thread-1 (]: DEBUG_COLS_KEYS: []
+[0m08:31:28.188287 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.transformed_clickstream_metrics"
+[0m08:31:28.190682 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m08:31:28.191923 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+    
+    
+  
+  
+  
+  
+  
+  
+  ()
+
+    
+    WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/default','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+    
+[0m08:31:28.193257 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m08:31:28.359428 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.164 seconds
+[0m08:31:28.362815 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m08:31:28.363937 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+INSERT INTO `default_catalog`.`default_database`.`transformed_clickstream_metrics` -- example_sink.sql
+
+
+-- Define your transformation query here.
+-- This query will continuously consume the streaming source and emit results to the sink.
+SELECT 
+    user_id,
+    event_type,
+    session_id,
+    COUNT(*) as event_count,
+    window_start,
+    window_end
+FROM TABLE(
+    -- Using the source model we defined in example_source.sql
+    TUMBLE(TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`, DESCRIPTOR(event_time), INTERVAL '1' MINUTE)
+)
+GROUP BY user_id, event_type, session_id, window_start, window_end
+[0m08:31:28.422584 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.057 seconds
+[0m08:31:28.426088 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: Close
+[0m08:31:28.427549 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '7246b0ff-8dfe-4bcb-86bb-9c2678840286', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca2b2a850>]}
+[0m08:31:28.429105 [info ] [Thread-1 (]: 2 of 2 OK created sql streaming_table model default_database.transformed_clickstream_metrics  [[32mPhase.RUNNING[0m in 0.29s]
+[0m08:31:28.430639 [debug] [Thread-1 (]: Finished running node model.clickstream.transformed_clickstream_metrics
+[0m08:31:28.434983 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m08:31:28.436167 [debug] [MainThread]: Connection 'model.clickstream.transformed_clickstream_metrics' was properly closed.
+[0m08:31:28.437067 [info ] [MainThread]: 
+[0m08:31:28.437970 [info ] [MainThread]: Finished running 1 project hook, 1 streaming source model, 1 streaming table model in 0 hours 0 minutes and 2.16 seconds (2.16s).
+[0m08:31:28.440362 [debug] [MainThread]: Command end result
+[0m08:31:28.520145 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m08:31:28.523879 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m08:31:28.537188 [debug] [MainThread]: Wrote artifact RunExecutionResult to /app/target/run_results.json
+[0m08:31:28.538130 [info ] [MainThread]: 
+[0m08:31:28.539397 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m08:31:28.540400 [info ] [MainThread]: 
+[0m08:31:28.541436 [info ] [MainThread]: Done. PASS=3 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=3
+[0m08:31:28.543540 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 3.0972831, "process_in_blocks": "0", "process_kernel_time": 0.378741, "process_mem_max_rss": "127632", "process_out_blocks": "5251", "process_user_time": 3.029775}
+[0m08:31:28.544970 [debug] [MainThread]: Command `dbt run` succeeded at 08:31:28.544695 after 3.10 seconds
+[0m08:31:28.545985 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca8aa8950>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca8aa8810>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f1ca8aa9950>]}
+[0m08:31:28.547171 [debug] [MainThread]: Flushing usage events
+[0m08:31:29.937552 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m08:37:40.068973 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a528aad0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a523bf10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a523b4d0>]}
+
+
+============================== 08:37:40.076598 | b80c8736-5fb3-4ea7-9f6b-37722decb0f1 ==============================
+[0m08:37:40.076598 [info ] [MainThread]: Running with dbt=1.11.7
+[0m08:37:40.079355 [debug] [MainThread]: running dbt with arguments {'profiles_dir': '/app', 'log_cache_events': 'False', 'version_check': 'True', 'partial_parse': 'True', 'invocation_command': 'dbt run', 'write_json': 'True', 'no_print': 'None', 'send_anonymous_usage_stats': 'True', 'log_path': '/app/logs', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'introspect': 'True', 'empty': 'False', 'cache_selected_only': 'False', 'use_colors': 'True', 'debug': 'False', 'quiet': 'False', 'target_path': 'None', 'warn_error': 'None', 'use_experimental_parser': 'False', 'log_format': 'default', 'static_parser': 'True', 'printer_width': '80', 'indirect_selection': 'eager', 'fail_fast': 'False'}
+[0m08:37:40.302229 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': 'b80c8736-5fb3-4ea7-9f6b-37722decb0f1', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a4f4b810>]}
+[0m08:37:40.379258 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': 'b80c8736-5fb3-4ea7-9f6b-37722decb0f1', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a83a6bd0>]}
+[0m08:37:40.380356 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m08:37:40.476157 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m08:37:40.600548 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 1 files added, 0 files changed.
+[0m08:37:40.601605 [debug] [MainThread]: Partial parsing: added file: clickstream://models/schema.yml
+[0m08:37:40.776719 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': 'b80c8736-5fb3-4ea7-9f6b-37722decb0f1', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a50ca2d0>]}
+[0m08:37:40.928114 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m08:37:40.930885 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m08:37:40.950222 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': 'b80c8736-5fb3-4ea7-9f6b-37722decb0f1', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a4b1a3d0>]}
+[0m08:37:40.950992 [info ] [MainThread]: Found 1 operation, 2 models, 448 macros
+[0m08:37:40.951608 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'b80c8736-5fb3-4ea7-9f6b-37722decb0f1', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a4f98450>]}
+[0m08:37:40.953708 [info ] [MainThread]: 
+[0m08:37:40.954382 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m08:37:40.954962 [info ] [MainThread]: 
+[0m08:37:40.955976 [debug] [MainThread]: Acquiring new confluent connection 'master'
+[0m08:37:40.962761 [debug] [ThreadPool]: Acquiring new confluent connection 'list_default_catalog'
+[0m08:37:41.025230 [debug] [ThreadPool]: Using confluent connection "list_default_catalog"
+[0m08:37:41.026612 [debug] [ThreadPool]: On list_default_catalog: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog"} */
+SELECT
+      SCHEMA_NAME as schema
+    FROM
+      `default_catalog`.`INFORMATION_SCHEMA`.`SCHEMATA`
+    WHERE
+      `SCHEMA_NAME` <> 'INFORMATION_SCHEMA'
+  
+[0m08:37:41.027837 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m08:37:41.094005 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.066 seconds
+[0m08:37:41.098394 [debug] [ThreadPool]: On list_default_catalog: Close
+[0m08:37:41.100823 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_default_catalog, now list_default_catalog_default_database)
+[0m08:37:41.110236 [debug] [ThreadPool]: Using confluent connection "list_default_catalog_default_database"
+[0m08:37:41.111233 [debug] [ThreadPool]: On list_default_catalog_default_database: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog_default_database"} */
+SELECT
+      TABLE_CATALOG_ID as database,
+      TABLE_NAME as name,
+      TABLE_SCHEMA as schema,
+      TABLE_TYPE as type
+    FROM
+      INFORMATION_SCHEMA.`TABLES`
+    WHERE
+      TABLE_CATALOG_ID = 'default_catalog'
+      AND TABLE_SCHEMA = 'default_database'
+  
+[0m08:37:41.112256 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m08:37:41.128848 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.017 seconds
+[0m08:37:41.134809 [debug] [ThreadPool]: On list_default_catalog_default_database: Close
+[0m08:37:41.139712 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'b80c8736-5fb3-4ea7-9f6b-37722decb0f1', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a405e190>]}
+[0m08:37:41.150055 [debug] [MainThread]: Writing injected SQL for node "operation.clickstream.clickstream-on-run-start-0"
+[0m08:37:41.157739 [info ] [MainThread]: 1 of 1 START hook: clickstream.on-run-start.0 .................................. [RUN]
+[0m08:37:41.159699 [debug] [MainThread]: Using confluent connection "master"
+[0m08:37:41.161050 [debug] [MainThread]: On master: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "master"} */
+CREATE DATABASE IF NOT EXISTS clickstream
+[0m08:37:41.161851 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m08:37:41.253614 [debug] [MainThread]: SQL status: Phase.COMPLETED in 0.092 seconds
+[0m08:37:41.301304 [info ] [MainThread]: 1 of 1 OK hook: clickstream.on-run-start.0 ..................................... [[32mOK[0m in 0.16s]
+[0m08:37:41.302466 [info ] [MainThread]: 
+[0m08:37:41.303367 [debug] [MainThread]: On master: Close
+[0m08:37:41.325472 [debug] [Thread-1 (]: Began running node model.clickstream.raw_kafka_datasource
+[0m08:37:41.327718 [info ] [Thread-1 (]: 1 of 2 START sql streaming_source model default_database.raw_kafka_datasource .. [RUN]
+[0m08:37:41.330788 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_default_catalog_default_database, now model.clickstream.raw_kafka_datasource)
+[0m08:37:41.332035 [debug] [Thread-1 (]: Began compiling node model.clickstream.raw_kafka_datasource
+[0m08:37:41.341001 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.raw_kafka_datasource"
+[0m08:37:41.342667 [debug] [Thread-1 (]: Began executing node model.clickstream.raw_kafka_datasource
+[0m08:37:41.370576 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.raw_kafka_datasource"
+[0m08:37:41.376805 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.raw_kafka_datasource"
+[0m08:37:41.378833 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.raw_kafka_datasource"} */
+CREATE TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`
+    ( -- example_source.sql
+
+
+-- Define your source schema here according to what your Kafka topic produces.
+-- This uses Flink SQL DDL syntax.
+user_id STRING,
+event_type STRING,
+session_id STRING,
+`timestamp` STRING,
+-- Add a conceptual event_time field extracted from a timestamp to handle windowing
+event_time AS TO_TIMESTAMP(REPLACE(REPLACE(`timestamp`, 'T', ' '), 'Z', '')),
+WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND)
+    WITH (
+      'connector' = 'kafka', 'topic' = 'your_topic_here', 'properties.bootstrap.servers' = 'kafka:29092', 'properties.group.id' = 'flink-consumer-group', 'scan.startup.mode' = 'earliest-offset', 'format' = 'json')
+[0m08:37:41.380057 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m08:37:41.414525 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.034 seconds
+[0m08:37:41.425716 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: Close
+[0m08:37:41.428669 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'b80c8736-5fb3-4ea7-9f6b-37722decb0f1', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a4a8fbd0>]}
+[0m08:37:41.429864 [info ] [Thread-1 (]: 1 of 2 OK created sql streaming_source model default_database.raw_kafka_datasource  [[32mPhase.RUNNING[0m in 0.10s]
+[0m08:37:41.431121 [debug] [Thread-1 (]: Finished running node model.clickstream.raw_kafka_datasource
+[0m08:37:41.432710 [debug] [Thread-1 (]: Began running node model.clickstream.transformed_clickstream_metrics
+[0m08:37:41.433509 [info ] [Thread-1 (]: 2 of 2 START sql streaming_table model default_database.transformed_clickstream_metrics  [RUN]
+[0m08:37:41.435653 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.clickstream.raw_kafka_datasource, now model.clickstream.transformed_clickstream_metrics)
+[0m08:37:41.436493 [debug] [Thread-1 (]: Began compiling node model.clickstream.transformed_clickstream_metrics
+[0m08:37:41.443260 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.transformed_clickstream_metrics"
+[0m08:37:41.444793 [debug] [Thread-1 (]: Began executing node model.clickstream.transformed_clickstream_metrics
+[0m08:37:41.465630 [info ] [Thread-1 (]: DEBUG_COLS_KEYS: ['user_id', 'event_type', 'session_id', 'event_count', 'window_start', 'window_end']
+[0m08:37:41.467040 [info ] [Thread-1 (]: DEBUG_COL: name=user_id column= data_type=TEXT quoted=
+[0m08:37:41.469956 [info ] [Thread-1 (]: DEBUG_COL: name=event_type column= data_type=TEXT quoted=
+[0m08:37:41.472176 [info ] [Thread-1 (]: DEBUG_COL: name=session_id column= data_type=TEXT quoted=
+[0m08:37:41.473627 [info ] [Thread-1 (]: DEBUG_COL: name=event_count column= data_type=BIGINT quoted=
+[0m08:37:41.474352 [info ] [Thread-1 (]: DEBUG_COL: name=window_start column= data_type=TIMESTAMP(3) quoted=
+[0m08:37:41.475210 [info ] [Thread-1 (]: DEBUG_COL: name=window_end column= data_type=TIMESTAMP(3) quoted=
+[0m08:37:41.476186 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.transformed_clickstream_metrics"
+[0m08:37:41.477440 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m08:37:41.478252 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+    
+    
+  
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+  
+  (`user_id` STRING,
+    `event_type` STRING,
+    `session_id` STRING,
+    `event_count` BIGINT,
+    `window_start` TIMESTAMP(3),
+    `window_end` TIMESTAMP(3))
+
+    
+    WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/default','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+    
+[0m08:37:41.479349 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m08:37:41.525017 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.046 seconds
+[0m08:37:41.526770 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m08:37:41.527460 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+INSERT INTO `default_catalog`.`default_database`.`transformed_clickstream_metrics` -- example_sink.sql
+
+
+-- Define your transformation query here.
+-- This query will continuously consume the streaming source and emit results to the sink.
+SELECT 
+    user_id,
+    event_type,
+    session_id,
+    COUNT(*) as event_count,
+    window_start,
+    window_end
+FROM TABLE(
+    -- Using the source model we defined in example_source.sql
+    TUMBLE(TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`, DESCRIPTOR(event_time), INTERVAL '1' MINUTE)
+)
+GROUP BY user_id, event_type, session_id, window_start, window_end
+[0m08:37:41.552050 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.024 seconds
+[0m08:37:41.555079 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: Close
+[0m08:37:41.556884 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'b80c8736-5fb3-4ea7-9f6b-37722decb0f1', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a4fa8610>]}
+[0m08:37:41.558181 [info ] [Thread-1 (]: 2 of 2 OK created sql streaming_table model default_database.transformed_clickstream_metrics  [[32mPhase.RUNNING[0m in 0.12s]
+[0m08:37:41.559599 [debug] [Thread-1 (]: Finished running node model.clickstream.transformed_clickstream_metrics
+[0m08:37:41.563707 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m08:37:41.564686 [debug] [MainThread]: Connection 'model.clickstream.transformed_clickstream_metrics' was properly closed.
+[0m08:37:41.565651 [info ] [MainThread]: 
+[0m08:37:41.566502 [info ] [MainThread]: Finished running 1 project hook, 1 streaming source model, 1 streaming table model in 0 hours 0 minutes and 0.61 seconds (0.61s).
+[0m08:37:41.568497 [debug] [MainThread]: Command end result
+[0m08:37:41.627911 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m08:37:41.631562 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m08:37:41.639664 [debug] [MainThread]: Wrote artifact RunExecutionResult to /app/target/run_results.json
+[0m08:37:41.640453 [info ] [MainThread]: 
+[0m08:37:41.641624 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m08:37:41.642622 [info ] [MainThread]: 
+[0m08:37:41.643781 [info ] [MainThread]: Done. PASS=3 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=3
+[0m08:37:41.646888 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 1.6457375, "process_in_blocks": "344", "process_kernel_time": 0.361376, "process_mem_max_rss": "127264", "process_out_blocks": "6142", "process_user_time": 3.039188}
+[0m08:37:41.648130 [debug] [MainThread]: Command `dbt run` succeeded at 08:37:41.647899 after 1.65 seconds
+[0m08:37:41.649025 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a525e210>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a63b6e10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f86a55b5810>]}
+[0m08:37:41.649959 [debug] [MainThread]: Flushing usage events
+[0m08:37:43.160856 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m08:53:00.681316 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb33213a10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb33525c50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb33213310>]}
+
+
+============================== 08:53:00.687893 | b4f36cec-dcd4-4667-a909-6cb06633f1da ==============================
+[0m08:53:00.687893 [info ] [MainThread]: Running with dbt=1.11.7
+[0m08:53:00.689047 [debug] [MainThread]: running dbt with arguments {'log_path': '/app/logs', 'log_cache_events': 'False', 'warn_error': 'None', 'version_check': 'True', 'target_path': 'None', 'profiles_dir': '/app', 'invocation_command': 'dbt run', 'indirect_selection': 'eager', 'empty': 'False', 'send_anonymous_usage_stats': 'True', 'partial_parse': 'True', 'debug': 'False', 'use_colors': 'True', 'log_format': 'default', 'static_parser': 'True', 'fail_fast': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'use_experimental_parser': 'False', 'cache_selected_only': 'False', 'printer_width': '80', 'quiet': 'False', 'write_json': 'True', 'no_print': 'None', 'introspect': 'True'}
+[0m08:53:00.923737 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': 'b4f36cec-dcd4-4667-a909-6cb06633f1da', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb33027750>]}
+[0m08:53:01.044115 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': 'b4f36cec-dcd4-4667-a909-6cb06633f1da', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb3315f290>]}
+[0m08:53:01.045339 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m08:53:01.150216 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m08:53:01.292122 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 1 files changed.
+[0m08:53:01.293229 [debug] [MainThread]: Partial parsing: updated file: clickstream://models/raw_kafka_datasource.sql
+[0m08:53:01.604460 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': 'b4f36cec-dcd4-4667-a909-6cb06633f1da', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb32c17dd0>]}
+[0m08:53:01.743797 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m08:53:01.746700 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m08:53:01.768202 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': 'b4f36cec-dcd4-4667-a909-6cb06633f1da', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb32c9c2d0>]}
+[0m08:53:01.769189 [info ] [MainThread]: Found 1 operation, 2 models, 448 macros
+[0m08:53:01.769934 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'b4f36cec-dcd4-4667-a909-6cb06633f1da', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb32d71390>]}
+[0m08:53:01.772200 [info ] [MainThread]: 
+[0m08:53:01.772964 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m08:53:01.773648 [info ] [MainThread]: 
+[0m08:53:01.774744 [debug] [MainThread]: Acquiring new confluent connection 'master'
+[0m08:53:01.780847 [debug] [ThreadPool]: Acquiring new confluent connection 'list_default_catalog'
+[0m08:53:01.835358 [debug] [ThreadPool]: Using confluent connection "list_default_catalog"
+[0m08:53:01.836322 [debug] [ThreadPool]: On list_default_catalog: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog"} */
+SELECT
+      SCHEMA_NAME as schema
+    FROM
+      `default_catalog`.`INFORMATION_SCHEMA`.`SCHEMATA`
+    WHERE
+      `SCHEMA_NAME` <> 'INFORMATION_SCHEMA'
+  
+[0m08:53:01.837004 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m08:53:01.908918 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.072 seconds
+[0m08:53:01.912954 [debug] [ThreadPool]: On list_default_catalog: Close
+[0m08:53:01.914936 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_default_catalog, now list_default_catalog_default_database)
+[0m08:53:01.927735 [debug] [ThreadPool]: Using confluent connection "list_default_catalog_default_database"
+[0m08:53:01.928965 [debug] [ThreadPool]: On list_default_catalog_default_database: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog_default_database"} */
+SELECT
+      TABLE_CATALOG_ID as database,
+      TABLE_NAME as name,
+      TABLE_SCHEMA as schema,
+      TABLE_TYPE as type
+    FROM
+      INFORMATION_SCHEMA.`TABLES`
+    WHERE
+      TABLE_CATALOG_ID = 'default_catalog'
+      AND TABLE_SCHEMA = 'default_database'
+  
+[0m08:53:01.930304 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m08:53:01.951057 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.021 seconds
+[0m08:53:01.955123 [debug] [ThreadPool]: On list_default_catalog_default_database: Close
+[0m08:53:01.956683 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'b4f36cec-dcd4-4667-a909-6cb06633f1da', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb312d5f50>]}
+[0m08:53:01.969684 [debug] [MainThread]: Writing injected SQL for node "operation.clickstream.clickstream-on-run-start-0"
+[0m08:53:01.982717 [info ] [MainThread]: 1 of 1 START hook: clickstream.on-run-start.0 .................................. [RUN]
+[0m08:53:01.985327 [debug] [MainThread]: Using confluent connection "master"
+[0m08:53:01.986854 [debug] [MainThread]: On master: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "master"} */
+CREATE DATABASE IF NOT EXISTS clickstream
+[0m08:53:01.988876 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m08:53:02.044337 [debug] [MainThread]: SQL status: Phase.COMPLETED in 0.056 seconds
+[0m08:53:02.058521 [info ] [MainThread]: 1 of 1 OK hook: clickstream.on-run-start.0 ..................................... [[32mOK[0m in 0.10s]
+[0m08:53:02.059677 [info ] [MainThread]: 
+[0m08:53:02.061035 [debug] [MainThread]: On master: Close
+[0m08:53:02.081029 [debug] [Thread-1 (]: Began running node model.clickstream.raw_kafka_datasource
+[0m08:53:02.082505 [info ] [Thread-1 (]: 1 of 2 START sql streaming_source model default_database.raw_kafka_datasource .. [RUN]
+[0m08:53:02.085202 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_default_catalog_default_database, now model.clickstream.raw_kafka_datasource)
+[0m08:53:02.086407 [debug] [Thread-1 (]: Began compiling node model.clickstream.raw_kafka_datasource
+[0m08:53:02.097382 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.raw_kafka_datasource"
+[0m08:53:02.101356 [debug] [Thread-1 (]: Began executing node model.clickstream.raw_kafka_datasource
+[0m08:53:02.137332 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.raw_kafka_datasource"
+[0m08:53:02.139511 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.raw_kafka_datasource"
+[0m08:53:02.140733 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.raw_kafka_datasource"} */
+CREATE TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`
+    ( -- example_source.sql
+
+
+-- Define your source schema here according to what your Kafka topic produces.
+-- This uses Flink SQL DDL syntax.
+user_id STRING,
+event_type STRING,
+session_id STRING,
+`timestamp` STRING,
+-- Add a conceptual event_time field extracted from a timestamp to handle windowing
+event_time AS TO_TIMESTAMP(REPLACE(REPLACE(`timestamp`, 'T', ' '), 'Z', '')),
+WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND)
+    WITH (
+      'connector' = 'kafka', 'topic' = 'clickstream', 'properties.bootstrap.servers' = 'kafka:29092', 'properties.group.id' = 'flink-consumer-group', 'scan.startup.mode' = 'earliest-offset', 'format' = 'json')
+[0m08:53:02.142057 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m08:53:02.187272 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.045 seconds
+[0m08:53:02.201474 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: Close
+[0m08:53:02.204489 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'b4f36cec-dcd4-4667-a909-6cb06633f1da', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb32e8cbd0>]}
+[0m08:53:02.205955 [info ] [Thread-1 (]: 1 of 2 OK created sql streaming_source model default_database.raw_kafka_datasource  [[32mPhase.RUNNING[0m in 0.12s]
+[0m08:53:02.207450 [debug] [Thread-1 (]: Finished running node model.clickstream.raw_kafka_datasource
+[0m08:53:02.209365 [debug] [Thread-1 (]: Began running node model.clickstream.transformed_clickstream_metrics
+[0m08:53:02.210580 [info ] [Thread-1 (]: 2 of 2 START sql streaming_table model default_database.transformed_clickstream_metrics  [RUN]
+[0m08:53:02.212921 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.clickstream.raw_kafka_datasource, now model.clickstream.transformed_clickstream_metrics)
+[0m08:53:02.214022 [debug] [Thread-1 (]: Began compiling node model.clickstream.transformed_clickstream_metrics
+[0m08:53:02.223787 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.transformed_clickstream_metrics"
+[0m08:53:02.227265 [debug] [Thread-1 (]: Began executing node model.clickstream.transformed_clickstream_metrics
+[0m08:53:02.252182 [info ] [Thread-1 (]: DEBUG_COLS_KEYS: ['user_id', 'event_type', 'session_id', 'event_count', 'window_start', 'window_end']
+[0m08:53:02.253317 [info ] [Thread-1 (]: DEBUG_COL: name=user_id column= data_type=TEXT quoted=
+[0m08:53:02.254490 [info ] [Thread-1 (]: DEBUG_COL: name=event_type column= data_type=TEXT quoted=
+[0m08:53:02.255604 [info ] [Thread-1 (]: DEBUG_COL: name=session_id column= data_type=TEXT quoted=
+[0m08:53:02.256637 [info ] [Thread-1 (]: DEBUG_COL: name=event_count column= data_type=BIGINT quoted=
+[0m08:53:02.257714 [info ] [Thread-1 (]: DEBUG_COL: name=window_start column= data_type=TIMESTAMP(3) quoted=
+[0m08:53:02.259248 [info ] [Thread-1 (]: DEBUG_COL: name=window_end column= data_type=TIMESTAMP(3) quoted=
+[0m08:53:02.260920 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.transformed_clickstream_metrics"
+[0m08:53:02.262951 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m08:53:02.264151 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+    
+    
+  
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+  
+  (`user_id` STRING,
+    `event_type` STRING,
+    `session_id` STRING,
+    `event_count` BIGINT,
+    `window_start` TIMESTAMP(3),
+    `window_end` TIMESTAMP(3))
+
+    
+    WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/default','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+    
+[0m08:53:02.265208 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m08:53:02.302722 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.037 seconds
+[0m08:53:02.305642 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m08:53:02.306858 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+INSERT INTO `default_catalog`.`default_database`.`transformed_clickstream_metrics` -- example_sink.sql
+
+
+-- Define your transformation query here.
+-- This query will continuously consume the streaming source and emit results to the sink.
+SELECT 
+    user_id,
+    event_type,
+    session_id,
+    COUNT(*) as event_count,
+    window_start,
+    window_end
+FROM TABLE(
+    -- Using the source model we defined in example_source.sql
+    TUMBLE(TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`, DESCRIPTOR(event_time), INTERVAL '1' MINUTE)
+)
+GROUP BY user_id, event_type, session_id, window_start, window_end
+[0m08:53:02.332263 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.025 seconds
+[0m08:53:02.334618 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: Close
+[0m08:53:02.335851 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'b4f36cec-dcd4-4667-a909-6cb06633f1da', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb31d82890>]}
+[0m08:53:02.337300 [info ] [Thread-1 (]: 2 of 2 OK created sql streaming_table model default_database.transformed_clickstream_metrics  [[32mPhase.RUNNING[0m in 0.12s]
+[0m08:53:02.338638 [debug] [Thread-1 (]: Finished running node model.clickstream.transformed_clickstream_metrics
+[0m08:53:02.342826 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m08:53:02.343702 [debug] [MainThread]: Connection 'model.clickstream.transformed_clickstream_metrics' was properly closed.
+[0m08:53:02.344551 [info ] [MainThread]: 
+[0m08:53:02.345543 [info ] [MainThread]: Finished running 1 project hook, 1 streaming source model, 1 streaming table model in 0 hours 0 minutes and 0.57 seconds (0.57s).
+[0m08:53:02.347916 [debug] [MainThread]: Command end result
+[0m08:53:02.432638 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m08:53:02.437377 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m08:53:02.451722 [debug] [MainThread]: Wrote artifact RunExecutionResult to /app/target/run_results.json
+[0m08:53:02.452813 [info ] [MainThread]: 
+[0m08:53:02.454311 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m08:53:02.455784 [info ] [MainThread]: 
+[0m08:53:02.456827 [info ] [MainThread]: Done. PASS=3 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=3
+[0m08:53:02.459917 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 1.8465211, "process_in_blocks": "0", "process_kernel_time": 0.343144, "process_mem_max_rss": "128872", "process_out_blocks": "6142", "process_user_time": 3.10108}
+[0m08:53:02.463529 [debug] [MainThread]: Command `dbt run` succeeded at 08:53:02.463056 after 1.85 seconds
+[0m08:53:02.465911 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb331b67d0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb331b4350>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbb340680d0>]}
+[0m08:53:02.470624 [debug] [MainThread]: Flushing usage events
+[0m08:53:04.483400 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m09:18:03.840130 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff1283f2a90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff128402d50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff12839f850>]}
+
+
+============================== 09:18:03.847077 | c479ec45-86c2-42fb-b757-444a2cdd100e ==============================
+[0m09:18:03.847077 [info ] [MainThread]: Running with dbt=1.11.7
+[0m09:18:03.848206 [debug] [MainThread]: running dbt with arguments {'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'debug': 'False', 'profiles_dir': '/app', 'invocation_command': 'dbt run', 'send_anonymous_usage_stats': 'True', 'cache_selected_only': 'False', 'write_json': 'True', 'warn_error': 'None', 'quiet': 'False', 'printer_width': '80', 'partial_parse': 'True', 'static_parser': 'True', 'introspect': 'True', 'fail_fast': 'False', 'target_path': 'None', 'use_experimental_parser': 'False', 'no_print': 'None', 'indirect_selection': 'eager', 'use_colors': 'True', 'log_path': '/app/logs', 'log_cache_events': 'False', 'log_format': 'default', 'empty': 'False', 'version_check': 'True'}
+[0m09:18:04.084508 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': 'c479ec45-86c2-42fb-b757-444a2cdd100e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff12833cc50>]}
+[0m09:18:04.161010 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': 'c479ec45-86c2-42fb-b757-444a2cdd100e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff12b519050>]}
+[0m09:18:04.162093 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m09:18:04.252427 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m09:18:04.384118 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 1 files changed.
+[0m09:18:04.385254 [debug] [MainThread]: Partial parsing: updated file: clickstream://models/transformed_clickstream_metrics.sql
+[0m09:18:04.879592 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': 'c479ec45-86c2-42fb-b757-444a2cdd100e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff1282252d0>]}
+[0m09:18:05.007692 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m09:18:05.012068 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m09:18:05.037527 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': 'c479ec45-86c2-42fb-b757-444a2cdd100e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff127f3f790>]}
+[0m09:18:05.038672 [info ] [MainThread]: Found 1 operation, 2 models, 448 macros
+[0m09:18:05.040546 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'c479ec45-86c2-42fb-b757-444a2cdd100e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff12718af50>]}
+[0m09:18:05.043761 [info ] [MainThread]: 
+[0m09:18:05.044923 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m09:18:05.045839 [info ] [MainThread]: 
+[0m09:18:05.047029 [debug] [MainThread]: Acquiring new confluent connection 'master'
+[0m09:18:05.053775 [debug] [ThreadPool]: Acquiring new confluent connection 'list_default_catalog'
+[0m09:18:05.124248 [debug] [ThreadPool]: Using confluent connection "list_default_catalog"
+[0m09:18:05.127484 [debug] [ThreadPool]: On list_default_catalog: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog"} */
+SELECT
+      SCHEMA_NAME as schema
+    FROM
+      `default_catalog`.`INFORMATION_SCHEMA`.`SCHEMATA`
+    WHERE
+      `SCHEMA_NAME` <> 'INFORMATION_SCHEMA'
+  
+[0m09:18:05.128442 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m09:18:05.483690 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.355 seconds
+[0m09:18:05.490115 [debug] [ThreadPool]: On list_default_catalog: Close
+[0m09:18:05.492942 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_default_catalog, now list_default_catalog_default_database)
+[0m09:18:05.503935 [debug] [ThreadPool]: Using confluent connection "list_default_catalog_default_database"
+[0m09:18:05.505196 [debug] [ThreadPool]: On list_default_catalog_default_database: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog_default_database"} */
+SELECT
+      TABLE_CATALOG_ID as database,
+      TABLE_NAME as name,
+      TABLE_SCHEMA as schema,
+      TABLE_TYPE as type
+    FROM
+      INFORMATION_SCHEMA.`TABLES`
+    WHERE
+      TABLE_CATALOG_ID = 'default_catalog'
+      AND TABLE_SCHEMA = 'default_database'
+  
+[0m09:18:05.506235 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m09:18:05.524744 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.018 seconds
+[0m09:18:05.532908 [debug] [ThreadPool]: On list_default_catalog_default_database: Close
+[0m09:18:05.534467 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'c479ec45-86c2-42fb-b757-444a2cdd100e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff12807f110>]}
+[0m09:18:05.543410 [debug] [MainThread]: Writing injected SQL for node "operation.clickstream.clickstream-on-run-start-0"
+[0m09:18:05.551524 [info ] [MainThread]: 1 of 1 START hook: clickstream.on-run-start.0 .................................. [RUN]
+[0m09:18:05.552621 [debug] [MainThread]: Using confluent connection "master"
+[0m09:18:05.553424 [debug] [MainThread]: On master: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "master"} */
+CREATE DATABASE IF NOT EXISTS clickstream
+[0m09:18:05.554339 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m09:18:05.652808 [debug] [MainThread]: SQL status: Phase.RUNNING in 0.098 seconds
+[0m09:18:05.655908 [info ] [MainThread]: 1 of 1 OK hook: clickstream.on-run-start.0 ..................................... [[32mOK[0m in 0.12s]
+[0m09:18:05.659396 [info ] [MainThread]: 
+[0m09:18:05.660552 [debug] [MainThread]: On master: Close
+[0m09:18:05.687522 [debug] [Thread-1 (]: Began running node model.clickstream.raw_kafka_datasource
+[0m09:18:05.689329 [info ] [Thread-1 (]: 1 of 2 START sql streaming_source model default_database.raw_kafka_datasource .. [RUN]
+[0m09:18:05.697335 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_default_catalog_default_database, now model.clickstream.raw_kafka_datasource)
+[0m09:18:05.699563 [debug] [Thread-1 (]: Began compiling node model.clickstream.raw_kafka_datasource
+[0m09:18:05.708066 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.raw_kafka_datasource"
+[0m09:18:05.715144 [debug] [Thread-1 (]: Began executing node model.clickstream.raw_kafka_datasource
+[0m09:18:05.752214 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.raw_kafka_datasource"
+[0m09:18:05.756152 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.raw_kafka_datasource"
+[0m09:18:05.760251 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.raw_kafka_datasource"} */
+CREATE TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`
+    ( -- example_source.sql
+
+
+-- Define your source schema here according to what your Kafka topic produces.
+-- This uses Flink SQL DDL syntax.
+user_id STRING,
+event_type STRING,
+session_id STRING,
+`timestamp` STRING,
+-- Add a conceptual event_time field extracted from a timestamp to handle windowing
+event_time AS TO_TIMESTAMP(REPLACE(REPLACE(`timestamp`, 'T', ' '), 'Z', '')),
+WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND)
+    WITH (
+      'connector' = 'kafka', 'topic' = 'clickstream', 'properties.bootstrap.servers' = 'kafka:29092', 'properties.group.id' = 'flink-consumer-group', 'scan.startup.mode' = 'earliest-offset', 'format' = 'json')
+[0m09:18:05.764099 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m09:18:06.887171 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 1.123 seconds
+[0m09:18:06.905540 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: Close
+[0m09:18:06.912399 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'c479ec45-86c2-42fb-b757-444a2cdd100e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff1264dca10>]}
+[0m09:18:06.914427 [info ] [Thread-1 (]: 1 of 2 OK created sql streaming_source model default_database.raw_kafka_datasource  [[32mPhase.RUNNING[0m in 1.22s]
+[0m09:18:06.916606 [debug] [Thread-1 (]: Finished running node model.clickstream.raw_kafka_datasource
+[0m09:18:06.919416 [debug] [Thread-1 (]: Began running node model.clickstream.transformed_clickstream_metrics
+[0m09:18:06.920896 [info ] [Thread-1 (]: 2 of 2 START sql streaming_table model default_database.transformed_clickstream_metrics  [RUN]
+[0m09:18:06.924363 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.clickstream.raw_kafka_datasource, now model.clickstream.transformed_clickstream_metrics)
+[0m09:18:06.925697 [debug] [Thread-1 (]: Began compiling node model.clickstream.transformed_clickstream_metrics
+[0m09:18:06.935994 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.transformed_clickstream_metrics"
+[0m09:18:06.940086 [debug] [Thread-1 (]: Began executing node model.clickstream.transformed_clickstream_metrics
+[0m09:18:06.981486 [info ] [Thread-1 (]: DEBUG_COLS_KEYS: ['user_id', 'event_type', 'session_id', 'event_count', 'window_start', 'window_end']
+[0m09:18:06.983177 [info ] [Thread-1 (]: DEBUG_COL: name=user_id column= data_type=TEXT quoted=
+[0m09:18:06.985056 [info ] [Thread-1 (]: DEBUG_COL: name=event_type column= data_type=TEXT quoted=
+[0m09:18:06.986587 [info ] [Thread-1 (]: DEBUG_COL: name=session_id column= data_type=TEXT quoted=
+[0m09:18:06.988701 [info ] [Thread-1 (]: DEBUG_COL: name=event_count column= data_type=BIGINT quoted=
+[0m09:18:06.990806 [info ] [Thread-1 (]: DEBUG_COL: name=window_start column= data_type=TIMESTAMP(3) quoted=
+[0m09:18:06.992335 [info ] [Thread-1 (]: DEBUG_COL: name=window_end column= data_type=TIMESTAMP(3) quoted=
+[0m09:18:06.994423 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.transformed_clickstream_metrics"
+[0m09:18:06.996593 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m09:18:07.002426 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+    
+    
+  
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+  
+  (`user_id` STRING,
+    `event_type` STRING,
+    `session_id` STRING,
+    `event_count` BIGINT,
+    `window_start` TIMESTAMP(3),
+    `window_end` TIMESTAMP(3))
+
+    
+    WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/clickstream','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+    
+[0m09:18:07.004363 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m09:18:07.374095 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.370 seconds
+[0m09:18:07.376152 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m09:18:07.376931 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+INSERT INTO `default_catalog`.`default_database`.`transformed_clickstream_metrics` -- example_sink.sql
+
+
+-- Define your transformation query here.
+-- This query will continuously consume the streaming source and emit results to the sink.
+SELECT 
+    user_id,
+    event_type,
+    session_id,
+    COUNT(*) as event_count,
+    window_start,
+    window_end
+FROM TABLE(
+    -- Using the source model we defined in example_source.sql
+    TUMBLE(TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`, DESCRIPTOR(event_time), INTERVAL '1' MINUTE)
+)
+GROUP BY user_id, event_type, session_id, window_start, window_end
+[0m09:18:07.408690 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.031 seconds
+[0m09:18:07.411416 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: Close
+[0m09:18:07.412491 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'c479ec45-86c2-42fb-b757-444a2cdd100e', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff124b5ebd0>]}
+[0m09:18:07.413787 [info ] [Thread-1 (]: 2 of 2 OK created sql streaming_table model default_database.transformed_clickstream_metrics  [[32mPhase.RUNNING[0m in 0.49s]
+[0m09:18:07.415236 [debug] [Thread-1 (]: Finished running node model.clickstream.transformed_clickstream_metrics
+[0m09:18:07.418863 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m09:18:07.420382 [debug] [MainThread]: Connection 'model.clickstream.transformed_clickstream_metrics' was properly closed.
+[0m09:18:07.421731 [info ] [MainThread]: 
+[0m09:18:07.422891 [info ] [MainThread]: Finished running 1 project hook, 1 streaming source model, 1 streaming table model in 0 hours 0 minutes and 2.37 seconds (2.37s).
+[0m09:18:07.425329 [debug] [MainThread]: Command end result
+[0m09:18:07.491896 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m09:18:07.495724 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m09:18:07.503753 [debug] [MainThread]: Wrote artifact RunExecutionResult to /app/target/run_results.json
+[0m09:18:07.504860 [info ] [MainThread]: 
+[0m09:18:07.506220 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m09:18:07.508108 [info ] [MainThread]: 
+[0m09:18:07.509485 [info ] [MainThread]: Done. PASS=3 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=3
+[0m09:18:07.511657 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 3.7424462, "process_in_blocks": "0", "process_kernel_time": 0.465933, "process_mem_max_rss": "129628", "process_out_blocks": "6141", "process_user_time": 4.467229}
+[0m09:18:07.512670 [debug] [MainThread]: Command `dbt run` succeeded at 09:18:07.512499 after 3.74 seconds
+[0m09:18:07.513559 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff12cf5c8d0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff12cf5c890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7ff12cf5d8d0>]}
+[0m09:18:07.514741 [debug] [MainThread]: Flushing usage events
+[0m09:18:09.641340 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m09:21:54.426375 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf32757690>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf32754210>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf32757b50>]}
+
+
+============================== 09:21:54.432356 | 307f5086-6d71-44eb-afbf-059036ba23a5 ==============================
+[0m09:21:54.432356 [info ] [MainThread]: Running with dbt=1.11.7
+[0m09:21:54.433434 [debug] [MainThread]: running dbt with arguments {'introspect': 'True', 'log_format': 'default', 'log_cache_events': 'False', 'log_path': '/app/logs', 'warn_error': 'None', 'version_check': 'True', 'debug': 'False', 'target_path': 'None', 'empty': 'False', 'static_parser': 'True', 'write_json': 'True', 'use_colors': 'True', 'profiles_dir': '/app', 'printer_width': '80', 'invocation_command': 'dbt run', 'use_experimental_parser': 'False', 'fail_fast': 'False', 'send_anonymous_usage_stats': 'True', 'cache_selected_only': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'quiet': 'False', 'indirect_selection': 'eager', 'no_print': 'None', 'partial_parse': 'True'}
+[0m09:21:54.629864 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '307f5086-6d71-44eb-afbf-059036ba23a5', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf326e3310>]}
+[0m09:21:54.699548 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '307f5086-6d71-44eb-afbf-059036ba23a5', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf35873050>]}
+[0m09:21:54.700657 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m09:21:54.786422 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m09:21:54.899531 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 0 files changed.
+[0m09:21:54.900303 [debug] [MainThread]: Nothing changed, skipping partial parsing.
+[0m09:21:54.900829 [debug] [MainThread]: Partial parsing enabled, no changes found, skipping parsing
+[0m09:21:54.947126 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '307f5086-6d71-44eb-afbf-059036ba23a5', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf321f8810>]}
+[0m09:21:55.046769 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m09:21:55.049015 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m09:21:55.066926 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '307f5086-6d71-44eb-afbf-059036ba23a5', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf3202a650>]}
+[0m09:21:55.067769 [info ] [MainThread]: Found 1 operation, 2 models, 448 macros
+[0m09:21:55.068352 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '307f5086-6d71-44eb-afbf-059036ba23a5', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf32183d50>]}
+[0m09:21:55.070100 [info ] [MainThread]: 
+[0m09:21:55.070586 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m09:21:55.071039 [info ] [MainThread]: 
+[0m09:21:55.071762 [debug] [MainThread]: Acquiring new confluent connection 'master'
+[0m09:21:55.076831 [debug] [ThreadPool]: Acquiring new confluent connection 'list_default_catalog'
+[0m09:21:55.176880 [debug] [ThreadPool]: Using confluent connection "list_default_catalog"
+[0m09:21:55.178043 [debug] [ThreadPool]: On list_default_catalog: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog"} */
+SELECT
+      SCHEMA_NAME as schema
+    FROM
+      `default_catalog`.`INFORMATION_SCHEMA`.`SCHEMATA`
+    WHERE
+      `SCHEMA_NAME` <> 'INFORMATION_SCHEMA'
+  
+[0m09:21:55.178777 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m09:21:55.240553 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.062 seconds
+[0m09:21:55.244034 [debug] [ThreadPool]: On list_default_catalog: Close
+[0m09:21:55.245920 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_default_catalog, now list_default_catalog_default_database)
+[0m09:21:55.253968 [debug] [ThreadPool]: Using confluent connection "list_default_catalog_default_database"
+[0m09:21:55.255052 [debug] [ThreadPool]: On list_default_catalog_default_database: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog_default_database"} */
+SELECT
+      TABLE_CATALOG_ID as database,
+      TABLE_NAME as name,
+      TABLE_SCHEMA as schema,
+      TABLE_TYPE as type
+    FROM
+      INFORMATION_SCHEMA.`TABLES`
+    WHERE
+      TABLE_CATALOG_ID = 'default_catalog'
+      AND TABLE_SCHEMA = 'default_database'
+  
+[0m09:21:55.256013 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m09:21:55.271036 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.015 seconds
+[0m09:21:55.278010 [debug] [ThreadPool]: On list_default_catalog_default_database: Close
+[0m09:21:55.281229 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '307f5086-6d71-44eb-afbf-059036ba23a5', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf32596290>]}
+[0m09:21:55.300951 [debug] [MainThread]: Writing injected SQL for node "operation.clickstream.clickstream-on-run-start-0"
+[0m09:21:55.321157 [info ] [MainThread]: 1 of 1 START hook: clickstream.on-run-start.0 .................................. [RUN]
+[0m09:21:55.324441 [debug] [MainThread]: Using confluent connection "master"
+[0m09:21:55.325544 [debug] [MainThread]: On master: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "master"} */
+CREATE DATABASE IF NOT EXISTS clickstream
+[0m09:21:55.326816 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m09:21:55.393515 [debug] [MainThread]: SQL status: Phase.COMPLETED in 0.067 seconds
+[0m09:21:55.430381 [info ] [MainThread]: 1 of 1 OK hook: clickstream.on-run-start.0 ..................................... [[32mOK[0m in 0.15s]
+[0m09:21:55.431473 [info ] [MainThread]: 
+[0m09:21:55.432909 [debug] [MainThread]: On master: Close
+[0m09:21:55.441727 [debug] [Thread-1 (]: Began running node model.clickstream.raw_kafka_datasource
+[0m09:21:55.443077 [info ] [Thread-1 (]: 1 of 2 START sql streaming_source model default_database.raw_kafka_datasource .. [RUN]
+[0m09:21:55.446497 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_default_catalog_default_database, now model.clickstream.raw_kafka_datasource)
+[0m09:21:55.449731 [debug] [Thread-1 (]: Began compiling node model.clickstream.raw_kafka_datasource
+[0m09:21:55.459437 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.raw_kafka_datasource"
+[0m09:21:55.466574 [debug] [Thread-1 (]: Began executing node model.clickstream.raw_kafka_datasource
+[0m09:21:55.496345 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.raw_kafka_datasource"
+[0m09:21:55.501492 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.raw_kafka_datasource"
+[0m09:21:55.503499 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.raw_kafka_datasource"} */
+CREATE TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`
+    ( -- example_source.sql
+
+
+-- Define your source schema here according to what your Kafka topic produces.
+-- This uses Flink SQL DDL syntax.
+user_id STRING,
+event_type STRING,
+session_id STRING,
+`timestamp` STRING,
+-- Add a conceptual event_time field extracted from a timestamp to handle windowing
+event_time AS TO_TIMESTAMP(REPLACE(REPLACE(`timestamp`, 'T', ' '), 'Z', '')),
+WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND)
+    WITH (
+      'connector' = 'kafka', 'topic' = 'clickstream', 'properties.bootstrap.servers' = 'kafka:29092', 'properties.group.id' = 'flink-consumer-group', 'scan.startup.mode' = 'earliest-offset', 'format' = 'json')
+[0m09:21:55.505668 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m09:21:55.549777 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.044 seconds
+[0m09:21:55.561968 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: Close
+[0m09:21:55.565241 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '307f5086-6d71-44eb-afbf-059036ba23a5', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf31341a90>]}
+[0m09:21:55.566765 [info ] [Thread-1 (]: 1 of 2 OK created sql streaming_source model default_database.raw_kafka_datasource  [[32mPhase.RUNNING[0m in 0.12s]
+[0m09:21:55.568352 [debug] [Thread-1 (]: Finished running node model.clickstream.raw_kafka_datasource
+[0m09:21:55.570156 [debug] [Thread-1 (]: Began running node model.clickstream.transformed_clickstream_metrics
+[0m09:21:55.571370 [info ] [Thread-1 (]: 2 of 2 START sql streaming_table model default_database.transformed_clickstream_metrics  [RUN]
+[0m09:21:55.572653 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.clickstream.raw_kafka_datasource, now model.clickstream.transformed_clickstream_metrics)
+[0m09:21:55.573730 [debug] [Thread-1 (]: Began compiling node model.clickstream.transformed_clickstream_metrics
+[0m09:21:55.581299 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.transformed_clickstream_metrics"
+[0m09:21:55.583532 [debug] [Thread-1 (]: Began executing node model.clickstream.transformed_clickstream_metrics
+[0m09:21:55.605279 [info ] [Thread-1 (]: DEBUG_COLS_KEYS: ['user_id', 'event_type', 'session_id', 'event_count', 'window_start', 'window_end']
+[0m09:21:55.606351 [info ] [Thread-1 (]: DEBUG_COL: name=user_id column= data_type=TEXT quoted=
+[0m09:21:55.607579 [info ] [Thread-1 (]: DEBUG_COL: name=event_type column= data_type=TEXT quoted=
+[0m09:21:55.608851 [info ] [Thread-1 (]: DEBUG_COL: name=session_id column= data_type=TEXT quoted=
+[0m09:21:55.610221 [info ] [Thread-1 (]: DEBUG_COL: name=event_count column= data_type=BIGINT quoted=
+[0m09:21:55.611647 [info ] [Thread-1 (]: DEBUG_COL: name=window_start column= data_type=TIMESTAMP(3) quoted=
+[0m09:21:55.613673 [info ] [Thread-1 (]: DEBUG_COL: name=window_end column= data_type=TIMESTAMP(3) quoted=
+[0m09:21:55.615904 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.transformed_clickstream_metrics"
+[0m09:21:55.621242 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m09:21:55.622801 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+    
+    
+  
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+  
+  (`user_id` STRING,
+    `event_type` STRING,
+    `session_id` STRING,
+    `event_count` BIGINT,
+    `window_start` TIMESTAMP(3),
+    `window_end` TIMESTAMP(3))
+
+    
+    WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/clickstream','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+    
+[0m09:21:55.624934 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m09:21:55.695454 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.071 seconds
+[0m09:21:55.698070 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m09:21:55.699277 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+INSERT INTO `default_catalog`.`default_database`.`transformed_clickstream_metrics` -- example_sink.sql
+
+
+-- Define your transformation query here.
+-- This query will continuously consume the streaming source and emit results to the sink.
+SELECT 
+    user_id,
+    event_type,
+    session_id,
+    COUNT(*) as event_count,
+    window_start,
+    window_end
+FROM TABLE(
+    -- Using the source model we defined in example_source.sql
+    TUMBLE(TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`, DESCRIPTOR(event_time), INTERVAL '1' MINUTE)
+)
+GROUP BY user_id, event_type, session_id, window_start, window_end
+[0m09:21:55.728528 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.028 seconds
+[0m09:21:55.732021 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: Close
+[0m09:21:55.736262 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '307f5086-6d71-44eb-afbf-059036ba23a5', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf31330090>]}
+[0m09:21:55.737984 [info ] [Thread-1 (]: 2 of 2 OK created sql streaming_table model default_database.transformed_clickstream_metrics  [[32mPhase.RUNNING[0m in 0.16s]
+[0m09:21:55.739665 [debug] [Thread-1 (]: Finished running node model.clickstream.transformed_clickstream_metrics
+[0m09:21:55.747544 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m09:21:55.750144 [debug] [MainThread]: Connection 'model.clickstream.transformed_clickstream_metrics' was properly closed.
+[0m09:21:55.753479 [info ] [MainThread]: 
+[0m09:21:55.755523 [info ] [MainThread]: Finished running 1 project hook, 1 streaming source model, 1 streaming table model in 0 hours 0 minutes and 0.68 seconds (0.68s).
+[0m09:21:55.758538 [debug] [MainThread]: Command end result
+[0m09:21:55.837918 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m09:21:55.841020 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m09:21:55.850528 [debug] [MainThread]: Wrote artifact RunExecutionResult to /app/target/run_results.json
+[0m09:21:55.851500 [info ] [MainThread]: 
+[0m09:21:55.852673 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m09:21:55.854281 [info ] [MainThread]: 
+[0m09:21:55.855591 [info ] [MainThread]: Done. PASS=3 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=3
+[0m09:21:55.857798 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 1.4887954, "process_in_blocks": "0", "process_kernel_time": 0.366597, "process_mem_max_rss": "127976", "process_out_blocks": "5260", "process_user_time": 2.766309}
+[0m09:21:55.858917 [debug] [MainThread]: Command `dbt run` succeeded at 09:21:55.858691 after 1.49 seconds
+[0m09:21:55.860095 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf32728bd0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf3272ac50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7fbf32a7ddd0>]}
+[0m09:21:55.861631 [debug] [MainThread]: Flushing usage events
+[0m09:21:57.992577 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m09:31:41.363703 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d8923750>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d8c49d50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d892f850>]}
+
+
+============================== 09:31:41.369695 | 08d7a0b8-2753-42fb-8b64-3e1d42d4eca7 ==============================
+[0m09:31:41.369695 [info ] [MainThread]: Running with dbt=1.11.7
+[0m09:31:41.370779 [debug] [MainThread]: running dbt with arguments {'log_cache_events': 'False', 'warn_error': 'None', 'version_check': 'True', 'use_experimental_parser': 'False', 'introspect': 'True', 'use_colors': 'True', 'log_format': 'default', 'fail_fast': 'False', 'debug': 'False', 'no_print': 'None', 'indirect_selection': 'eager', 'printer_width': '80', 'partial_parse': 'True', 'empty': 'False', 'send_anonymous_usage_stats': 'True', 'profiles_dir': '/app', 'quiet': 'False', 'invocation_command': 'dbt run', 'cache_selected_only': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'log_path': '/app/logs', 'write_json': 'True', 'static_parser': 'True', 'target_path': 'None'}
+[0m09:31:41.573504 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '08d7a0b8-2753-42fb-8b64-3e1d42d4eca7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d8688b50>]}
+[0m09:31:41.646931 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '08d7a0b8-2753-42fb-8b64-3e1d42d4eca7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d8624910>]}
+[0m09:31:41.648051 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m09:31:41.741927 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m09:31:41.867626 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 0 files changed.
+[0m09:31:41.868497 [debug] [MainThread]: Nothing changed, skipping partial parsing.
+[0m09:31:41.869401 [debug] [MainThread]: Partial parsing enabled, no changes found, skipping parsing
+[0m09:31:41.916407 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '08d7a0b8-2753-42fb-8b64-3e1d42d4eca7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d82d1c50>]}
+[0m09:31:42.015747 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m09:31:42.018463 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m09:31:42.038187 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '08d7a0b8-2753-42fb-8b64-3e1d42d4eca7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d8576790>]}
+[0m09:31:42.040022 [info ] [MainThread]: Found 1 operation, 2 models, 448 macros
+[0m09:31:42.040671 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '08d7a0b8-2753-42fb-8b64-3e1d42d4eca7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d81aec90>]}
+[0m09:31:42.043067 [info ] [MainThread]: 
+[0m09:31:42.043830 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m09:31:42.044433 [info ] [MainThread]: 
+[0m09:31:42.045272 [debug] [MainThread]: Acquiring new confluent connection 'master'
+[0m09:31:42.051238 [debug] [ThreadPool]: Acquiring new confluent connection 'list_default_catalog'
+[0m09:31:42.151621 [debug] [ThreadPool]: Using confluent connection "list_default_catalog"
+[0m09:31:42.152611 [debug] [ThreadPool]: On list_default_catalog: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog"} */
+SELECT
+      SCHEMA_NAME as schema
+    FROM
+      `default_catalog`.`INFORMATION_SCHEMA`.`SCHEMATA`
+    WHERE
+      `SCHEMA_NAME` <> 'INFORMATION_SCHEMA'
+  
+[0m09:31:42.153240 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m09:31:42.219821 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.067 seconds
+[0m09:31:42.223421 [debug] [ThreadPool]: On list_default_catalog: Close
+[0m09:31:42.225156 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_default_catalog, now list_default_catalog_default_database)
+[0m09:31:42.234537 [debug] [ThreadPool]: Using confluent connection "list_default_catalog_default_database"
+[0m09:31:42.235706 [debug] [ThreadPool]: On list_default_catalog_default_database: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog_default_database"} */
+SELECT
+      TABLE_CATALOG_ID as database,
+      TABLE_NAME as name,
+      TABLE_SCHEMA as schema,
+      TABLE_TYPE as type
+    FROM
+      INFORMATION_SCHEMA.`TABLES`
+    WHERE
+      TABLE_CATALOG_ID = 'default_catalog'
+      AND TABLE_SCHEMA = 'default_database'
+  
+[0m09:31:42.236661 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m09:31:42.251611 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.015 seconds
+[0m09:31:42.255177 [debug] [ThreadPool]: On list_default_catalog_default_database: Close
+[0m09:31:42.259556 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '08d7a0b8-2753-42fb-8b64-3e1d42d4eca7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d828a510>]}
+[0m09:31:42.268300 [debug] [MainThread]: Writing injected SQL for node "operation.clickstream.clickstream-on-run-start-0"
+[0m09:31:42.279235 [info ] [MainThread]: 1 of 1 START hook: clickstream.on-run-start.0 .................................. [RUN]
+[0m09:31:42.281247 [debug] [MainThread]: Using confluent connection "master"
+[0m09:31:42.282291 [debug] [MainThread]: On master: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "master"} */
+CREATE DATABASE IF NOT EXISTS clickstream
+[0m09:31:42.283124 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m09:31:42.334299 [debug] [MainThread]: SQL status: Phase.COMPLETED in 0.051 seconds
+[0m09:31:42.346896 [info ] [MainThread]: 1 of 1 OK hook: clickstream.on-run-start.0 ..................................... [[32mOK[0m in 0.09s]
+[0m09:31:42.347734 [info ] [MainThread]: 
+[0m09:31:42.348399 [debug] [MainThread]: On master: Close
+[0m09:31:42.357254 [debug] [Thread-1 (]: Began running node model.clickstream.raw_kafka_datasource
+[0m09:31:42.359192 [info ] [Thread-1 (]: 1 of 2 START sql streaming_source model default_database.raw_kafka_datasource .. [RUN]
+[0m09:31:42.361159 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_default_catalog_default_database, now model.clickstream.raw_kafka_datasource)
+[0m09:31:42.362272 [debug] [Thread-1 (]: Began compiling node model.clickstream.raw_kafka_datasource
+[0m09:31:42.368890 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.raw_kafka_datasource"
+[0m09:31:42.370363 [debug] [Thread-1 (]: Began executing node model.clickstream.raw_kafka_datasource
+[0m09:31:42.396006 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.raw_kafka_datasource"
+[0m09:31:42.400064 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.raw_kafka_datasource"
+[0m09:31:42.401494 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.raw_kafka_datasource"} */
+CREATE TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`
+    ( -- example_source.sql
+
+
+-- Define your source schema here according to what your Kafka topic produces.
+-- This uses Flink SQL DDL syntax.
+user_id STRING,
+event_type STRING,
+session_id STRING,
+`timestamp` STRING,
+-- Add a conceptual event_time field extracted from a timestamp to handle windowing
+event_time AS TO_TIMESTAMP(REPLACE(REPLACE(`timestamp`, 'T', ' '), 'Z', '')),
+WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND)
+    WITH (
+      'connector' = 'kafka', 'topic' = 'clickstream', 'properties.bootstrap.servers' = 'kafka:29092', 'properties.group.id' = 'flink-consumer-group', 'scan.startup.mode' = 'earliest-offset', 'format' = 'json')
+[0m09:31:42.402542 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m09:31:42.442850 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.040 seconds
+[0m09:31:42.452950 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: Close
+[0m09:31:42.455542 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '08d7a0b8-2753-42fb-8b64-3e1d42d4eca7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d890b290>]}
+[0m09:31:42.456983 [info ] [Thread-1 (]: 1 of 2 OK created sql streaming_source model default_database.raw_kafka_datasource  [[32mPhase.RUNNING[0m in 0.09s]
+[0m09:31:42.458352 [debug] [Thread-1 (]: Finished running node model.clickstream.raw_kafka_datasource
+[0m09:31:42.459991 [debug] [Thread-1 (]: Began running node model.clickstream.transformed_clickstream_metrics
+[0m09:31:42.461010 [info ] [Thread-1 (]: 2 of 2 START sql streaming_table model default_database.transformed_clickstream_metrics  [RUN]
+[0m09:31:42.462813 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.clickstream.raw_kafka_datasource, now model.clickstream.transformed_clickstream_metrics)
+[0m09:31:42.463575 [debug] [Thread-1 (]: Began compiling node model.clickstream.transformed_clickstream_metrics
+[0m09:31:42.469383 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.transformed_clickstream_metrics"
+[0m09:31:42.471393 [debug] [Thread-1 (]: Began executing node model.clickstream.transformed_clickstream_metrics
+[0m09:31:42.492603 [info ] [Thread-1 (]: DEBUG_COLS_KEYS: ['user_id', 'event_type', 'session_id', 'event_count', 'window_start', 'window_end']
+[0m09:31:42.494286 [info ] [Thread-1 (]: DEBUG_COL: name=user_id column= data_type=TEXT quoted=
+[0m09:31:42.495792 [info ] [Thread-1 (]: DEBUG_COL: name=event_type column= data_type=TEXT quoted=
+[0m09:31:42.497205 [info ] [Thread-1 (]: DEBUG_COL: name=session_id column= data_type=TEXT quoted=
+[0m09:31:42.498335 [info ] [Thread-1 (]: DEBUG_COL: name=event_count column= data_type=BIGINT quoted=
+[0m09:31:42.499826 [info ] [Thread-1 (]: DEBUG_COL: name=window_start column= data_type=TIMESTAMP(3) quoted=
+[0m09:31:42.500924 [info ] [Thread-1 (]: DEBUG_COL: name=window_end column= data_type=TIMESTAMP(3) quoted=
+[0m09:31:42.502023 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.transformed_clickstream_metrics"
+[0m09:31:42.503274 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m09:31:42.504157 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+    
+    
+  
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+  
+  (`user_id` STRING,
+    `event_type` STRING,
+    `session_id` STRING,
+    `event_count` BIGINT,
+    `window_start` TIMESTAMP(3),
+    `window_end` TIMESTAMP(3))
+
+    
+    WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/clickstream','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+    
+[0m09:31:42.505493 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m09:31:42.553266 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: Close
+[0m09:31:42.567567 [debug] [Thread-1 (]: Database Error in model transformed_clickstream_metrics (models/transformed_clickstream_metrics.sql)
+  confluent_sql error for '/* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+  create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+      
+      
+    
+    
+    
+    
+    
+      
+      
+      
+      
+        
+      
+      
+    
+      
+      
+      
+      
+        
+      
+      
+    
+      
+      
+      
+      
+        
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+    
+    (`user_id` STRING,
+      `event_type` STRING,
+      `session_id` STRING,
+      `event_count` BIGINT,
+      `window_start` TIMESTAMP(3),
+      `window_end` TIMESTAMP(3))
+  
+      
+      WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/clickstream','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+      ': Statement 'dbt-confluent-addf5857-7ffa-47b5-9cfe-6fbdbe2622f7' failed: 
+  compiled code at target/run/clickstream/models/transformed_clickstream_metrics.sql
+[0m09:31:42.568854 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '08d7a0b8-2753-42fb-8b64-3e1d42d4eca7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d8229890>]}
+[0m09:31:42.570220 [error] [Thread-1 (]: 2 of 2 ERROR creating sql streaming_table model default_database.transformed_clickstream_metrics  [[31mERROR[0m in 0.11s]
+[0m09:31:42.571577 [debug] [Thread-1 (]: Finished running node model.clickstream.transformed_clickstream_metrics
+[0m09:31:42.572874 [debug] [Thread-4 (]: Marking all children of 'model.clickstream.transformed_clickstream_metrics' to be skipped because of status 'error'.  Reason: Database Error in model transformed_clickstream_metrics (models/transformed_clickstream_metrics.sql)
+  confluent_sql error for '/* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+  create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+      
+      
+    
+    
+    
+    
+    
+      
+      
+      
+      
+        
+      
+      
+    
+      
+      
+      
+      
+        
+      
+      
+    
+      
+      
+      
+      
+        
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+    
+    (`user_id` STRING,
+      `event_type` STRING,
+      `session_id` STRING,
+      `event_count` BIGINT,
+      `window_start` TIMESTAMP(3),
+      `window_end` TIMESTAMP(3))
+  
+      
+      WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/clickstream','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+      ': Statement 'dbt-confluent-addf5857-7ffa-47b5-9cfe-6fbdbe2622f7' failed: 
+  compiled code at target/run/clickstream/models/transformed_clickstream_metrics.sql.
+[0m09:31:42.576628 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m09:31:42.577394 [debug] [MainThread]: Connection 'model.clickstream.transformed_clickstream_metrics' was properly closed.
+[0m09:31:42.578097 [info ] [MainThread]: 
+[0m09:31:42.578780 [info ] [MainThread]: Finished running 1 project hook, 1 streaming source model, 1 streaming table model in 0 hours 0 minutes and 0.53 seconds (0.53s).
+[0m09:31:42.580676 [debug] [MainThread]: Command end result
+[0m09:31:42.628781 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m09:31:42.631648 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m09:31:42.639922 [debug] [MainThread]: Wrote artifact RunExecutionResult to /app/target/run_results.json
+[0m09:31:42.640723 [info ] [MainThread]: 
+[0m09:31:42.641718 [info ] [MainThread]: [31mCompleted with 1 error, 0 partial successes, and 0 warnings:[0m
+[0m09:31:42.642446 [info ] [MainThread]: 
+[0m09:31:42.643463 [error] [MainThread]: [31mFailure in model transformed_clickstream_metrics (models/transformed_clickstream_metrics.sql)[0m
+[0m09:31:42.644704 [error] [MainThread]:   Database Error in model transformed_clickstream_metrics (models/transformed_clickstream_metrics.sql)
+  confluent_sql error for '/* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+  create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+      
+      
+    
+    
+    
+    
+    
+      
+      
+      
+      
+        
+      
+      
+    
+      
+      
+      
+      
+        
+      
+      
+    
+      
+      
+      
+      
+        
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+      
+      
+      
+      
+      
+    
+    
+    (`user_id` STRING,
+      `event_type` STRING,
+      `session_id` STRING,
+      `event_count` BIGINT,
+      `window_start` TIMESTAMP(3),
+      `window_end` TIMESTAMP(3))
+  
+      
+      WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/clickstream','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+      ': Statement 'dbt-confluent-addf5857-7ffa-47b5-9cfe-6fbdbe2622f7' failed: 
+  compiled code at target/run/clickstream/models/transformed_clickstream_metrics.sql
+[0m09:31:42.645716 [info ] [MainThread]: 
+[0m09:31:42.646762 [info ] [MainThread]:   compiled code at target/compiled/clickstream/models/transformed_clickstream_metrics.sql
+[0m09:31:42.647587 [info ] [MainThread]: 
+[0m09:31:42.648381 [info ] [MainThread]: Done. PASS=2 WARN=0 ERROR=1 SKIP=0 NO-OP=0 TOTAL=3
+[0m09:31:42.650146 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": false, "command_wall_clock_time": 1.3571646, "process_in_blocks": "456", "process_kernel_time": 0.410671, "process_mem_max_rss": "128064", "process_out_blocks": "5268", "process_user_time": 3.119826}
+[0m09:31:42.651063 [debug] [MainThread]: Command `dbt run` failed at 09:31:42.650934 after 1.36 seconds
+[0m09:31:42.651739 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d88c6290>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37d9021ad0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f37dba3c350>]}
+[0m09:31:42.652464 [debug] [MainThread]: Flushing usage events
+[0m09:31:45.700015 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m14:17:28.061284 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd526f810>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd526fe10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd526f7d0>]}
+
+
+============================== 14:17:28.066863 | 01886fe1-b723-45b2-9784-d9ae2b3b63c7 ==============================
+[0m14:17:28.066863 [info ] [MainThread]: Running with dbt=1.11.7
+[0m14:17:28.067807 [debug] [MainThread]: running dbt with arguments {'indirect_selection': 'eager', 'quiet': 'False', 'cache_selected_only': 'False', 'version_check': 'True', 'profiles_dir': '/app', 'target_path': 'None', 'partial_parse': 'True', 'introspect': 'True', 'warn_error': 'None', 'empty': 'False', 'write_json': 'True', 'invocation_command': 'dbt run', 'no_print': 'None', 'static_parser': 'True', 'use_colors': 'True', 'use_experimental_parser': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'fail_fast': 'False', 'log_format': 'default', 'log_path': '/app/logs', 'log_cache_events': 'False', 'send_anonymous_usage_stats': 'True', 'printer_width': '80', 'debug': 'False'}
+[0m14:17:28.266003 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '01886fe1-b723-45b2-9784-d9ae2b3b63c7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd5085e90>]}
+[0m14:17:28.335929 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '01886fe1-b723-45b2-9784-d9ae2b3b63c7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd4f84c90>]}
+[0m14:17:28.336958 [info ] [MainThread]: Registered adapter: confluent=0.1.0
+[0m14:17:28.423748 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m14:17:28.538377 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 0 files changed.
+[0m14:17:28.539187 [debug] [MainThread]: Nothing changed, skipping partial parsing.
+[0m14:17:28.539676 [debug] [MainThread]: Partial parsing enabled, no changes found, skipping parsing
+[0m14:17:28.580228 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '01886fe1-b723-45b2-9784-d9ae2b3b63c7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd4db3910>]}
+[0m14:17:28.670572 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m14:17:28.673492 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m14:17:28.694396 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '01886fe1-b723-45b2-9784-d9ae2b3b63c7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd4d05210>]}
+[0m14:17:28.695471 [info ] [MainThread]: Found 1 operation, 2 models, 448 macros
+[0m14:17:28.696239 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '01886fe1-b723-45b2-9784-d9ae2b3b63c7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd50b3890>]}
+[0m14:17:28.698975 [info ] [MainThread]: 
+[0m14:17:28.699670 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m14:17:28.700399 [info ] [MainThread]: 
+[0m14:17:28.701417 [debug] [MainThread]: Acquiring new confluent connection 'master'
+[0m14:17:28.707416 [debug] [ThreadPool]: Acquiring new confluent connection 'list_default_catalog'
+[0m14:17:28.808545 [debug] [ThreadPool]: Using confluent connection "list_default_catalog"
+[0m14:17:28.809547 [debug] [ThreadPool]: On list_default_catalog: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog"} */
+SELECT
+      SCHEMA_NAME as schema
+    FROM
+      `default_catalog`.`INFORMATION_SCHEMA`.`SCHEMATA`
+    WHERE
+      `SCHEMA_NAME` <> 'INFORMATION_SCHEMA'
+  
+[0m14:17:28.810143 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m14:17:28.882930 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.073 seconds
+[0m14:17:28.886629 [debug] [ThreadPool]: On list_default_catalog: Close
+[0m14:17:28.888553 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_default_catalog, now list_default_catalog_default_database)
+[0m14:17:28.896998 [debug] [ThreadPool]: Using confluent connection "list_default_catalog_default_database"
+[0m14:17:28.897949 [debug] [ThreadPool]: On list_default_catalog_default_database: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "list_default_catalog_default_database"} */
+SELECT
+      TABLE_CATALOG_ID as database,
+      TABLE_NAME as name,
+      TABLE_SCHEMA as schema,
+      TABLE_TYPE as type
+    FROM
+      INFORMATION_SCHEMA.`TABLES`
+    WHERE
+      TABLE_CATALOG_ID = 'default_catalog'
+      AND TABLE_SCHEMA = 'default_database'
+  
+[0m14:17:28.898643 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m14:17:28.915204 [debug] [ThreadPool]: SQL status: Phase.COMPLETED in 0.017 seconds
+[0m14:17:28.918723 [debug] [ThreadPool]: On list_default_catalog_default_database: Close
+[0m14:17:28.923049 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '01886fe1-b723-45b2-9784-d9ae2b3b63c7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd41b46d0>]}
+[0m14:17:28.932646 [debug] [MainThread]: Writing injected SQL for node "operation.clickstream.clickstream-on-run-start-0"
+[0m14:17:28.941348 [info ] [MainThread]: 1 of 1 START hook: clickstream.on-run-start.0 .................................. [RUN]
+[0m14:17:28.943356 [debug] [MainThread]: Using confluent connection "master"
+[0m14:17:28.944523 [debug] [MainThread]: On master: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "connection_name": "master"} */
+CREATE DATABASE IF NOT EXISTS clickstream
+[0m14:17:28.945442 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m14:17:28.986216 [debug] [MainThread]: SQL status: Phase.COMPLETED in 0.041 seconds
+[0m14:17:29.001069 [info ] [MainThread]: 1 of 1 OK hook: clickstream.on-run-start.0 ..................................... [[32mOK[0m in 0.08s]
+[0m14:17:29.002064 [info ] [MainThread]: 
+[0m14:17:29.004572 [debug] [MainThread]: On master: Close
+[0m14:17:29.026697 [debug] [Thread-1 (]: Began running node model.clickstream.raw_kafka_datasource
+[0m14:17:29.030122 [info ] [Thread-1 (]: 1 of 2 START sql streaming_source model default_database.raw_kafka_datasource .. [RUN]
+[0m14:17:29.032006 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_default_catalog_default_database, now model.clickstream.raw_kafka_datasource)
+[0m14:17:29.033642 [debug] [Thread-1 (]: Began compiling node model.clickstream.raw_kafka_datasource
+[0m14:17:29.043271 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.raw_kafka_datasource"
+[0m14:17:29.046029 [debug] [Thread-1 (]: Began executing node model.clickstream.raw_kafka_datasource
+[0m14:17:29.070141 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.raw_kafka_datasource"
+[0m14:17:29.076327 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.raw_kafka_datasource"
+[0m14:17:29.077565 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.raw_kafka_datasource"} */
+CREATE TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`
+    ( -- example_source.sql
+
+
+-- Define your source schema here according to what your Kafka topic produces.
+-- This uses Flink SQL DDL syntax.
+user_id STRING,
+event_type STRING,
+session_id STRING,
+`timestamp` STRING,
+-- Add a conceptual event_time field extracted from a timestamp to handle windowing
+event_time AS TO_TIMESTAMP(REPLACE(REPLACE(`timestamp`, 'T', ' '), 'Z', '')),
+WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND)
+    WITH (
+      'connector' = 'kafka', 'topic' = 'clickstream', 'properties.bootstrap.servers' = 'kafka:29092', 'properties.group.id' = 'flink-consumer-group', 'scan.startup.mode' = 'earliest-offset', 'format' = 'json')
+[0m14:17:29.078757 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m14:17:29.110605 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.032 seconds
+[0m14:17:29.121917 [debug] [Thread-1 (]: On model.clickstream.raw_kafka_datasource: Close
+[0m14:17:29.124237 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '01886fe1-b723-45b2-9784-d9ae2b3b63c7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fcfd66b50>]}
+[0m14:17:29.125479 [info ] [Thread-1 (]: 1 of 2 OK created sql streaming_source model default_database.raw_kafka_datasource  [[32mPhase.RUNNING[0m in 0.09s]
+[0m14:17:29.126549 [debug] [Thread-1 (]: Finished running node model.clickstream.raw_kafka_datasource
+[0m14:17:29.127792 [debug] [Thread-1 (]: Began running node model.clickstream.transformed_clickstream_metrics
+[0m14:17:29.128710 [info ] [Thread-1 (]: 2 of 2 START sql streaming_table model default_database.transformed_clickstream_metrics  [RUN]
+[0m14:17:29.131067 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.clickstream.raw_kafka_datasource, now model.clickstream.transformed_clickstream_metrics)
+[0m14:17:29.131758 [debug] [Thread-1 (]: Began compiling node model.clickstream.transformed_clickstream_metrics
+[0m14:17:29.137251 [debug] [Thread-1 (]: Writing injected SQL for node "model.clickstream.transformed_clickstream_metrics"
+[0m14:17:29.139190 [debug] [Thread-1 (]: Began executing node model.clickstream.transformed_clickstream_metrics
+[0m14:17:29.158152 [info ] [Thread-1 (]: DEBUG_COLS_KEYS: ['user_id', 'event_type', 'session_id', 'event_count', 'window_start', 'window_end']
+[0m14:17:29.159535 [info ] [Thread-1 (]: DEBUG_COL: name=user_id column= data_type=TEXT quoted=
+[0m14:17:29.160721 [info ] [Thread-1 (]: DEBUG_COL: name=event_type column= data_type=TEXT quoted=
+[0m14:17:29.161656 [info ] [Thread-1 (]: DEBUG_COL: name=session_id column= data_type=TEXT quoted=
+[0m14:17:29.163008 [info ] [Thread-1 (]: DEBUG_COL: name=event_count column= data_type=BIGINT quoted=
+[0m14:17:29.164546 [info ] [Thread-1 (]: DEBUG_COL: name=window_start column= data_type=TIMESTAMP(3) quoted=
+[0m14:17:29.166407 [info ] [Thread-1 (]: DEBUG_COL: name=window_end column= data_type=TIMESTAMP(3) quoted=
+[0m14:17:29.168008 [debug] [Thread-1 (]: Writing runtime sql for node "model.clickstream.transformed_clickstream_metrics"
+[0m14:17:29.171166 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m14:17:29.173654 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+create table `default_catalog`.`default_database`.`transformed_clickstream_metrics`
+    
+    
+  
+  
+  
+  
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+      
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+  
+  
+  (`user_id` STRING,
+    `event_type` STRING,
+    `session_id` STRING,
+    `event_count` BIGINT,
+    `window_start` TIMESTAMP(3),
+    `window_end` TIMESTAMP(3))
+
+    
+    WITH ('connector' = 'jdbc','url' = 'jdbc:mysql://host.docker.internal:9004/clickstream','table-name' = 'transformed_clickstream_metrics','driver' = 'com.mysql.jdbc.Driver','username' = 'flink_user','password' = '12345')
+    
+[0m14:17:29.174897 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m14:17:29.230087 [debug] [Thread-1 (]: SQL status: Phase.COMPLETED in 0.055 seconds
+[0m14:17:29.246432 [debug] [Thread-1 (]: Using confluent connection "model.clickstream.transformed_clickstream_metrics"
+[0m14:17:29.247295 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "clickstream", "target_name": "dev", "node_id": "model.clickstream.transformed_clickstream_metrics"} */
+INSERT INTO `default_catalog`.`default_database`.`transformed_clickstream_metrics` -- example_sink.sql
+
+
+-- Define your transformation query here.
+-- This query will continuously consume the streaming source and emit results to the sink.
+SELECT 
+    user_id,
+    event_type,
+    session_id,
+    COUNT(*) as event_count,
+    window_start,
+    window_end
+FROM TABLE(
+    -- Using the source model we defined in example_source.sql
+    TUMBLE(TABLE `default_catalog`.`default_database`.`raw_kafka_datasource`, DESCRIPTOR(event_time), INTERVAL '1' MINUTE)
+)
+GROUP BY user_id, event_type, session_id, window_start, window_end
+[0m14:17:29.264952 [debug] [Thread-1 (]: SQL status: Phase.RUNNING in 0.017 seconds
+[0m14:17:29.267857 [debug] [Thread-1 (]: On model.clickstream.transformed_clickstream_metrics: Close
+[0m14:17:29.270524 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '01886fe1-b723-45b2-9784-d9ae2b3b63c7', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fcfd4f0d0>]}
+[0m14:17:29.274407 [info ] [Thread-1 (]: 2 of 2 OK created sql streaming_table model default_database.transformed_clickstream_metrics  [[32mPhase.COMPLETED[0m in 0.14s]
+[0m14:17:29.277234 [debug] [Thread-1 (]: Finished running node model.clickstream.transformed_clickstream_metrics
+[0m14:17:29.283454 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m14:17:29.285679 [debug] [MainThread]: Connection 'model.clickstream.transformed_clickstream_metrics' was properly closed.
+[0m14:17:29.286703 [info ] [MainThread]: 
+[0m14:17:29.287588 [info ] [MainThread]: Finished running 1 project hook, 1 streaming source model, 1 streaming table model in 0 hours 0 minutes and 0.59 seconds (0.59s).
+[0m14:17:29.289698 [debug] [MainThread]: Command end result
+[0m14:17:29.359243 [debug] [MainThread]: Wrote artifact WritableManifest to /app/target/manifest.json
+[0m14:17:29.364066 [debug] [MainThread]: Wrote artifact SemanticManifest to /app/target/semantic_manifest.json
+[0m14:17:29.372023 [debug] [MainThread]: Wrote artifact RunExecutionResult to /app/target/run_results.json
+[0m14:17:29.372803 [info ] [MainThread]: 
+[0m14:17:29.373617 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m14:17:29.374305 [info ] [MainThread]: 
+[0m14:17:29.374974 [info ] [MainThread]: Done. PASS=3 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=3
+[0m14:17:29.376504 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 1.3718442, "process_in_blocks": "0", "process_kernel_time": 0.414748, "process_mem_max_rss": "127188", "process_out_blocks": "5260", "process_user_time": 2.836078}
+[0m14:17:29.377173 [debug] [MainThread]: Command `dbt run` succeeded at 14:17:29.377047 after 1.37 seconds
+[0m14:17:29.377958 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd552ebd0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd539ead0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f7fd526ff50>]}
+[0m14:17:29.378541 [debug] [MainThread]: Flushing usage events
+[0m14:17:30.873281 [debug] [MainThread]: An error was encountered while trying to flush usage events

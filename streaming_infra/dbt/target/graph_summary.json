@@ -1,0 +1,1 @@
+{"_invocation_id": "01886fe1-b723-45b2-9784-d9ae2b3b63c7", "linked": {"0": {"name": "operation.clickstream.clickstream-on-run-start-0", "type": "operation"}, "1": {"name": "model.clickstream.raw_kafka_datasource", "type": "model", "succ": [2]}, "2": {"name": "model.clickstream.transformed_clickstream_metrics", "type": "model"}}}

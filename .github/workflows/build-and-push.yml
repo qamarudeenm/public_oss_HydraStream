@@ -1,0 +1,113 @@
+name: 🌊 HydraStream - Build & Push Images
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*.*.*'          # Triggers on version tags like v1.0.0, v1.2.3
+  workflow_dispatch:       # Allows manual trigger from GitHub UI
+
+env:
+  REPO: blue2berry/hydrastream
+  FLINK_VERSION: flink1.19.1
+
+jobs:
+  build-and-push:
+    name: Build & Push to Docker Hub
+    runs-on: ubuntu-latest
+
+    steps:
+      # ──────────────────────────────────────────────
+      # 1. Checkout the repository
+      # ──────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ──────────────────────────────────────────────
+      # 2. Set up Docker Buildx (for multi-platform support)
+      # ──────────────────────────────────────────────
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ──────────────────────────────────────────────
+      # 3. Log in to Docker Hub using GitHub Secrets
+      # ──────────────────────────────────────────────
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # ──────────────────────────────────────────────
+      # 4. Derive version tag from git ref
+      # ──────────────────────────────────────────────
+      - name: Set version tag
+        id: version
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "VERSION=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=latest" >> $GITHUB_OUTPUT
+          fi
+
+      # ──────────────────────────────────────────────
+      # 5. Build & Push: Flink Engine
+      # ──────────────────────────────────────────────
+      - name: Build & Push Engine
+        uses: docker/build-push-action@v5
+        with:
+          context: streaming_infra/flink
+          file: streaming_infra/flink/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REPO }}:engine-${{ env.FLINK_VERSION }}
+            ${{ env.REPO }}:engine-${{ steps.version.outputs.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ──────────────────────────────────────────────
+      # 6. Build & Push: Flink Proxy Gateway
+      # ──────────────────────────────────────────────
+      - name: Build & Push Proxy Gateway
+        uses: docker/build-push-action@v5
+        with:
+          context: streaming_infra/infra/flink-proxy-gateway
+          file: streaming_infra/infra/flink-proxy-gateway/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REPO }}:proxy-latest
+            ${{ env.REPO }}:proxy-${{ steps.version.outputs.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ──────────────────────────────────────────────
+      # 7. Build & Push: dbt Worker
+      # ──────────────────────────────────────────────
+      - name: Build & Push dbt Worker
+        uses: docker/build-push-action@v5
+        with:
+          context: streaming_infra/dbt
+          file: streaming_infra/dbt/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REPO }}:dbt-latest
+            ${{ env.REPO }}:dbt-${{ steps.version.outputs.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ──────────────────────────────────────────────
+      # 8. Summary
+      # ──────────────────────────────────────────────
+      - name: Print Summary
+        run: |
+          echo "## 🌊 HydraStream Images Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Image | Tag |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| Engine | \`${{ env.REPO }}:engine-${{ env.FLINK_VERSION }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Proxy | \`${{ env.REPO }}:proxy-latest\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| dbt Worker | \`${{ env.REPO }}:dbt-latest\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 https://hub.docker.com/r/blue2berry/hydrastream/tags" >> $GITHUB_STEP_SUMMARY

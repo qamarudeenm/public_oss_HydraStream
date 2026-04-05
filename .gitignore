@@ -14,3 +14,10 @@ __pycache__/
 .env.local
 .env.prod
 .env.dev
+start_local_deps.sh
+architecture_design_mermaid.png
+codebase_overview.md
+pipeline_architecture.md
+pipeline_architecture.html
+scripts/
+streaming_infra/dbt/models/*

@@ -1,0 +1,45 @@
+name: clickstream-simulator
+
+networks:
+  default:
+    name: streaming_net
+    external: true
+
+services:
+  # ──────────────────────────────────────────────
+  # Application Services
+  # ──────────────────────────────────────────────
+  website:
+    build:
+      context: ./website
+    ports:
+      - "3000:3000"
+    depends_on:
+      - collector
+
+  collector:
+    build:
+      context: ./collector
+    ports:
+      - "5000:5000"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_TOPIC: ${KAFKA_TOPIC:-clickstream}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # ──────────────────────────────────────────────
+  # Traffic Simulator (on-demand)
+  # Usage: docker compose run simulator --users 50
+  # ──────────────────────────────────────────────
+  simulator:
+    build:
+      context: ./simulator
+    environment:
+      SIMULATOR_USERS: ${SIMULATOR_USERS:-20}
+      SIMULATOR_COLLECTOR_URL: http://collector:5000/events
+      SIMULATOR_PACE: ${SIMULATOR_PACE:-0.3}
+    depends_on:
+      - collector
+    profiles:
+      - simulate

@@ -1,4 +1,4 @@
-clickstream:
+hydrastream:
   outputs:
     dev:
       type: confluent

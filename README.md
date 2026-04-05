@@ -1,349 +1,242 @@
-# Clickstream Tracking Project
+# 🌊 HydraStream: The Real-Time Data Engine
 
-A complete, dockerized near-real-time clickstream tracking pipeline built around a simulated ecommerce experience ("Nexus Market").
+A high-performance streaming infrastructure designed to bridge the gap between SQL-based dbt models and Apache Flink's powerful streaming engine.
 
 ---
 
-## Architecture
+## 🚀 The Challenge: Why HydraStream?
+
+Building real-time data pipelines is traditionally heavy, complex, and disconnected from the modern data stack. The "Data Community" faces several critical pain points:
+
+*   **Infrastructure Complexity**: Manually orchestrating Kafka, Flink clusters, and SQL Gateways is a massive barrier to entry.
+*   **The Language Gap**: Most data analysts are experts in SQL and dbt, but streaming often requires specialized Java/Scala knowledge.
+*   **Slow Development Cycles**: Testing streaming logic against live data usually takes minutes or hours per iteration.
+*   **Integration Friction**: Bridging raw event streams (Kafka) to analytics-ready warehouses (ClickHouse/PostgreSQL) with complex windowing is difficult to manage and version control.
+
+**This project solves these by providing a "batteries-included" environment where streaming is treated exactly like batch: version-controlled SQL, dbt models, and automated testing.**
+
+---
+
+## 🏗️ Architecture Visualization
 
 ```mermaid
 graph TD
-    subgraph Client ["Client (Browser)"]
-        W["Website 🌐 (:3000)"] -->|JS Tracker| C["Collector 🚀 (:5000)"]
+    subgraph "Sandbox Demo (data_simulator)"
+        User["User (Frontend)"]
+        Simulator["Traffic Simulator (Locust)"]
+        Collector["Collector (Backend API)"]
     end
 
-    subgraph Ingestion ["Ingestion Layer"]
-        C -->|aiokafka| K["Kafka 📨 (:29092)"]
+    subgraph "Streaming Infrastructure (streaming_infra)"
+        Kafka[("Apache Kafka (Kraft)")]
+        subgraph "Flink Cluster"
+            JobManager["Flink JobManager"]
+            TaskManager["Flink TaskManager"]
+            Gateway["Flink SQL Gateway"]
+        end
+        Proxy["Flink Proxy Gateway"]
+        DBT["dbt-flink CLI"]
     end
 
-    subgraph Transformation ["Transformation Layer (Flink/dbt)"]
-        K <-->|Source| FST["Flink SQL Gateway 🛠️ (:8083)"]
-        D["dbt-flink 🏗️"] -->|SQL| FP["Flink Proxy Proxy 🌉 (:8080)"]
-        FP -->|HTTP| FST
-        FST -->|JDBC Sink| P[("PostgreSQL 🐘 (:5414)")]
+    subgraph "Destination Sink"
+        Sink[("Target DB (ClickHouse/Postgres)")]
     end
 
-    subgraph Simulation ["Load Generation"]
-        S["Simulator 🤖"] -->|REST| C
-    end
-
-    style P fill:#f9f,stroke:#333,stroke-width:2px
-    style K fill:#bbf,stroke:#333,stroke-width:2px
-    style FST fill:#dfd,stroke:#333,stroke-width:2px
-    style D fill:#fb8,stroke:#333,stroke-width:2px
-```
-
-## Project Structure
-
-| Directory | Component | Description |
-|---|---|---|
-| `website/` | **Frontend** | Simulated ecommerce storefront ("Nexus Market") with `tracker.js` |
-| `collector/` | **Ingestion** | FastAPI service validating and pushing events to Kafka |
-| `dbt/` | **Transform** | dbt project defining Flink SQL streaming models and JDBC sinks |
-| `infra/flink-proxy-gateway/` | **Orchestra** | Custom proxy enabling dbt (Confluent adapter) ↔ OSS Flink Gateway |
-| `simulator/` | **Load Test** | Python script generating synthetic user journeys (weighted) |
-| `infra/` | **Config** | SQL initialization scripts and proxy source code |
-| `flink/` | **Runtime** | Custom Docker image for Flink (JobManager, TaskManager, Gateway) |
-
----
-
-## 1. Website — Tracked Activities
-
-The `NexusTracker` library (`tracker.js`) captures two categories of events:
-
-### 1.1 Automatic Events
-
-These fire without any manual instrumentation, captured by a global DOM listener.
-
-| Event Type | Trigger | Data Payload |
-|---|---|---|
-| `click` | User clicks any `<button>` or `<a>` element | `element_id`, `element_text`, `classes` |
-
-### 1.2 Explicit Business Events
-
-These are fired at specific points in the user journey within `main.js`.
-
-| Event Type | Trigger | Data Payload | Funnel Stage |
-|---|---|---|---|
-| `page_view` | User navigates to any section | `page` (e.g. `home`, `cart`, `checkout`) | Awareness |
-| `add_to_cart` | User clicks "Add to Cart" on a product | `product_id`, `product_name`, `price` | Interest |
-| `remove_from_cart` | User clicks "Remove" in cart | `product_id` | Interest (negative) |
-| `checkout_start` | User clicks "Proceed to Checkout" | `cart_size`, `total` | Consideration |
-| `checkout_step` | User completes shipping form → payment | `step` (e.g. `payment`) | Consideration |
-| `purchase_success` | User clicks "Pay Now" (success) | `order_id`, `total` | Conversion |
-| `purchase_failed` | User clicks "Simulate Failure" | `reason` (e.g. `insufficient_funds`) | Drop-off |
-| `retry_payment` | User clicks "Retry Payment" after failure | — | Recovery |
-
-### 1.3 Event Schema (sent to Collector)
-
-Every event sent to the collector follows this JSON structure:
-
-```json
-{
-  "event_type": "add_to_cart",
-  "page_url": "http://localhost:3000/index.html",
-  "user_id": "user_k7x9m2p4q",
-  "session_id": "sess_a3b8f1c2e",
-  "data": {
-    "product_id": "prod_001",
-    "product_name": "Aero-Flow Runners",
-    "price": 189.99
-  },
-  "timestamp": "2026-03-28T14:10:00.000Z"
-}
-```
-
-| Field | Type | Source | Description |
-|---|---|---|---|
-| `event_type` | `string` | `main.js` | Identifies what happened |
-| `page_url` | `string` | `tracker.js` | Full browser URL at time of event |
-| `user_id` | `string` | `tracker.js` | Random per-browser-session user ID |
-| `session_id` | `string` | `tracker.js` | Random per-page-load session ID |
-| `data` | `object` | `main.js` | Event-specific payload (varies by type) |
-| `timestamp` | `string` | `tracker.js` | ISO 8601 timestamp from client |
-
-### 1.4 Derivable Metrics
-
-| Metric | How to Calculate | Business Value |
-|---|---|---|
-| **Page Views per Session** | `COUNT(page_view) GROUP BY session_id` | Engagement depth |
-| **Add-to-Cart Rate** | `COUNT(add_to_cart) / COUNT(page_view WHERE page='home')` | Product interest |
-| **Cart Abandonment Rate** | `1 - (COUNT(checkout_start) / COUNT(add_to_cart))` | Friction detection |
-| **Checkout Abandonment Rate** | `1 - (COUNT(purchase_success) / COUNT(checkout_start))` | Payment friction |
-| **Conversion Rate (E2E)** | `COUNT(purchase_success) / COUNT(DISTINCT session_id)` | Overall funnel health |
-| **Average Order Value** | `AVG(total) FROM purchase_success events` | Revenue optimization |
-| **Failure Rate** | `COUNT(purchase_failed) / (COUNT(purchase_success) + COUNT(purchase_failed))` | Payment reliability |
-| **Retry Rate** | `COUNT(retry_payment) / COUNT(purchase_failed)` | User persistence |
-| **Top Clicked Elements** | `COUNT(*) GROUP BY element_id WHERE event_type='click'` | UX hotspot analysis |
-| **Session Duration** | `MAX(timestamp) - MIN(timestamp) GROUP BY session_id` | Engagement time |
-| **Product Popularity** | `COUNT(add_to_cart) GROUP BY product_id` | Demand signal |
-| **Remove-from-Cart Rate** | `COUNT(remove_from_cart) / COUNT(add_to_cart)` | Buyer's remorse signal |
-
----
-
-## 2. Collector Layer — Event Ingestion
-
-The collector is a **FastAPI** application (`collector/main.py`) that acts as the bridge between the frontend and Kafka.
-
-### 2.1 API Endpoint
-
-| Method | Path | Description |
-|---|---|---|
-| `POST` | `/events` | Receives a single click event, validates it, and produces it to Kafka |
-| `GET` | `/health` | Returns `{"status": "healthy"}` for container healthchecks |
-
-### 2.2 Request Validation (Pydantic)
-
-The collector validates every incoming event against the `ClickEvent` model:
-
-```python
-class ClickEvent(BaseModel):
-    event_type: str            # Required — e.g. "page_view", "add_to_cart"
-    page_url: str              # Required — full URL from browser
-    user_id: str               # Required — client-generated user identifier
-    session_id: str            # Required — client-generated session identifier
-    element_id: str = None     # Optional — DOM element id (for click events)
-    element_text: str = None   # Optional — visible text of clicked element
-    product_id: str = None     # Optional — product identifier (cart/purchase events)
-    data: Dict[str, Any] = {}  # Optional — flexible payload for event-specific data
-    timestamp: str = None      # Optional — ISO 8601; server fills if missing
-```
-
-> Invalid payloads (e.g. missing `event_type`) receive a `422 Unprocessable Entity` response.
-
-### 2.3 Kafka Production
-
-| Config | Value | Source |
-|---|---|---|
-| Bootstrap Servers | `kafka:29092` | `KAFKA_BOOTSTRAP_SERVERS` env var |
-| Topic | `clickstream` | `KAFKA_TOPIC` env var |
-| Serialization | JSON (`json.dumps().encode('utf-8')`) | Hardcoded |
-| Library | `aiokafka` (async) | Non-blocking I/O |
-
-**Flow:**
-1. Event arrives at `POST /events`
-2. Pydantic validates the payload → rejects with `422` if invalid
-3. Server-side timestamp backfill if `timestamp` is `null`
-4. `AIOKafkaProducer.send_and_wait()` produces to the `clickstream` topic
-5. Returns `{"status": "ok"}` on success, `500` on Kafka failure
-
-### 2.4 Collector Observability
-
-| Signal | Implementation |
-|---|---|
-| Structured Logging | Every event logged with `event_type` and `session_id` |
-| Health Endpoint | `GET /health` for Docker/K8s probes |
-| Error Handling | Kafka failures return HTTP 500 with error detail |
-| CORS | `allow_origins=["*"]` — permits requests from any frontend origin |
-
----
-
-## 3. Connection Flow & Infrastructure
-
-The pipeline follows a specific orchestration path where **dbt** manages the SQL lifecycle, but **Flink** handles the actual streaming execution and data movement.
-
-### 3.1 Orchestration Chain
-
-```mermaid
-sequenceDiagram
-    participant dbt as dbt-flink (App)
-    participant PRX as Flink Proxy (:8080)
-    participant FSQ as Flink SQL Gateway (:8083)
-    participant KAF as Kafka (:29092)
-    participant PG as PostgreSQL (:5414)
-
-    dbt->>PRX: Send SQL Statement (POST /sessions)
-    PRX->>FSQ: Proxy to Flink (POST /sessions)
-    FSQ-->>PRX: Return Operation Handle
-    PRX-->>dbt: Return Success
+    User -->|Events| Collector
+    Simulator -->|Events| Collector
+    Collector -->|Produce| Kafka
     
-    Note over FSQ, PG: Flink executes Sink Job
-    FSQ->>KAF: Consume from 'clickstream'
-    FSQ->>PG: JDBC UPSERT to 'clickstream_analytics'
-```
-
-### 3.2 Where Each Connection is Configured
-
-| Layer | Connects To | Configured In | Key Settings |
-|---|---|---|---|
-| **dbt** | Flink Proxy Gateway (`:8080`) | `dbt/profiles.yml` | `host`, `organization_id`, `environment_id` |
-| **Flink Proxy** | Flink SQL Gateway (`:8083`) | `docker-compose.yml` | `PROXY_FLINK_GATEWAY_URL` |
-| **Flink → source** | Kafka (`:29092`) | `dbt/models/clickstream_raw.sql` | `'connector' = 'kafka'`, `'properties.bootstrap.servers'` |
-| **Flink → sink** | PostgreSQL (`:5414`) | `dbt/models/clickstream_summary.sql` | `'connector' = 'jdbc'`, `'url'`, `'table-name'`, `'username'` |
-
-### 3.3 PostgreSQL Credentials (Host-Level)
-
-The PostgreSQL instance runs on the host machine (accessibble via `host.docker.internal:5414` from within Docker).
-
-| Credential | Value | Role |
-|---|---|---|
-| **Host** | `host.docker.internal:5414` | Target Database Address |
-| **Database** | `postgres` | Physical DB Name |
-| **Schema** | `clickstream` | Logical Isolation |
-| **User** | `data_eng` | ETL Runner |
-| **Password** | `12345pP` | Authentication |
-
-> **Note:** Initial schema setup is defined in [init_postgres.sql](file:///home/blueberry/Desktop/clickstream/infra/init_postgres.sql).
-
-### 3.4 dbt Profile (Proxy Connection Only)
-
-`dbt/profiles.yml` configures the connection to **Flink** through the proxy. It uses the `confluent-sql` adapter to talk to the Flink SQL Gateway's REST API:
-
-```yaml
-clickstream:
-  outputs:
-    dev:
-      type: confluent
-      host: http://flink-proxy-gateway:8080   # Proxy URL (Docker network)
-      organization_id: nexus-org               # Flink Catalog Namespace
-      environment_id: default_catalog          # Maps to Flink catalog
-      dbname: default_database                 # Maps to Flink database
+    DBT -->|SQL Models| Proxy
+    Proxy -->|REST API| Gateway
+    Gateway -->|Submit Job| JobManager
+    JobManager -->|Execute| TaskManager
+    
+    TaskManager -->|Consume| Kafka
+    TaskManager -->|Transform & Sink| Sink
 ```
 
 ---
 
-## 4. Getting Started
+## 🧪 Quick Start: Test with Sample Data
 
-### Prerequisites
-- **Docker & Docker Compose** (Tested with Engine 25.x+)
-- **Local PostgreSQL** running on port `5414` (Exposed to Docker via `host-gateway`)
-- **Flink SQL Gateway** (Automatically starts via Docker Compose)
+Follow these steps to see a full real-time pipeline in action in under 5 minutes.
 
-### Launch the Stack
+### 1. Start the Infrastructure
+Spin up Kafka, Flink, and the dbt-flink proxy.
 ```bash
-# 1. Ensure Postgres is running locally
-# 2. Start the core services
+cd streaming_infra
 docker compose up -d
 ```
 
-### Run dbt Transformations
+### 2. Deploy the Streaming Models
+Use dbt to create the Flink jobs that will process the data.
 ```bash
 docker compose run dbt dbt run
 ```
 
-### Access the Website
-Open `http://localhost:3000` in your browser and interact with the shop.
-
-### Configuration
-Edit `.env` to change service endpoints:
+### 3. Generate Traffic
+Start the mock e-commerce storefront and the automated traffic simulator to pump events into Kafka.
 ```bash
-FLINK_GATEWAY_URL=http://flink-sql-gateway:8083
-POSTGRES_HOST=host.docker.internal
-POSTGRES_PORT=5414
+cd ../data_simulator
+docker compose up -d
+
+# Optional: Run the simulator at high volume (50 concurrent users)
+docker compose run simulator --users 50
 ```
+
+### 4. Verify the Results
+The data is now flowing from the **Simulator** -> **Kafka** -> **Flink (dbt)** -> **Destination Sink**.
+*   **Flink Dashboard**: [http://localhost:8022](http://localhost:8022) to see the running jobs.
+*   **Frontend Site**: [http://localhost:3000](http://localhost:3000) to click around manually.
 
 ---
 
-## 5. Traffic Simulator
+## 🐳 Quick Start: Using Pre-Built Images
+If you do not want to build the images from source, you can use our pre-built distributed images. This significantly speeds up onboarding and eliminates the need for local Java or Python environments.
 
-A dockerized service that generates mock users with randomized ecommerce journeys. It does **not** visit the website — it sends events directly to the collector API, simulating what the `NexusTracker` would send from a real browser.
+1.  **Run the Engine and Proxy**:
+    Use the provided pre-built images in a `docker-compose.yml`:
+    ```yaml
+    services:
+      hydrastream-engine:
+        image: hydrastream/engine:flink1.19.1
+        environment:
+          - KAFKA_TOPIC=my-topic
+          - CLICKHOUSE_JDBC_URL=jdbc:mysql://my-host:9004/db
 
-### 5.1 Usage
+      hydrastream-proxy:
+        image: hydrastream/proxy:latest
+    ```
 
-The simulator uses a Docker Compose **profile** so it won't start with `docker compose up`. Run it on-demand:
-
-```bash
-docker compose --profile simulate run --rm simulator --users 20 2>&1 | tee simulator.log
-```
-
-```bash
-# 20 users (default)
-docker compose --profile simulate run --rm simulator
-
-# 50 users
-docker compose --profile simulate run --rm simulator --users 50
-
-# 100 users, faster pace
-docker compose --profile simulate run --rm simulator --users 100 --pace 0.1
-```
-
-Or via environment variables in `.env`:
-```bash
-SIMULATOR_USERS=50
-SIMULATOR_PACE=0.2
-```
-
-### 5.2 Journey Types
-
-Each mock user randomly follows one of these weighted journey types:
-
-| Journey | Weight | Steps | Simulates |
-|---|---|---|---|
-| **Browser** | 40% | Browse products, click around | Window shoppers |
-| **Cart Abandoner** | 25% | Browse → Add to cart → Leave | Users who add but don't checkout |
-| **Checkout Abandoner** | 15% | Browse → Cart → Start checkout → Leave | Users who drop off at shipping/payment |
-| **Successful Buyer** | 10% | Browse → Cart → Checkout → Pay ✓ | Completed purchases |
-| **Failed Buyer** | 5% | Browse → Cart → Checkout → Pay ✗ | Payment failures |
-| **Retry Buyer** | 5% | Browse → Cart → Checkout → Fail → Retry → Pay ✓ | Recovered purchases |
-
-### 5.3 Events Generated per Journey
-
-| Journey | Approx. Events | Event Types Fired |
-|---|---|---|
-| Browser | 3–6 | `page_view`, `click` |
-| Cart Abandoner | 6–12 | `page_view`, `click`, `add_to_cart`, `remove_from_cart` |
-| Checkout Abandoner | 8–14 | + `checkout_start`, `checkout_step` |
-| Successful Buyer | 10–16 | + `purchase_success` |
-| Failed Buyer | 10–16 | + `purchase_failed` |
-| Retry Buyer | 12–20 | + `retry_payment`, `purchase_success` |
-
-### 5.4 Configuration Reference
-
-| Variable | Default | Description |
-|---|---|---|
-| `SIMULATOR_USERS` | `20` | Number of concurrent simulated users |
-| `SIMULATOR_COLLECTOR_URL` | `http://collector:5000/events` | Collector endpoint |
-| `SIMULATOR_PACE` | `0.3` | Seconds between actions (lower = faster) |
+2.  **Execute your Custom dbt Models**:
+    Mount your local dbt project directory into the pre-built dbt-worker image:
+    ```bash
+    # Run from the directory where your specialized dbt models are located
+    docker run --network host \
+        -v $(pwd)/models:/app/models \
+        -e FLINK_PROXY_HOST=localhost \
+        hydrastream/dbt-worker:latest dbt run
+    ```
 
 ---
 
+## 🛠️ Components Deep-Dive
+
+### 1. Streaming Infrastructure (`streaming_infra/`)
+The core engine. It uses:
+*   **Apache Kafka**: Ingestion layer (Kraft mode).
+*   **Apache Flink**: Transformation layer (windowing, aggregations).
+*   **dbt-flink-adapter**: Allows you to write Flink SQL as dbt models.
+*   **Flink Proxy Gateway**: Bridges the gap for standard dbt commands.
+
+#### Connecting Your Own Database (e.g., ClickHouse)
+Configure your `.env` file in `streaming_infra`:
+```bash
+CLICKHOUSE_JDBC_URL="jdbc:mysql://your.clickhouse.host/db"
+CLICKHOUSE_USER="admin"
+CLICKHOUSE_TARGET_TABLE="transformed_metrics"
+```
+
+> [!IMPORTANT]
+> **Schema Management**: Flink creates mapping metadata in its own catalog but **does not** create physical tables in your destination database. You must create the target table (sink) in ClickHouse/Postgres/etc. before starting the dbt run.
+
+### 2. The Sandbox Demo (`data_simulator/`)
+The interactive part of the project.
+*   **Backend/Collector**: Receives events from the frontend and pushes to Kafka.
+*   **Frontend**: A simple React app to simulate user behavior.
+*   **Simulator**: A Python script using `locust` or similar to generate massive clickstream load.
+
 ---
 
-## 6. Infrastructure Hardening & Performance
+## 📖 Understanding the dbt-flink Pattern
 
-The pipeline includes several reliability features implemented during the ClickHouse → PostgreSQL migration:
+A common question is: **"Why does every datastream have two models?"**
 
-- **Enhanced Timeouts**: `httpx` timeouts in the Flink Proxy Gateway and the `confluent-sql` library are set to **300s** to handle complex Flink job submissions.
-- **JDBC Persistence**: The PostgreSQL sink uses standard JDBC connectors with automatic schema isolation via the `clickstream` schema.
-- **Memory Optimization**: Flink TaskManagers are tuned with `taskmanager.memory.process.size: 2048m` to prevent OOM during heavy transformation loads.
-- **Network Routing**: Corrected SQL Gateway network binding (`rest.address: 0.0.0.0`) ensures seamless intra-cluster communication between the Proxy and Flink.
+In the `dbt-flink` world, we split logic into **Sources** and **Transformation/Sinks** to maintain a clean separation between "how to read" and "what to do."
+
+### 1. The Two-Model Architecture
+
+| Model type | Materialization | Purpose |
+| :--- | :--- | :--- |
+| **Source Model** | `streaming_source` | **DDL Only**. Defines the schema, data types, and watermark strategy for your incoming Kafka topic. It doesn't trigger a Flink job; it simply registers the topic in the Flink catalog. |
+| **Transformation Model** | `streaming_table` | **Job Submission**. Contains the `SELECT` logic (windowing, aggregations). It uses `{{ ref() }}` to point to a source and includes the `with` config to define the **Sink** (where the data goes, e.g., ClickHouse). |
+
+> [!TIP]
+> Think of the **Source Model** as your connection string and schema, and the **Transformation Model** as your actual long-running streaming application.
+
+---
+
+### 2. Kafka Configuration Deep-Dive
+
+In your `streaming_source` models, you'll see a `with` block. Here is what those parameters do:
+
+| Parameter | Recommended Value | Why? |
+| :--- | :--- | :--- |
+| `connector` | `'kafka'` | Tells Flink to use the optimized Kafka source connector. |
+| `topic` | `your_topic` | The exact name of the Kafka topic. |
+| `properties.bootstrap.servers` | `kafka:29092` | The address of your Kafka brokers. |
+| `properties.group.id` | `flink-group` | The consumer group ID. This is vital for Flink to track "where it is" in the stream (offsets). |
+| `scan.startup.mode` | `'earliest-offset'` | Controls where the job starts reading. `earliest` starts from the beginning of time; `latest` starts only from new messages. |
+| `format` | `'json'` | Specifies the payload format. Common options include `json`, `avro`, or `csv`. |
+
+#### 🌊 The Power of Watermarks
+In `raw_kafka_datasource.sql`, you'll notice:
+```sql
+WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND
+```
+This is the most critical line for streaming. It tells Flink: *"Wait up to 5 seconds for late-arriving events before closing the time window."* Without this, your real-time aggregations would be inaccurate.
+
+---
+
+### 🔌 Connecting an Existing Kafka Cluster
+
+If you already have a Kafka cluster (e.g., Confluent Cloud, Amazon MSK, or a self-hosted cluster) and only want to use **HydraStream** for the **Flink + dbt** processing layer, follow these steps:
+
+#### 1. Disable the Local Kafka Service
+You don't need the bundled Kafka container. In `streaming_infra/docker-compose.yml`, you can comment out or remove the `kafka` service block to save resources.
+
+#### 2. Configure Environment Variables
+Update your `streaming_infra/.env` file with your external cluster details:
+```env
+# Example: Confluent Cloud or Remote Kafka
+KAFKA_BOOTSTRAP_SERVERS=pkc-xxxx.us-east-1.aws.confluent.cloud:9092
+KAFKA_TOPIC=your_existing_topic_name
+```
+
+#### 3. Update Security & Authentication
+If your production Kafka requires SSL or SASL (standard for cloud providers), you must update the `with` block in your **Source Model** (`raw_kafka_datasource.sql`):
+
+```sql
+{{ config(
+    materialized='streaming_source',
+    connector='kafka',
+    with={
+        'topic': env_var('KAFKA_TOPIC'),
+        'properties.bootstrap.servers': env_var('KAFKA_BOOTSTRAP_SERVERS'),
+        'properties.security.protocol': 'SASL_SSL',
+        'properties.sasl.mechanism': 'PLAIN',
+        'properties.sasl.jaas.config': 'org.apache.kafka.common.security.plain.PlainLoginModule required username="YOUR_API_KEY" password="YOUR_API_SECRET";'
+    }
+) }}
+```
+
+#### 4. Network Connectivity
+Ensure the **Flink TaskManager** container can reach your Kafka endpoint.
+- If Kafka is on the **same host**, use `host.docker.internal:9092`.
+- If Kafka is **remote**, ensure your network firewalls allow traffic from your Flink cluster IP range.
+
+---
+
+## 🏁 Deploying to Production
+
+---
+
+## 📜 Legal & Trademarks
+
+HydraStream is an independent project and is not affiliated with, sponsored by, or endorsed by dbt Labs, Inc. or the Apache Software Foundation.
+
+*   **dbt™** is a trademark of dbt Labs, Inc.
+*   **Apache Flink®**, **Apache Kafka®**, and the Apache projects are trademarks of the [Apache Software Foundation](https://www.apache.org/).
+
+HydraStream is provided "as is" under the Apache License 2.0. Any third-party drivers downloaded dynamically at runtime are subject to their respective licenses.
+

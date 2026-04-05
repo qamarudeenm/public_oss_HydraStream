@@ -1,8 +1,8 @@
-name: 'clickstream'
+name: 'hydrastream'
 version: '1.0.0'
 config-version: 2
 
-profile: 'clickstream'
+profile: 'hydrastream'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -19,5 +19,5 @@ on-run-start:
   - "CREATE DATABASE IF NOT EXISTS clickstream"
 
 models:
-  clickstream:
+  hydrastream:
     +materialized: table # In Flink context, this often maps to CREATE TABLE

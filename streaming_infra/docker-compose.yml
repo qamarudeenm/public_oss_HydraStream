@@ -1,4 +1,8 @@
-name: clickstream
+name: hydrastream
+
+networks:
+  streaming_net:
+    name: streaming_net
 
 services:
   # ──────────────────────────────────────────────
@@ -6,6 +10,8 @@ services:
   # ──────────────────────────────────────────────
   kafka:
     image: apache/kafka:3.9.0
+    networks:
+      - streaming_net
     ports:
       - "9092:9092"
     environment:
@@ -33,51 +39,13 @@ services:
       start_period: 60s
 
   # ──────────────────────────────────────────────
-  # NOTE: Using LOCAL ClickHouse (host machine)
-  # To re-enable Docker ClickHouse, uncomment below:
-  # clickhouse:
-  #   image: clickhouse/clickhouse-server:latest
-  #   ports:
-  #     - "8123:8123"
-  #     - "9000:9000"
-  #   ulimits:
-  #     nofile:
-  #       soft: 262144
-  #       hard: 262144
-  #   volumes:
-  #     - clickhouse_data:/var/lib/clickhouse
-
-  # ──────────────────────────────────────────────
-  # Application Services
-  # ──────────────────────────────────────────────
-  website:
-    build:
-      context: ./website
-    ports:
-      - "3000:3000"
-    depends_on:
-      - collector
-
-  collector:
-    build:
-      context: ./collector
-    ports:
-      - "5000:5000"
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      KAFKA_TOPIC: clickstream
-    depends_on:
-      kafka:
-        condition: service_healthy
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
-  # ──────────────────────────────────────────────
   # Transformation Layer (Flink 1.19.1 in Docker)
   # ──────────────────────────────────────────────
   flink-jobmanager:
     build: ./flink
     command: jobmanager
+    networks:
+      - streaming_net
     ports:
       - "8022:8081"
     environment:
@@ -89,12 +57,12 @@ services:
         condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # volumes:
-    #   - ./flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar:/opt/flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar
 
   flink-taskmanager:
     build: ./flink
     command: taskmanager
+    networks:
+      - streaming_net
     depends_on:
       - flink-jobmanager
     environment:
@@ -105,12 +73,12 @@ services:
         taskmanager.memory.process.size: 2048m
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # volumes:
-    #   - ./flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar:/opt/flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar
 
   flink-sql-gateway:
     build: ./flink
     command: /opt/flink/bin/sql-gateway.sh start-foreground
+    networks:
+      - streaming_net
     ports:
       - "8083:8083"
     depends_on:
@@ -122,12 +90,12 @@ services:
         sql-gateway.endpoint.rest.address: 0.0.0.0
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # volumes:
-    #   - ./flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar:/opt/flink/lib/flink-sql-connector-clickhouse-1.19.0-1.0.0.jar
 
   flink-proxy-gateway:
     build:
       context: ./infra/flink-proxy-gateway
+    networks:
+      - streaming_net
     ports:
       - "8080:8080"
     environment:
@@ -145,6 +113,8 @@ services:
   dbt:
     build:
       context: ./dbt
+    networks:
+      - streaming_net
     volumes:
       - ./dbt:/app
     environment:
@@ -153,24 +123,11 @@ services:
       FLINK_PROXY_PORT: 8080
       CLICKHOUSE_USER: ${CLICKHOUSE_USER}
       CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_JDBC_URL: ${CLICKHOUSE_JDBC_URL}
+      CLICKHOUSE_TARGET_TABLE: ${CLICKHOUSE_TARGET_TABLE}
+      KAFKA_TOPIC: ${KAFKA_TOPIC:-clickstream}
     depends_on:
       - flink-proxy-gateway
-
-  # ──────────────────────────────────────────────
-  # Traffic Simulator (on-demand)
-  # Usage: docker compose run simulator --users 50
-  # ──────────────────────────────────────────────
-  simulator:
-    build:
-      context: ./simulator
-    environment:
-      SIMULATOR_USERS: ${SIMULATOR_USERS:-20}
-      SIMULATOR_COLLECTOR_URL: http://collector:5000/events
-      SIMULATOR_PACE: ${SIMULATOR_PACE:-0.3}
-    depends_on:
-      - collector
-    profiles:
-      - simulate
 
 volumes:
   kafka_data:

@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
-KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "clickstream")
+KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
 
 app = FastAPI(title="Clickstream Collector")
 
