@@ -6,8 +6,12 @@ on:
       - main
       - master
     tags:
-      - 'v*.*.*'          # Triggers on version tags like v1.0.0, v1.2.3
-  workflow_dispatch:       # Allows manual trigger from GitHub UI
+      - 'v*.*.*'
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
 
 env:
   REPO: blue2berry/hydrastream
@@ -60,7 +64,7 @@ jobs:
         with:
           context: streaming_infra/flink
           file: streaming_infra/flink/Dockerfile
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REPO }}:engine-${{ env.FLINK_VERSION }}
             ${{ env.REPO }}:engine-${{ steps.version.outputs.VERSION }}
@@ -75,7 +79,7 @@ jobs:
         with:
           context: streaming_infra/infra/flink-proxy-gateway
           file: streaming_infra/infra/flink-proxy-gateway/Dockerfile
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REPO }}:proxy-latest
             ${{ env.REPO }}:proxy-${{ steps.version.outputs.VERSION }}
@@ -90,7 +94,7 @@ jobs:
         with:
           context: streaming_infra/dbt
           file: streaming_infra/dbt/Dockerfile
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REPO }}:dbt-latest
             ${{ env.REPO }}:dbt-${{ steps.version.outputs.VERSION }}
