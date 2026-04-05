@@ -21,3 +21,4 @@ pipeline_architecture.md
 pipeline_architecture.html
 scripts/
 streaming_infra/dbt/models/*
+!streaming_infra/dbt/models/.gitkeep
