@@ -92,31 +92,167 @@ The data is now flowing from the **Simulator** -> **Kafka** -> **Flink (dbt)** -
 ---
 
 ## 🐳 Quick Start: Using Pre-Built Images
-If you do not want to build the images from source, you can use our pre-built distributed images. This significantly speeds up onboarding and eliminates the need for local Java or Python environments.
 
-1.  **Run the Engine and Proxy**:
-    Use the provided pre-built images in a `docker-compose.yml`:
-    ```yaml
-    services:
-      hydrastream-engine:
-        image: hydrastream/engine:flink1.19.1
-        environment:
-          - KAFKA_TOPIC=my-topic
-          - CLICKHOUSE_JDBC_URL=jdbc:mysql://my-host:9004/db
+Skip the build step entirely and use the published images from Docker Hub.
 
-      hydrastream-proxy:
-        image: hydrastream/proxy:latest
-    ```
+**🔗 Docker Hub**: [https://hub.docker.com/r/blue2berry/hydrastream/tags](https://hub.docker.com/r/blue2berry/hydrastream/tags)
 
-2.  **Execute your Custom dbt Models**:
-    Mount your local dbt project directory into the pre-built dbt-worker image:
-    ```bash
-    # Run from the directory where your specialized dbt models are located
-    docker run --network host \
-        -v $(pwd)/models:/app/models \
-        -e FLINK_PROXY_HOST=localhost \
-        hydrastream/dbt-worker:latest dbt run
-    ```
+| Image | Tag | Pull Command |
+| :--- | :--- | :--- |
+| Flink Engine (JobManager + TaskManager + SQL Gateway) | `engine-flink1.19.1` | `docker pull blue2berry/hydrastream:engine-flink1.19.1` |
+| Flink Proxy Gateway | `proxy-latest` | `docker pull blue2berry/hydrastream:proxy-latest` |
+| dbt Worker | `dbt-latest` | `docker pull blue2berry/hydrastream:dbt-latest` |
+
+### Step 1: Create a `.env` file
+
+Create a `.env` file in your working directory with the following variables:
+```env
+# --- Kafka (use your own external cluster OR leave as-is for the bundled one) ---
+KAFKA_TOPIC=clickstream
+KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+
+# --- ClickHouse Sink (update with your own connection details) ---
+CLICKHOUSE_JDBC_URL=jdbc:mysql://your.clickhouse.host:9004/your_database
+CLICKHOUSE_USER=admin
+CLICKHOUSE_PASSWORD=your_password
+CLICKHOUSE_TARGET_TABLE=transformed_clickstream_metrics
+```
+
+### Step 2: Create a `docker-compose.yml`
+
+Copy this into a new `docker-compose.yml` and run it in an empty directory:
+
+```yaml
+name: hydrastream
+
+networks:
+  streaming_net:
+    name: streaming_net
+
+services:
+  # ── Bundled Kafka (remove this block if you use an external Kafka cluster) ──
+  kafka:
+    image: apache/kafka:3.9.0
+    networks: [streaming_net]
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 0
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:29092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+      interval: 10s
+      retries: 15
+      start_period: 60s
+
+  # ── Flink Cluster ──────────────────────────────────────────────────────────
+  flink-jobmanager:
+    image: blue2berry/hydrastream:engine-flink1.19.1
+    command: jobmanager
+    networks: [streaming_net]
+    ports:
+      - "8022:8081"   # Flink Dashboard → http://localhost:8022
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  flink-taskmanager:
+    image: blue2berry/hydrastream:engine-flink1.19.1
+    command: taskmanager
+    networks: [streaming_net]
+    depends_on: [flink-jobmanager]
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        taskmanager.memory.process.size: 2048m
+
+  flink-sql-gateway:
+    image: blue2berry/hydrastream:engine-flink1.19.1
+    command: /opt/flink/bin/sql-gateway.sh start-foreground
+    networks: [streaming_net]
+    ports:
+      - "8083:8083"
+    depends_on: [flink-jobmanager]
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        sql-gateway.endpoint.rest.address: 0.0.0.0
+
+  # ── Flink Proxy Gateway ────────────────────────────────────────────────────
+  flink-proxy-gateway:
+    image: blue2berry/hydrastream:proxy-latest
+    networks: [streaming_net]
+    ports:
+      - "8080:8080"   # Proxy API → http://localhost:8080
+    environment:
+      PROXY_FLINK_GATEWAY_URL: http://flink-sql-gateway:8083
+      PROXY_LISTEN_HOST: 0.0.0.0
+      PROXY_LISTEN_PORT: 8080
+    depends_on: [flink-sql-gateway]
+
+  # ── dbt Worker (bring your own models) ────────────────────────────────────
+  dbt:
+    image: blue2berry/hydrastream:dbt-latest
+    networks: [streaming_net]
+    volumes:
+      - ./models:/app/models   # Mount your local dbt models here
+    environment:
+      DBT_PROFILES_DIR: /app
+      FLINK_PROXY_HOST: flink-proxy-gateway
+      FLINK_PROXY_PORT: 8080
+      KAFKA_TOPIC: ${KAFKA_TOPIC:-clickstream}
+      CLICKHOUSE_JDBC_URL: ${CLICKHOUSE_JDBC_URL}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_TARGET_TABLE: ${CLICKHOUSE_TARGET_TABLE}
+    depends_on: [flink-proxy-gateway]
+
+volumes:
+  kafka_data:
+```
+
+### Step 3: Start the Infrastructure
+
+```bash
+docker compose up -d
+```
+
+Check the **Flink Dashboard** at [http://localhost:8022](http://localhost:8022) to confirm the cluster is healthy.
+
+### Step 4: Add Your dbt Models
+
+Create a `models/` directory alongside your `docker-compose.yml` and place your Flink SQL dbt models inside. See the [dbt-flink Pattern section](#-understanding-the-dbt-flink-pattern) below for how to structure them.
+
+```
+my-project/
+├── docker-compose.yml
+├── .env
+└── models/
+    ├── raw_kafka_datasource.sql    ← Source model (Kafka schema)
+    └── my_transformation.sql       ← Transformation model (Flink job)
+```
+
+### Step 5: Deploy Your Streaming Models
+
+```bash
+docker compose run dbt dbt run
+```
+
+This submits your SQL models as long-running Flink jobs. You can monitor them live in the Flink Dashboard.
 
 ---
 
