@@ -23,3 +23,4 @@ scripts/
 streaming_infra/dbt/models/*
 !streaming_infra/dbt/models/.gitkeep
 docs/
+build_and_push_local.sh
