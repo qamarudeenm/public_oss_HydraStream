@@ -324,7 +324,7 @@ In the `dbt-flink` world, we split logic into **Sources** and **Transformation/S
 ### 2. ⚠️ Required: Define Your Raw Data Schema (Flink DDL)
 
 > [!IMPORTANT]
-> Unlike standard dbt batch models, **Flink cannot infer schema from your data**. You must explicitly declare every column, its SQL data type, and a watermark strategy in your **Source Model**. This is a hard requirement — without it, the DDL statement sent to Flink will fail.
+> Unlike standard dbt batch models, **the current version of Flink does not support automatic schema inference**. You must explicitly declare every column, its SQL data type, and a watermark strategy in your **Source Model**. This is a hard requirement — without it, the DDL statement sent to Flink will fail.
 
 The source model is a pure **Flink DDL definition**. It tells Flink:
 - What fields exist in the Kafka JSON payload
@@ -550,6 +550,14 @@ Example resource recommendations for the Flink cluster:
 > execution.checkpointing.interval: 60000
 > ```
 > Add these to the `FLINK_PROPERTIES` block in your `docker-compose.yml` or Kubernetes config.
+
+## 🙏 Acknowledgements
+
+The Flink Proxy Gateway used in HydraStream was created entirely by **[Zander Matheson](https://www.linkedin.com/in/alexandermatheson/)** as part of his open-source **[flink-proxy-gateway](https://github.com/awmatheson/flink-proxy-gateway)** project. His proxy bridges the Confluent dbt adapter (`dbt-confluent`) to open-source Apache Flink's SQL Gateway, which is the key integration that makes writing Flink streaming jobs in dbt possible without Confluent Cloud. HydraStream includes a modified copy of his proxy, adapted for this project's specific use case.
+
+All credit for the original proxy gateway goes to Zander. Thank you.
+
+---
 
 ## 📜 Legal & Trademarks
 
