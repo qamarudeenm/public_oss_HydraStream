@@ -17,5 +17,8 @@ RUN sed -i 's/cloud_provider=credentials.cloud_provider,//' /usr/local/lib/pytho
 RUN sed -i 's/cloud_region=credentials.cloud_region,/endpoint="http:\/\/flink-proxy-gateway:8080",/' /usr/local/lib/python3.11/site-packages/dbt/adapters/confluent/connections.py
 RUN sed -i 's/httpx.Client(/httpx.Client(timeout=httpx.Timeout(300.0, connect=30.0), /g' /usr/local/lib/python3.11/site-packages/confluent_sql/connection.py
 
+# Copy the dbt project and profiles
+COPY . /app/
+
 # Default command: keep container alive or run dbt
 CMD ["tail", "-f", "/dev/null"]

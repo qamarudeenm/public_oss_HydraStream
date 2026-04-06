@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: example_sink
+    config:
+      contract:
+        enforced: true  
+    columns:
+      - name: event_type
+        data_type: STRING
+      - name: session_id
+        data_type: STRING
+      - name: event_count
+        data_type: BIGINT
+      - name: window_start
+        data_type: TIMESTAMP(3)
+      - name: window_end
+        data_type: TIMESTAMP(3)
+
+  - name: example_source
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: session_id
+        data_type: STRING
+      - name: user_id
+        data_type: STRING
+      - name: page_url
+        data_type: STRING
+      - name: event_type
+        data_type: STRING
+      - name: product_id
+        data_type: STRING
+      - name: revenue
+        data_type: DOUBLE
+      - name: event_time
+        data_type: TIMESTAMP(3)

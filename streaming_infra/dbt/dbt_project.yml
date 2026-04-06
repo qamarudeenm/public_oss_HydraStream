@@ -16,7 +16,7 @@ clean-targets:
   - "dbt_packages"
 
 on-run-start:
-  - "CREATE DATABASE IF NOT EXISTS clickstream"
+  - "{{ drop_flink_tables() }}"
 
 models:
   hydrastream:
