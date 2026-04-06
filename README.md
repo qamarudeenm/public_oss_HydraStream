@@ -402,6 +402,42 @@ This is the most critical line for streaming. It tells Flink: *"Wait up to 5 sec
 
 ---
 
+### 3. Model Contracts & Schema Management (`schema.yml`)
+
+While `dbt` batch models typically use `schema.yml` for documentation and testing, **HydraStream** uses it to enforce strict schema contracts for your streaming models.
+
+Because streaming data is continuous and less predictable, it is highly recommended to place a `schema.yml` file alongside your `.sql` models in the `models/` directory for every model you create.
+
+#### Example `schema.yml`
+Here is an example structure derived from our sample models (found in `sample_dbt_model/`). It maps explicitly to your models and ensures Flink processes and sinks the correct data types.
+
+```yaml
+version: 2
+
+models:
+  - name: example_sink
+    config:
+      contract:
+        enforced: true  
+    columns:
+      - name: event_type
+        data_type: STRING
+        description: "The type of event (e.g., click, view)"
+      - name: session_id
+        data_type: STRING
+      - name: event_count
+        data_type: BIGINT
+      - name: window_start
+        data_type: TIMESTAMP(3)
+      - name: window_end
+        data_type: TIMESTAMP(3)
+```
+
+> [!TIP]
+> Setting `enforced: true` on the model contract prevents silent data corruption. If your Flink transformation produces output that doesn't strictly match the data types in your `schema.yml`, dbt will catch it before submitting the job to Flink.
+
+---
+
 ### 🔌 Connecting an Existing Kafka Cluster
 
 If you already have a Kafka cluster (e.g., Confluent Cloud, Amazon MSK, or a self-hosted cluster) and only want to use **HydraStream** for the **Flink + dbt** processing layer, follow these steps:
