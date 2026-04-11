@@ -47,8 +47,17 @@ COPY ./job /opt/flink/job
 # Copy Flink configuration
 COPY ./job/flink-conf.yaml /opt/flink/conf/flink-conf.yaml
 
+# Copy the custom entrypoint script
+COPY ./entrypoint.sh /entrypoint.sh
+USER root
+RUN chmod +x /entrypoint.sh
+USER flink
+
 # Fix permissions for the job directory
 USER root
 RUN chown -R flink:flink /opt/flink && \
     chmod -R 755 /opt/flink
 USER flink
+
+# Set the custom entrypoint
+ENTRYPOINT ["/entrypoint.sh"]

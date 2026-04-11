@@ -36,12 +36,33 @@ def test_detect_multiple_drivers():
     sql = """
     CREATE TABLE t1 WITH ('driver' = 'com.mysql.jdbc.Driver');
     CREATE TABLE t2 WITH ('driver' = 'org.postgresql.Driver');
+    CREATE TABLE t3 WITH ('driver' = 'com.clickhouse.jdbc.ClickHouseDriver');
+    CREATE TABLE t4 WITH ('driver' = 'net.snowflake.client.jdbc.SnowflakeDriver');
     """
     urls = detect_required_drivers(sql)
     assert DRIVER_REGISTRY["com.mysql.jdbc.Driver"] in urls
     assert DRIVER_REGISTRY["org.postgresql.Driver"] in urls
+    assert DRIVER_REGISTRY["com.clickhouse.jdbc.ClickHouseDriver"] in urls
+    assert DRIVER_REGISTRY["net.snowflake.client.jdbc.SnowflakeDriver"] in urls
 
 def test_case_insensitivity():
     sql = "CREATE TABLE t1 WITH ('DRIVER' = 'com.mysql.jdbc.Driver')"
     urls = detect_required_drivers(sql)
     assert DRIVER_REGISTRY["com.mysql.jdbc.Driver"] in urls
+
+def test_infer_from_url():
+    sql = "CREATE TABLE t1 WITH ('url' = 'jdbc:mysql://localhost:3306/db')"
+    urls = detect_required_drivers(sql)
+    assert DRIVER_REGISTRY["com.mysql.jdbc.Driver"] in urls
+    
+    sql = "CREATE TABLE t1 WITH ('url' = 'jdbc:postgresql://localhost:5432/db')"
+    urls = detect_required_drivers(sql)
+    assert DRIVER_REGISTRY["org.postgresql.Driver"] in urls
+    
+    sql = "CREATE TABLE t1 WITH ('url' = 'jdbc:clickhouse://localhost:8123/db')"
+    urls = detect_required_drivers(sql)
+    assert DRIVER_REGISTRY["com.clickhouse.jdbc.ClickHouseDriver"] in urls
+    
+    sql = "CREATE TABLE t1 WITH ('url' = 'jdbc:snowflake://account.snowflakecomputing.com/')"
+    urls = detect_required_drivers(sql)
+    assert DRIVER_REGISTRY["net.snowflake.client.jdbc.SnowflakeDriver"] in urls

@@ -39,6 +39,7 @@ class Session:
     key: SessionKey
     last_used: float = field(default_factory=lambda: asyncio.get_event_loop().time())
     added_jars: set[str] = field(default_factory=set)
+    jar_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
 
 
 class SessionManager:

@@ -269,6 +269,17 @@ HydraStream is optimized for real-time ingestion into historical data warehouses
 | **Snowflake** | 🛠️ *WIP* | Planned. Requires Snowflake's specific JDBC driver and Flink dialect. |
 | **BigQuery / Redshift** | 🛠️ *WIP* | Roadmap. |
 
+### ⚖️ IP Compliance & Driver Management
+
+To comply with open-source licensing (specifically GPLv2 restrictions for the MySQL JDBC driver), HydraStream **does not bundle** proprietary or GPL-licensed JDBC drivers in its default Docker images.
+
+Instead, HydraStream implements an **On-Demand Driver Download** mechanism:
+1.  **Proxy-level Detection**: The Flink Gateway Proxy automatically detects required drivers from your SQL `CREATE TABLE` statements (via the `driver` property or by inferring from the `url` protocol).
+2.  **Runtime Download**: When a driver is needed, the proxy dynamically executes `ADD JAR` with the appropriate Maven Central URL to the Flink session.
+3.  **No Persistence**: Drivers are downloaded to the Flink cluster at runtime and are not baked into the permanent filesystem of the container images.
+
+This strategy ensures that our distribution remains compliant with liberal licenses (Apache 2.0) while providing seamless connectivity to a wide range of databases.
+
 > [!NOTE]
 > **Why MySQL Driver for ClickHouse?**
 > ClickHouse provides a [MySQL-compatible wire protocol](https://clickhouse.com/docs/en/interfaces/mysql). HydraStream leverages this by using the standard Flink JDBC connector combined with the MySQL 5.1.49 driver. This allows for high-performance streaming without requiring specialized native connectors that can be unstable in Flink.

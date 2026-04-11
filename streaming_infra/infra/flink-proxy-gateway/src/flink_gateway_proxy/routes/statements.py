@@ -95,21 +95,22 @@ async def create_statement(
     if required_jars:
         session = await session_manager.get_session_by_handle(session_handle)
         if session:
-            for jar_url in required_jars:
-                if jar_url not in session.added_jars:
-                    logger.info(f"Adding required JAR {jar_url} to session {session_handle}")
-                    try:
-                        # Use SQL Gateway to add JAR
-                        add_jar_sql = f"ADD JAR '{jar_url}'"
-                        op_handle = await gateway_client.execute_statement(session_handle, add_jar_sql)
-                        status = await gateway_client.wait_for_operation(session_handle, op_handle)
-                        if status == "FINISHED":
-                            session.added_jars.add(jar_url)
-                        else:
-                            logger.error(f"Failed to add JAR {jar_url}, status: {status}")
-                    except Exception as e:
-                        logger.error(f"Failed to add JAR {jar_url}: {e}")
-                        # Continue anyway, Flink might already have it or fail later
+            async with session.jar_lock:
+                for jar_url in required_jars:
+                    if jar_url not in session.added_jars:
+                        logger.info(f"Adding required JAR {jar_url} to session {session_handle}")
+                        try:
+                            # Use SQL Gateway to add JAR
+                            add_jar_sql = f"ADD JAR '{jar_url}'"
+                            op_handle = await gateway_client.execute_statement(session_handle, add_jar_sql)
+                            status = await gateway_client.wait_for_operation(session_handle, op_handle)
+                            if status == "FINISHED":
+                                session.added_jars.add(jar_url)
+                            else:
+                                logger.error(f"Failed to add JAR {jar_url}, status: {status}")
+                        except Exception as e:
+                            logger.error(f"Failed to add JAR {jar_url}: {e}")
+                            # Continue anyway, Flink might already have it or fail later
 
     if "INFORMATION_SCHEMA" in sql_upper and "SCHEMATA" in sql_upper:
         operation_handle = "mock-schemata-op"

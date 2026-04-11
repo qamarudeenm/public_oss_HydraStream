@@ -64,6 +64,7 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: flink-jobmanager
+      - MYSQL_JDBC_DRIVER_URL=${MYSQL_JDBC_DRIVER_URL:-https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar}
     depends_on:
       kafka:
         condition: service_healthy
@@ -83,6 +84,7 @@ services:
         jobmanager.rpc.address: flink-jobmanager
         taskmanager.numberOfTaskSlots: 2
         taskmanager.memory.process.size: 2048m
+      - MYSQL_JDBC_DRIVER_URL=${MYSQL_JDBC_DRIVER_URL:-https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -100,6 +102,7 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: flink-jobmanager
         sql-gateway.endpoint.rest.address: 0.0.0.0
+      - MYSQL_JDBC_DRIVER_URL=${MYSQL_JDBC_DRIVER_URL:-https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
