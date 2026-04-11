@@ -1,3 +1,17 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 const PRODUCTS = [
     { id: 'prod_001', name: 'Aero-Flow Runners', price: 189.99, image: 'assets/product_shoes_premium_1774700211718.png' },
     { id: 'prod_002', name: 'Nexus Chrono v2', price: 449.00, image: 'assets/product_watch_premium_1774700266752.png' },

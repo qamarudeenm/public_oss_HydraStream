@@ -1,5 +1,18 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Async HTTP client for Flink SQL Gateway REST API."""
 
+import asyncio
 import logging
 from typing import Any
 
@@ -108,6 +121,33 @@ class FlinkGatewayClient:
             f"Executed statement in session {session_handle}: {exec_response.operation_handle}"
         )
         return exec_response.operation_handle
+
+    async def wait_for_operation(
+        self,
+        session_handle: str,
+        operation_handle: str,
+        timeout: float = 60.0,
+        interval: float = 0.5,
+    ) -> str:
+        """Wait for an operation to complete.
+
+        Args:
+            session_handle: Session handle
+            operation_handle: Operation handle
+            timeout: Maximum time to wait in seconds
+            interval: Polling interval in seconds
+
+        Returns:
+            Final status (e.g., FINISHED, ERROR)
+        """
+        start_time = asyncio.get_event_loop().time()
+        while asyncio.get_event_loop().time() - start_time < timeout:
+            status_resp = await self.get_operation_status(session_handle, operation_handle)
+            status = status_resp.status
+            if status in {"FINISHED", "ERROR", "CANCELED"}:
+                return status
+            await asyncio.sleep(interval)
+        return "TIMEOUT"
 
     async def get_operation_status(
         self, session_handle: str, operation_handle: str

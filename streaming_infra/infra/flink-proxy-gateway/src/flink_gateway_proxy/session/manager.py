@@ -1,3 +1,15 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Session lifecycle manager for Flink SQL Gateway sessions."""
 
 import asyncio
@@ -26,6 +38,7 @@ class Session:
     handle: str
     key: SessionKey
     last_used: float = field(default_factory=lambda: asyncio.get_event_loop().time())
+    added_jars: set[str] = field(default_factory=set)
 
 
 class SessionManager:
@@ -136,6 +149,21 @@ class SessionManager:
 
             logger.info(f"Created new session: {session_handle} for {key}")
             return session_handle
+
+    async def get_session_by_handle(self, session_handle: str) -> Session | None:
+        """Get a session by its handle.
+
+        Args:
+            session_handle: Session handle
+
+        Returns:
+            Session object or None if not found
+        """
+        async with self._lock:
+            for session in self._sessions.values():
+                if session.handle == session_handle:
+                    return session
+            return None
 
     async def _heartbeat_loop(self) -> None:
         """Background task to send heartbeats to all sessions."""

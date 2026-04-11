@@ -1,3 +1,15 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Statement endpoints for Confluent API."""
 
 import logging
@@ -20,6 +32,7 @@ from ..models.confluent import (
 )
 from ..session.manager import SessionManager
 from ..state.store import StatementRecord, StateStore
+from ..translator.drivers import detect_required_drivers
 from ..translator.results import translate_flink_results_to_confluent
 from ..translator.statement import build_statement_response
 from ..translator.status import flink_status_to_confluent_phase
@@ -76,6 +89,28 @@ async def create_statement(
 
     sql = body.spec.statement
     sql_upper = sql.upper()
+
+    # On-demand driver management
+    required_jars = detect_required_drivers(sql)
+    if required_jars:
+        session = await session_manager.get_session_by_handle(session_handle)
+        if session:
+            for jar_url in required_jars:
+                if jar_url not in session.added_jars:
+                    logger.info(f"Adding required JAR {jar_url} to session {session_handle}")
+                    try:
+                        # Use SQL Gateway to add JAR
+                        add_jar_sql = f"ADD JAR '{jar_url}'"
+                        op_handle = await gateway_client.execute_statement(session_handle, add_jar_sql)
+                        status = await gateway_client.wait_for_operation(session_handle, op_handle)
+                        if status == "FINISHED":
+                            session.added_jars.add(jar_url)
+                        else:
+                            logger.error(f"Failed to add JAR {jar_url}, status: {status}")
+                    except Exception as e:
+                        logger.error(f"Failed to add JAR {jar_url}: {e}")
+                        # Continue anyway, Flink might already have it or fail later
+
     if "INFORMATION_SCHEMA" in sql_upper and "SCHEMATA" in sql_upper:
         operation_handle = "mock-schemata-op"
     elif "INFORMATION_SCHEMA" in sql_upper and "TABLES" in sql_upper:
