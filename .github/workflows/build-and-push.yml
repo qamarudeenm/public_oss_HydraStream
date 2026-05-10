@@ -1,3 +1,15 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: 🌊 HydraStream - Build & Push Images
 
 on:
@@ -20,7 +32,7 @@ env:
 jobs:
   build-and-push:
     name: Build & Push to Docker Hub
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       # ──────────────────────────────────────────────
@@ -68,8 +80,8 @@ jobs:
           tags: |
             ${{ env.REPO }}:engine-${{ env.FLINK_VERSION }}
             ${{ env.REPO }}:engine-${{ steps.version.outputs.VERSION }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
       # ──────────────────────────────────────────────
       # 6. Build & Push: Flink Proxy Gateway
@@ -83,8 +95,8 @@ jobs:
           tags: |
             ${{ env.REPO }}:proxy-latest
             ${{ env.REPO }}:proxy-${{ steps.version.outputs.VERSION }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
       # ──────────────────────────────────────────────
       # 7. Build & Push: dbt Worker
@@ -98,11 +110,19 @@ jobs:
           tags: |
             ${{ env.REPO }}:dbt-latest
             ${{ env.REPO }}:dbt-${{ steps.version.outputs.VERSION }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
       # ──────────────────────────────────────────────
-      # 8. Summary
+      # 8. Rotate local buildx cache
+      # ──────────────────────────────────────────────
+      - name: Rotate buildx cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
+
+      # ──────────────────────────────────────────────
+      # 9. Summary
       # ──────────────────────────────────────────────
       - name: Print Summary
         run: |

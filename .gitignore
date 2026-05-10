@@ -19,8 +19,11 @@ architecture_design_mermaid.png
 codebase_overview.md
 pipeline_architecture.md
 pipeline_architecture.html
-scripts/
 streaming_infra/dbt/models/*
 !streaming_infra/dbt/models/.gitkeep
+streaming_infra/dbt/target/
+streaming_infra/dbt/logs/
+control_plane/frontend/node_modules/
+control_plane/frontend/.next/
 docs/
 build_and_push_local.sh
