@@ -47,5 +47,29 @@ class ProxyConfig(BaseSettings):
     default_principal: str = "proxy-user"
     """Default principal name for statement tracking"""
 
+    state_backend: str = "redis"
+    """State backend: redis | memory"""
+
+    state_redis_url: str = "redis://localhost:6379/0"
+    """Redis URL for persistent statement state"""
+
+    state_redis_key_prefix: str = "flink-gateway-proxy:statements"
+    """Redis key prefix for statement records"""
+
+    dbt_cloud_shared_secret: str = ""
+    """Shared secret for validating dbt callback signatures"""
+
+    dbt_tenant_gateway_map: dict[str, str] = {}
+    """Tenant to Flink SQL Gateway URL mapping for runtime dispatch"""
+
+    dbt_dispatch_max_attempts: int = 3
+    """Maximum retry attempts for statement dispatch on retryable failures"""
+
+    dbt_artifact_dir: str = ""
+    """Default artifact directory containing manifest.json and run_results.json"""
+
+    dbt_tenant_artifact_map: dict[str, str] = {}
+    """Tenant to artifact directory mapping for inventory and lineage extraction"""
+
     log_level: str = "info"
     """Logging level"""

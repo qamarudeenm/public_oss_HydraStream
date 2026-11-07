@@ -20,7 +20,7 @@ from fastapi.responses import JSONResponse
 
 from .config import ProxyConfig
 from .gateway.client import FlinkGatewayClient
-from .routes import statements
+from .routes import dbt_artifacts, dbt_runtime, statements
 from .session.manager import SessionManager
 from .state.store import StateStore
 
@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):
     # Set logging level
     logging.getLogger().setLevel(config.log_level.upper())
 
-    logger.info(f"Starting Flink Gateway Proxy")
+    logger.info("Starting Flink Gateway Proxy")
     logger.info(f"Flink Gateway URL: {config.flink_gateway_url}")
     logger.info(f"Listen: {config.listen_host}:{config.listen_port}")
 
@@ -58,7 +58,11 @@ async def lifespan(app: FastAPI):
     gateway_client = FlinkGatewayClient(config.flink_gateway_url)
 
     # Initialize state store
-    state_store = StateStore()
+    state_store = await StateStore.create(
+        backend=config.state_backend,
+        redis_url=config.state_redis_url,
+        redis_key_prefix=config.state_redis_key_prefix,
+    )
 
     # Initialize session manager
     session_manager = SessionManager(
@@ -72,6 +76,15 @@ async def lifespan(app: FastAPI):
 
     # Inject dependencies into routes
     statements.set_dependencies(gateway_client, session_manager, state_store)
+    dbt_runtime.set_runtime_config(
+        shared_secret=config.dbt_cloud_shared_secret,
+        tenant_gateway_map=config.dbt_tenant_gateway_map,
+        max_dispatch_attempts=config.dbt_dispatch_max_attempts,
+    )
+    dbt_artifacts.set_artifact_config(
+        default_artifact_dir=config.dbt_artifact_dir,
+        tenant_artifact_map=config.dbt_tenant_artifact_map,
+    )
 
     logger.info("Flink Gateway Proxy started successfully")
 
@@ -82,6 +95,9 @@ async def lifespan(app: FastAPI):
 
     # Stop session manager
     await session_manager.stop()
+
+    # Close state store
+    await state_store.close()
 
     # Close gateway client
     await gateway_client.close()
@@ -99,6 +115,8 @@ app = FastAPI(
 
 # Include routers
 app.include_router(statements.router)
+app.include_router(dbt_runtime.router)
+app.include_router(dbt_artifacts.router)
 
 
 @app.get("/health")
