@@ -22,6 +22,7 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import orchestrator
+from .auth import get_current_user
 from .database import AsyncSessionLocal, engine, get_db
 from .db_models import TenantRecord
 from .dbt_artifacts import ArtifactLoadError, load_dbt_artifacts
@@ -102,13 +103,20 @@ app.add_middleware(
 
 
 @app.get("/tenants", response_model=List[Tenant])
-async def list_tenants(db: AsyncSession = Depends(get_db)):
+async def list_tenants(
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     result = await db.execute(select(TenantRecord))
     return [_record_to_tenant(r) for r in result.scalars().all()]
 
 
 @app.get("/tenants/{tenant_id}", response_model=Tenant)
-async def get_tenant(tenant_id: str, db: AsyncSession = Depends(get_db)):
+async def get_tenant(
+    tenant_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -116,7 +124,11 @@ async def get_tenant(tenant_id: str, db: AsyncSession = Depends(get_db)):
 
 
 @app.post("/tenants", response_model=Tenant)
-async def create_tenant(tenant: Tenant, db: AsyncSession = Depends(get_db)):
+async def create_tenant(
+    tenant: Tenant,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     existing = await db.get(TenantRecord, tenant.id)
     if existing is not None:
         raise HTTPException(status_code=400, detail="Tenant ID already exists")
@@ -133,6 +145,7 @@ async def update_tenant(
     tenant_id: str,
     tenant_update: dict = Body(...),
     db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
 ):
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
@@ -157,7 +170,11 @@ async def update_tenant(
 
 
 @app.delete("/tenants/{tenant_id}")
-async def delete_tenant(tenant_id: str, db: AsyncSession = Depends(get_db)):
+async def delete_tenant(
+    tenant_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     record = await db.get(TenantRecord, tenant_id)
     if record is not None:
         await db.delete(record)
@@ -166,7 +183,10 @@ async def delete_tenant(tenant_id: str, db: AsyncSession = Depends(get_db)):
 
 
 @app.post("/tenants/preview")
-async def preview_tenant_profiles(tenant: Tenant):
+async def preview_tenant_profiles(
+    tenant: Tenant,
+    _user: dict = Depends(get_current_user),
+):
     tenant = _secure_environment_tokens(tenant)
     return {
         "profiles.yml": orchestrator.generate_tenant_profiles_yml(tenant),
@@ -179,7 +199,11 @@ async def preview_tenant_profiles(tenant: Tenant):
 
 
 @app.get("/tenants/{tenant_id}/profiles.yml")
-async def get_tenant_profiles(tenant_id: str, db: AsyncSession = Depends(get_db)):
+async def get_tenant_profiles(
+    tenant_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -187,7 +211,11 @@ async def get_tenant_profiles(tenant_id: str, db: AsyncSession = Depends(get_db)
 
 
 @app.get("/tenants/{tenant_id}/vars.json")
-async def get_tenant_vars(tenant_id: str, db: AsyncSession = Depends(get_db)):
+async def get_tenant_vars(
+    tenant_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -195,7 +223,11 @@ async def get_tenant_vars(tenant_id: str, db: AsyncSession = Depends(get_db)):
 
 
 @app.get("/tenants/{tenant_id}/dbt_project.yml")
-async def get_tenant_dbt_project(tenant_id: str, db: AsyncSession = Depends(get_db)):
+async def get_tenant_dbt_project(
+    tenant_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -203,7 +235,11 @@ async def get_tenant_dbt_project(tenant_id: str, db: AsyncSession = Depends(get_
 
 
 @app.get("/tenants/{tenant_id}/verification")
-async def get_tenant_mapping_verification(tenant_id: str, db: AsyncSession = Depends(get_db)):
+async def get_tenant_mapping_verification(
+    tenant_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -211,7 +247,11 @@ async def get_tenant_mapping_verification(tenant_id: str, db: AsyncSession = Dep
 
 
 @app.get("/tenants/{tenant_id}/preflight")
-async def get_tenant_preflight(tenant_id: str, db: AsyncSession = Depends(get_db)):
+async def get_tenant_preflight(
+    tenant_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -222,7 +262,11 @@ async def get_tenant_preflight(tenant_id: str, db: AsyncSession = Depends(get_db
 
 
 @app.get("/tenants/{tenant_id}/runs")
-async def get_tenant_run_history(tenant_id: str, db: AsyncSession = Depends(get_db)):
+async def get_tenant_run_history(
+    tenant_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -302,7 +346,11 @@ async def get_tenant_run_history(tenant_id: str, db: AsyncSession = Depends(get_
 
 
 @app.get("/tenants/{tenant_id}/dbt/artifacts/summary")
-async def get_tenant_dbt_artifact_summary(tenant_id: str, db: AsyncSession = Depends(get_db)):
+async def get_tenant_dbt_artifact_summary(
+    tenant_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -323,7 +371,11 @@ async def get_tenant_dbt_artifact_summary(tenant_id: str, db: AsyncSession = Dep
 
 
 @app.get("/tenants/{tenant_id}/docker-compose.yml")
-async def get_tenant_docker_compose(tenant_id: str, db: AsyncSession = Depends(get_db)):
+async def get_tenant_docker_compose(
+    tenant_id: str,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+):
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
