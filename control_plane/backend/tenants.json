@@ -1,0 +1,97 @@
+[
+  {
+    "id": "tenant-alpha",
+    "name": "Alpha Corporation",
+    "kafka": {
+      "bootstrap_servers": "kafka:29092",
+      "topic": "clickstream-alpha",
+      "group_id": "alpha-consumer-group"
+    },
+    "sink": {
+      "jdbc_url": "jdbc:mysql://host.docker.internal:9004/clickstream_alpha",
+      "user": "flink_user",
+      "password": "12345",
+      "summary_table": "alpha_summary",
+      "metrics_table": "alpha_metrics"
+    },
+    "flink_version": "1.19.1",
+    "dbt_version": "1.7.0",
+    "status": "active"
+  },
+  {
+    "id": "test-tenant-vvf3n",
+    "name": "Test Tenant Corp",
+    "kafka": {
+      "bootstrap_servers": "localhost:9092",
+      "topic": "test-topic",
+      "group_id": "test-group"
+    },
+    "sink": {
+      "jdbc_url": "jdbc:mysql://host.docker.internal:9004/clickstream",
+      "user": "flink_user",
+      "password": "12345",
+      "summary_table": "clickstream_summary",
+      "metrics_table": "transformed_clickstream_metrics"
+    },
+    "flink_version": "1.19.1",
+    "dbt_version": "1.7.0",
+    "status": "inactive"
+  },
+  {
+    "id": "test-tenant-bcvikqm",
+    "name": "Test Tenant Corp",
+    "kafka": {
+      "bootstrap_servers": "localhost:9092",
+      "topic": "test-topic",
+      "group_id": "test-group"
+    },
+    "sink": {
+      "jdbc_url": "jdbc:mysql://host.docker.internal:9004/clickstream",
+      "user": "flink_user",
+      "password": "12345",
+      "summary_table": "clickstream_summary",
+      "metrics_table": "transformed_clickstream_metrics"
+    },
+    "flink_version": "1.19.1",
+    "dbt_version": "1.7.0",
+    "status": "inactive"
+  },
+  {
+    "id": "test-tenant-tbe6nh",
+    "name": "Test Tenant Corp",
+    "kafka": {
+      "bootstrap_servers": "localhost:9092",
+      "topic": "test-topic",
+      "group_id": "test-group"
+    },
+    "sink": {
+      "jdbc_url": "jdbc:mysql://host.docker.internal:9004/clickstream",
+      "user": "flink_user",
+      "password": "12345",
+      "summary_table": "clickstream_summary",
+      "metrics_table": "transformed_clickstream_metrics"
+    },
+    "flink_version": "1.19.1",
+    "dbt_version": "1.7.0",
+    "status": "inactive"
+  },
+  {
+    "id": "test-tenant-ahkkad",
+    "name": "Test Tenant Corp",
+    "kafka": {
+      "bootstrap_servers": "localhost:9092",
+      "topic": "test-topic",
+      "group_id": "test-group"
+    },
+    "sink": {
+      "jdbc_url": "jdbc:mysql://host.docker.internal:9004/clickstream",
+      "user": "flink_user",
+      "password": "12345",
+      "summary_table": "clickstream_summary",
+      "metrics_table": "transformed_clickstream_metrics"
+    },
+    "flink_version": "1.19.1",
+    "dbt_version": "1.7.0",
+    "status": "inactive"
+  }
+]
