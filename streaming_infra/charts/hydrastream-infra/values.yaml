@@ -1,0 +1,68 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Default values for hydrastream-infra.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+postgresql:
+  enabled: true
+  auth:
+    username: hydra
+    password: hydra
+    database: hydrastream
+  primary:
+    persistence:
+      size: 10Gi
+      storageClass: "standard"
+    resources:
+      limits:
+        cpu: 1
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+
+# Control plane backend configuration
+controlPlane:
+  database:
+    # Set to override — defaults to the in-cluster postgresql above
+    urlSecretName: ""
+    # DATABASE_URL is constructed from postgresql values when urlSecretName is empty
+    host: "hydrastream-infra-postgresql"
+    port: 5432
+    name: hydrastream
+    user: hydra
+
+kafka:
+  replicaCount: 1
+  image:
+    repository: apache/kafka
+    tag: "3.9.0"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  storage:
+    size: 10Gi
+    class: "standard"
+  # KRaft configuration
+  nodeId: 0
+  processRoles: "controller,broker"
+  controllerQuorumVoters: "0@localhost:9093"
+  listeners: "PLAINTEXT://:29092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:9092"
+  advertisedListeners: "PLAINTEXT://kafka-service:29092,EXTERNAL://localhost:9092"
+  autoCreateTopics: true
