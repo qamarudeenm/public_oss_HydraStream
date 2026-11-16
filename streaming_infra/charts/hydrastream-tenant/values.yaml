@@ -1,0 +1,120 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Default values for hydrastream-tenant.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: blue2berry/hydrastream
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "engine-flink1.19.1"
+
+proxy:
+  image:
+    repository: blue2berry/hydrastream
+    pullPolicy: IfNotPresent
+    # Must be set to a git-SHA-based tag at deploy time, e.g. proxy-abc1234.
+    # Build & Push CI publishes tags in the form proxy-<7-char-git-sha>.
+    # Override with: helm upgrade ... --set proxy.image.tag=proxy-<sha>
+    # Never use proxy-latest — it is a mutable tag and not suitable for production.
+    tag: ""
+  replicaCount: 1
+  auth:
+    mode: oidc_jwt
+    issuerUrl: https://issuer.example.com
+    audience: flink-proxy
+    algorithms: RS256
+  service:
+    type: ClusterIP
+    port: 8080
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+flink:
+  version: v1_19
+  image: "blue2berry/hydrastream:engine-flink1.19.1"
+  jobManager:
+    replicaCount: 1
+    resource:
+      cpu: 1
+      memory: "2Gi"
+  taskManager:
+    replicaCount: 2
+    resource:
+      cpu: 1
+      memory: "2Gi"
+  sqlGateway:
+    replicaCount: 1
+    service:
+      type: ClusterIP
+      port: 8083
+
+kafka:
+  bootstrapServers: "kafka-service:9092"
+  topic: "clickstream"
+
+clickhouse:
+  jdbcUrl: "jdbc:mysql://clickhouse-service:9004/default"
+  user: "admin"
+  password: "REPLACE_ME_SECURE_SECRET"
+  targetTable: "transformed_clickstream_metrics"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

@@ -57,15 +57,23 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # ──────────────────────────────────────────────
-      # 4. Derive version tag from git ref
+      # 4. Derive image tags from git ref
+      #    - Always tag proxy with short SHA (immutable)
+      #    - On release tags (v*.*.*), also tag with semver
+      #    - proxy-latest is intentionally NOT pushed (BLUAA-291)
       # ──────────────────────────────────────────────
-      - name: Set version tag
-        id: version
+      - name: Derive image tags
+        id: tags
         run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          echo "SHORT_SHA=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "PROXY_SHA_TAG=proxy-${SHORT_SHA}" >> $GITHUB_OUTPUT
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
             echo "VERSION=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "HAS_SEMVER=true" >> $GITHUB_OUTPUT
           else
             echo "VERSION=latest" >> $GITHUB_OUTPUT
+            echo "HAS_SEMVER=false" >> $GITHUB_OUTPUT
           fi
 
       # ──────────────────────────────────────────────
@@ -79,22 +87,33 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REPO }}:engine-${{ env.FLINK_VERSION }}
-            ${{ env.REPO }}:engine-${{ steps.version.outputs.VERSION }}
+            ${{ env.REPO }}:engine-${{ steps.tags.outputs.VERSION }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
       # ──────────────────────────────────────────────
       # 6. Build & Push: Flink Proxy Gateway
+      #    Tags: proxy-<sha> (always), proxy-<semver> (on release tags only)
+      #    proxy-latest is NOT pushed — use SHA tags for reproducible deploys
       # ──────────────────────────────────────────────
-      - name: Build & Push Proxy Gateway
+      - name: Build & Push Proxy Gateway (SHA tag)
         uses: docker/build-push-action@v5
         with:
           context: streaming_infra/infra/flink-proxy-gateway
           file: streaming_infra/infra/flink-proxy-gateway/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ env.REPO }}:proxy-latest
-            ${{ env.REPO }}:proxy-${{ steps.version.outputs.VERSION }}
+          tags: ${{ env.REPO }}:${{ steps.tags.outputs.PROXY_SHA_TAG }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      - name: Build & Push Proxy Gateway (semver tag, release only)
+        if: ${{ github.event_name != 'pull_request' && steps.tags.outputs.HAS_SEMVER == 'true' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: streaming_infra/infra/flink-proxy-gateway
+          file: streaming_infra/infra/flink-proxy-gateway/Dockerfile
+          push: true
+          tags: ${{ env.REPO }}:proxy-${{ steps.tags.outputs.VERSION }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
@@ -109,7 +128,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REPO }}:dbt-latest
-            ${{ env.REPO }}:dbt-${{ steps.version.outputs.VERSION }}
+            ${{ env.REPO }}:dbt-${{ steps.tags.outputs.VERSION }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
@@ -131,7 +150,8 @@ jobs:
           echo "| Image | Tag |" >> $GITHUB_STEP_SUMMARY
           echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
           echo "| Engine | \`${{ env.REPO }}:engine-${{ env.FLINK_VERSION }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Proxy | \`${{ env.REPO }}:proxy-latest\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Proxy | \`${{ env.REPO }}:${{ steps.tags.outputs.PROXY_SHA_TAG }}\` (immutable SHA tag) |" >> $GITHUB_STEP_SUMMARY
           echo "| dbt Worker | \`${{ env.REPO }}:dbt-latest\` |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "ℹ️ Proxy image is tagged with git SHA for reproducible deployments. \`proxy-latest\` is no longer published." >> $GITHUB_STEP_SUMMARY
           echo "🔗 https://hub.docker.com/r/blue2berry/hydrastream/tags" >> $GITHUB_STEP_SUMMARY
