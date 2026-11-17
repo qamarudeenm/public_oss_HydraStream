@@ -186,6 +186,11 @@ env:
 - `DELETE /sql/v1/organizations/{org}/environments/{env}/statements/{name}` - Delete statement
 - `GET /sql/v1/organizations/{org}/environments/{env}/statements` - List statements
 
+### dbt Runtime Callback
+
+- `POST /runtime/v1/dbt/run-callback` - Authenticated dbt Cloud run callback dispatch
+- `GET /runtime/v1/tenants/{tenant_id}/dbt/artifacts/summary` - Model inventory + lineage summary from dbt artifacts
+
 ## Configuration Reference
 
 | Environment Variable | Default | Description |
@@ -197,18 +202,26 @@ env:
 | `PROXY_SESSION_IDLE_TIMEOUT` | `600` | Seconds before idle sessions are cleaned up |
 | `PROXY_AUTH_MODE` | `passthrough` | Authentication mode |
 | `PROXY_DEFAULT_PRINCIPAL` | `proxy-user` | Default principal name |
+| `PROXY_STATE_BACKEND` | `redis` | Statement state backend (`redis` or `memory`) |
+| `PROXY_STATE_REDIS_URL` | `redis://localhost:6379/0` | Redis URL for persistent statement state |
+| `PROXY_STATE_REDIS_KEY_PREFIX` | `flink-gateway-proxy:statements` | Redis key prefix for statement records |
+| `PROXY_DBT_CLOUD_SHARED_SECRET` | `` | Shared secret for `X-Dbt-Signature` HMAC verification |
+| `PROXY_DBT_TENANT_GATEWAY_MAP` | `{}` | JSON map of tenant IDs to Flink SQL Gateway URLs |
+| `PROXY_DBT_DISPATCH_MAX_ATTEMPTS` | `3` | Max retry attempts for retryable dispatch failures |
+| `PROXY_DBT_ARTIFACT_DIR` | `` | Default directory containing dbt `manifest.json` and `run_results.json` |
+| `PROXY_DBT_TENANT_ARTIFACT_MAP` | `{}` | JSON map of tenant IDs to artifact directories |
 | `PROXY_LOG_LEVEL` | `info` | Logging level |
 
 ## Limitations
 
-- **In-memory state**: Statement records are stored in memory and lost on restart
+- **Redis dependency**: Default persistent state backend requires a reachable Redis instance
 - **Single instance**: Not designed for horizontal scaling (sessions are per-instance)
 - **Schema extraction**: Currently limited; full schema metadata extraction is TODO
 - **Pagination**: Basic implementation; token-based pagination could be improved
 
 ## Future Enhancements
 
-- Persistent state store (Redis, PostgreSQL)
+- PostgreSQL-backed state store option
 - Distributed session management
 - Full schema extraction from Flink metadata
 - Enhanced error handling and retry logic

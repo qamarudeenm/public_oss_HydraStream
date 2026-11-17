@@ -10,15 +10,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class ControlPlaneConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="CONTROL_PLANE_", env_file=".env", extra="ignore")
+
     oidc_issuer_url: str = ""
     oidc_audience: str = "hydrastream-control-plane"
     auth_disabled: bool = False
 
-    model_config = {"env_prefix": "CONTROL_PLANE_"}
+    listen_host: str = "0.0.0.0"
+    listen_port: int = 8000
+    log_level: str = "info"
 
 
 settings = ControlPlaneConfig()

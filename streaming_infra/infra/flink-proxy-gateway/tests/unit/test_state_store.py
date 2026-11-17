@@ -12,17 +12,45 @@
 
 """Unit tests for state store."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from fnmatch import fnmatch
 
 import pytest
 
 from flink_gateway_proxy.state.store import StatementRecord, StateStore
 
 
+class FakeRedis:
+    """Minimal async Redis stub for state store tests."""
+
+    def __init__(self):
+        self._data: dict[str, str] = {}
+
+    async def ping(self):
+        return "PONG"
+
+    async def set(self, key: str, value: str):
+        self._data[key] = value
+
+    async def get(self, key: str):
+        return self._data.get(key)
+
+    async def delete(self, key: str):
+        self._data.pop(key, None)
+
+    async def aclose(self):
+        return None
+
+    async def scan_iter(self, match: str):
+        for key in list(self._data):
+            if fnmatch(key, match):
+                yield key
+
+
 @pytest.mark.asyncio
 async def test_state_store_add_get():
     """Test adding and getting records."""
-    store = StateStore()
+    store = StateStore(backend="memory")
 
     record = StatementRecord(
         name="test-stmt",
@@ -36,7 +64,7 @@ async def test_state_store_add_get():
         phase="PENDING",
         traits=None,
         result_token=0,
-        created_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
         compute_pool_id="pool-1",
         principal="user-1",
     )
@@ -53,7 +81,7 @@ async def test_state_store_add_get():
 @pytest.mark.asyncio
 async def test_state_store_update():
     """Test updating records."""
-    store = StateStore()
+    store = StateStore(backend="memory")
 
     record = StatementRecord(
         name="test-stmt",
@@ -67,7 +95,7 @@ async def test_state_store_update():
         phase="PENDING",
         traits=None,
         result_token=0,
-        created_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
         compute_pool_id="pool-1",
         principal="user-1",
     )
@@ -83,7 +111,7 @@ async def test_state_store_update():
 @pytest.mark.asyncio
 async def test_state_store_delete():
     """Test deleting records."""
-    store = StateStore()
+    store = StateStore(backend="memory")
 
     record = StatementRecord(
         name="test-stmt",
@@ -97,7 +125,7 @@ async def test_state_store_delete():
         phase="PENDING",
         traits=None,
         result_token=0,
-        created_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
         compute_pool_id="pool-1",
         principal="user-1",
     )
@@ -112,7 +140,7 @@ async def test_state_store_delete():
 @pytest.mark.asyncio
 async def test_state_store_list_by_labels():
     """Test listing by labels."""
-    store = StateStore()
+    store = StateStore(backend="memory")
 
     record1 = StatementRecord(
         name="stmt-1",
@@ -126,7 +154,7 @@ async def test_state_store_list_by_labels():
         phase="PENDING",
         traits=None,
         result_token=0,
-        created_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
         compute_pool_id="pool-1",
         principal="user-1",
     )
@@ -143,7 +171,7 @@ async def test_state_store_list_by_labels():
         phase="PENDING",
         traits=None,
         result_token=0,
-        created_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
         compute_pool_id="pool-1",
         principal="user-1",
     )
@@ -160,7 +188,7 @@ async def test_state_store_list_by_labels():
         phase="PENDING",
         traits=None,
         result_token=0,
-        created_at=datetime.now(timezone.utc),
+        created_at=datetime.now(UTC),
         compute_pool_id="pool-1",
         principal="user-1",
     )
@@ -172,3 +200,48 @@ async def test_state_store_list_by_labels():
     results = await store.list_by_labels({"user.confluent.io/batch": "true"})
     assert len(results) == 2
     assert all(r.labels.get("user.confluent.io/batch") == "true" for r in results)
+
+
+@pytest.mark.asyncio
+async def test_state_store_redis_backend_round_trip():
+    """Test Redis backend persistence flow."""
+    store = StateStore(
+        backend="redis",
+        redis_url="redis://fake:6379/0",
+        _redis=FakeRedis(),
+    )
+    await store.start()
+
+    created_at = datetime.now(UTC)
+    record = StatementRecord(
+        name="redis-stmt",
+        org_id="org-1",
+        env_id="env-1",
+        session_handle="session-1",
+        operation_handle="op-1",
+        sql="SELECT 1",
+        properties={},
+        labels={"team": "platform"},
+        phase="PENDING",
+        traits={"sql_kind": "SELECT"},
+        result_token=0,
+        created_at=created_at,
+        compute_pool_id="pool-1",
+        principal="user-1",
+    )
+
+    await store.add(record)
+    await store.update("redis-stmt", phase="RUNNING", result_token=3)
+
+    fetched = await store.get("redis-stmt")
+    assert fetched is not None
+    assert fetched.phase == "RUNNING"
+    assert fetched.result_token == 3
+    assert fetched.created_at == created_at
+
+    by_label = await store.list_by_labels({"team": "platform"})
+    assert len(by_label) == 1
+    assert by_label[0].name == "redis-stmt"
+
+    await store.delete("redis-stmt")
+    assert await store.get("redis-stmt") is None

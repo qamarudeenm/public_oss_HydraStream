@@ -1,0 +1,167 @@
+# ─────────────────────────────────────────────────────────────────
+# Apache Flink Cluster on GKE
+# Includes: JobManager, TaskManager, SQL Gateway
+# Image: built by Cloud Build and stored in Artifact Registry
+# ─────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flink-config
+  namespace: hydrastream
+data:
+  flink-conf.yaml: |
+    jobmanager.rpc.address: flink-jobmanager
+    taskmanager.numberOfTaskSlots: 2
+    taskmanager.memory.process.size: 2048m
+    # Flink state checkpointing to GCS
+    state.backend: filesystem
+    state.checkpoints.dir: gs://hydrastream-local-hydrastream-flink-state/checkpoints
+    execution.checkpointing.interval: 60000
+    # SQL Gateway
+    sql-gateway.endpoint.rest.address: 0.0.0.0
+    sql-gateway.endpoint.rest.port: 8083
+---
+# ── Flink JobManager ──────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-jobmanager
+  namespace: hydrastream
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      component: jobmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: jobmanager
+    spec:
+      containers:
+        - name: flink-jobmanager
+          # Replace with your Artifact Registry URL after terraform apply
+          image: us-central1-docker.pkg.dev/hydrastream-local/hydrastream/engine:flink1.19.1
+          command: ["jobmanager"]
+          ports:
+            - containerPort: 8081
+              name: ui
+            - containerPort: 6123
+              name: rpc
+          env:
+            - name: FLINK_PROPERTIES
+              valueFrom:
+                configMapKeyRef:
+                  name: flink-config
+                  key: flink-conf.yaml
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flink-jobmanager
+  namespace: hydrastream
+spec:
+  selector:
+    app: flink
+    component: jobmanager
+  ports:
+    - name: ui
+      port: 8081
+    - name: rpc
+      port: 6123
+---
+# ── Flink TaskManager ─────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-taskmanager
+  namespace: hydrastream
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      component: taskmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: taskmanager
+    spec:
+      containers:
+        - name: flink-taskmanager
+          image: us-central1-docker.pkg.dev/hydrastream-local/hydrastream/engine:flink1.19.1
+          command: ["taskmanager"]
+          env:
+            - name: FLINK_PROPERTIES
+              valueFrom:
+                configMapKeyRef:
+                  name: flink-config
+                  key: flink-conf.yaml
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "3Gi"
+---
+# ── Flink SQL Gateway ─────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-sql-gateway
+  namespace: hydrastream
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      component: sql-gateway
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: sql-gateway
+    spec:
+      containers:
+        - name: flink-sql-gateway
+          image: us-central1-docker.pkg.dev/hydrastream-local/hydrastream/engine:flink1.19.1
+          command: ["/opt/flink/bin/sql-gateway.sh", "start-foreground"]
+          ports:
+            - containerPort: 8083
+              name: rest
+          env:
+            - name: FLINK_PROPERTIES
+              valueFrom:
+                configMapKeyRef:
+                  name: flink-config
+                  key: flink-conf.yaml
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flink-sql-gateway
+  namespace: hydrastream
+spec:
+  selector:
+    app: flink
+    component: sql-gateway
+  ports:
+    - name: rest
+      port: 8083
