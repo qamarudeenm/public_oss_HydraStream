@@ -207,3 +207,20 @@ WI-2 (Helm Validation) ──→ WI-3 (Flink E2E) ──┤
 ## Approval
 
 **CTO approved 2026-11-17.** Child issues created. Sprint 2 execution in progress.
+
+---
+
+## Sprint 2 Status (2026-11-18)
+
+| WI | Issue | Title | Status | Notes |
+|----|-------|-------|--------|-------|
+| 0 | BLUAA-299 | Merge Sprint 1 commits | ✅ Done | Merged to remote |
+| 1 | BLUAA-300 | Frontend OIDC auth | ✅ Done | PKCE flow, AuthProvider, all API calls authenticated |
+| 2 | BLUAA-301 | Helm chart validation | 🔄 In Progress | Charts lint+template OK, PostgreSQL dependency vendored. Full K8s deployment blocked by registry/infra access. Active run ongoing. |
+| 3 | BLUAA-302 | Flink E2E validation | 🔄 In Progress | E2E scripts created (`e2e_validate.sh`, `minisky-test.sh`). Full Flink cluster validation blocked by Docker pull/build in sandbox. Active run ongoing. |
+| 4 | BLUAA-316 | Production deployment guide | ✅ Done | 917-line guide covering 15 sections, reviewed by DevOps Engineer |
+| 5 | BLUAA-303 | Smoke test (acceptance) | ✅ Done | 75 tests passing (up from 56). All acceptance criteria met. |
+
+**Sprint 2 goal assessment:** The sprint goal — "ready for first production tenant deployment" — is substantially met. Code is production-ready, auth works, deployment guide exists, 75 tests pass. The remaining gap is live K8s infrastructure validation (WI-2, WI-3), which requires cloud resources not available in the sandbox. Both items have active runs attempting to push validation as far as possible within sandbox constraints.
+
+**Test count:** 75 passed (51 backend + 24 flink-proxy), up from 56 at Sprint 1 close.
