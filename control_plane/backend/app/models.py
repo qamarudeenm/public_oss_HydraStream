@@ -48,6 +48,7 @@ def default_environment_mapping(tenant_id: str, env_name: str) -> EnvironmentMap
 class Tenant(BaseModel):
     id: str
     name: str
+    description: str = ""
     kafka: KafkaConfig = Field(default_factory=KafkaConfig)
     sink: SinkConfig = Field(default_factory=SinkConfig)
     flink_version: str = "1.19.1"
@@ -62,3 +63,13 @@ class Tenant(BaseModel):
                 staging=default_environment_mapping(self.id, "staging"),
                 prod=default_environment_mapping(self.id, "prod"),
             )
+
+
+class TenantCreate(BaseModel):
+    name: str
+    description: str = ""
+
+
+class TenantUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None

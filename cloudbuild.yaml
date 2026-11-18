@@ -1,0 +1,211 @@
+# Cloud Build configuration for HydraStream CI/CD
+# This replaces both quality-gates.yml and build-and-push.yml from GitHub Actions
+# Uses substitutions that can be overridden for Minisky vs real GCP environments
+
+options:
+  machineType: 'E2_HIGHCPU_8'  # Appropriate machine type for our builds
+  substitutionOption: 'ALLOW_LOOSE'
+  logging: CLOUD_LOGGING_ONLY
+
+# Substitutions - these can be overridden via triggers or command line
+substitutions:
+  _REPO: 'blue2berry/hydrastream'
+  _FLINK_VERSION: 'flink1.19.1'
+  _ARTIFACT_REGISTRY: '${REGION}-docker.pkg.dev/${PROJECT_ID}/hydrastream-images'
+  _REGION: 'us-central1'
+  _PROJECT_ID: '${PROJECT_ID}'  # Will be actual project ID or 'local-dev' for Minisky
+
+# Available triggers would be configured separately in Cloud Console or via gcloud
+# to match the GitHub Actions triggers (push, pull_request, tag, workflow_dispatch)
+
+steps:
+# ============================================================================
+# QUALITY GATES STEPS (equivalent to quality-gates.yml)
+# ============================================================================
+
+- name: 'gcr.io/cloud-builders/git'
+  id: 'Repository Hygiene'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      tracked_artifacts="$(git ls-files 'streaming_infra/dbt/target/**' 'streaming_infra/dbt/logs/**')"
+      if [ -n "$tracked_artifacts" ]; then
+        echo "Tracked dbt artifacts detected:"
+        echo "$tracked_artifacts"
+        exit 1
+      fi
+  waitFor: ['-']
+
+- name: 'gcr.io/cloud-builders/git'
+  id: 'Checkout for Proxy Quality'
+  entrypoint: 'bash'
+  args: ['-c', 'git checkout $SHORT_SHA']
+  waitFor: ['Repository Hygiene']
+
+- name: 'python:3.11-slim'
+  id: 'Flink Proxy Quality Setup'
+  dir: 'streaming_infra/infra/flink-proxy-gateway'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      # Install uv and dependencies
+      pip install uv
+      uv sync --all-extras
+  waitFor: ['Checkout for Proxy Quality']
+
+- name: 'python:3.11-slim'
+  id: 'Flink Proxy Lint and Type Check'
+  dir: 'streaming_infra/infra/flink-proxy-gateway'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      make lint
+  waitFor: ['Flink Proxy Quality Setup']
+
+- name: 'python:3.11-slim'
+  id: 'Flink Proxy Unit Tests'
+  dir: 'streaming_infra/infra/flink-proxy-gateway'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      make test-unit
+  waitFor: ['Flink Proxy Quality Setup']
+
+- name: 'gcr.io/cloud-builders/git'
+  id: 'Checkout for Frontend Quality'
+  entrypoint: 'bash'
+  args: ['-c', 'git checkout $SHORT_SHA']
+  waitFor: ['Repository Hygiene']
+
+- name: 'node:22-slim'
+  id: 'Frontend Lint Setup'
+  dir: 'control_plane/frontend'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      npm ci
+  waitFor: ['Checkout for Frontend Quality']
+
+- name: 'node:22-slim'
+  id: 'Frontend Lint'
+  dir: 'control_plane/frontend'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      npm run lint
+  waitFor: ['Frontend Lint Setup']
+
+- name: 'gcr.io/cloud-builders/git'
+  id: 'Checkout for Security Gate'
+  entrypoint: 'bash'
+  args: ['-c', 'git checkout $SHORT_SHA']
+  waitFor: ['Repository Hygiene']
+
+- name: 'ubuntu'
+  id: 'Install Ripgrep'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      apt-get update && apt-get install -y ripgrep
+  waitFor: ['Checkout for Security Gate']
+
+- name: 'ubuntu'
+  id: 'Cybersecurity Release Gate'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      ./streaming_infra/security/cybersecurity-gate.sh
+  waitFor: ['Install Ripgrep']
+
+# ============================================================================
+# BUILD & PUSH IMAGES STEPS (equivalent to build-and-push.yml)
+# ============================================================================
+# These steps only run for pushes to main/master or tag pushes
+# In Cloud Build, this would be controlled by trigger configuration
+
+- name: 'gcr.io/cloud-builders/git'
+  id: 'Checkout for Build'
+  entrypoint: 'bash'
+  args: ['-c', 'git checkout $BRANCH_NAME || git checkout $SHORT_SHA']
+  waitFor:
+    - 'Repository Hygiene'
+    - 'Checkout for Proxy Quality'
+    - 'Flink Proxy Lint and Type Check'
+    - 'Flink Proxy Unit Tests'
+    - 'Checkout for Frontend Quality'
+    - 'Frontend Lint'
+    - 'Checkout for Security Gate'
+    - 'Install Ripgrep'
+    - 'Cybersecurity Release Gate'
+
+# Build Flink Engine Docker image
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build Flink Engine'
+  dir: 'streaming_infra/flink'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      docker build -t $_ARTIFACT_REGISTRY/flink-engine:$SHORT_SHA .
+      docker push $_ARTIFACT_REGISTRY/flink-engine:$SHORT_SHA
+  waitFor: ['Checkout for Build']
+
+# Build Flink Proxy Gateway Docker image
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build Flink Proxy Gateway'
+  dir: 'streaming_infra/infra/flink-proxy-gateway'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      docker build -t $_ARTIFACT_REGISTRY/flink-proxy-gateway:$SHORT_SHA .
+      docker push $_ARTIFACT_REGISTRY/flink-proxy-gateway:$SHORT_SHA
+  waitFor: ['Checkout for Build']
+
+# Build dbt Worker Docker image
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build dbt Worker'
+  dir: 'streaming_infra/dbt'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      docker build -t $_ARTIFACT_REGISTRY/dbt-worker:$SHORT_SHA .
+      docker push $_ARTIFACT_REGISTRY/dbt-worker:$SHORT_SHA
+  waitFor: ['Checkout for Build']
+
+# Tag images with version tag if this is a tag push
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Tag Images (if tag push)'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      if [[ "$BRANCH_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        docker tag $_ARTIFACT_REGISTRY/flink-engine:$SHORT_SHA $_ARTIFACT_REGISTRY/flink-engine:$BRANCH_NAME
+        docker push $_ARTIFACT_REGISTRY/flink-engine:$BRANCH_NAME
+
+        docker tag $_ARTIFACT_REGISTRY/flink-proxy-gateway:$SHORT_SHA $_ARTIFACT_REGISTRY/flink-proxy-gateway:$BRANCH_NAME
+        docker push $_ARTIFACT_REGISTRY/flink-proxy-gateway:$BRANCH_NAME
+
+        docker tag $_ARTIFACT_REGISTRY/dbt-worker:$SHORT_SHA $_ARTIFACT_REGISTRY/dbt-worker:$BRANCH_NAME
+        docker push $_ARTIFACT_REGISTRY/dbt-worker:$BRANCH_NAME
+      fi
+  waitFor:
+    - 'Build Flink Engine'
+    - 'Build Flink Proxy Gateway'
+    - 'Build dbt Worker'
+
+images:
+  - $_ARTIFACT_REGISTRY/flink-engine:$SHORT_SHA
+  - $_ARTIFACT_REGISTRY/flink-proxy-gateway:$SHORT_SHA
+  - $_ARTIFACT_REGISTRY/dbt-worker:$SHORT_SHA
+  # Tagged images will be added automatically if they exist

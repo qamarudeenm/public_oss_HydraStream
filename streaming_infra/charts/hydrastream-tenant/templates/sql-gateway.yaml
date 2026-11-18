@@ -1,0 +1,70 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hydrastream-tenant.fullname" . }}-sql-gateway
+  labels:
+    {{- include "hydrastream-tenant.labels" . | nindent 4 }}
+    component: sql-gateway
+spec:
+  replicas: {{ .Values.flink.sqlGateway.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "hydrastream-tenant.selectorLabels" . | nindent 6 }}
+      component: sql-gateway
+  template:
+    metadata:
+      labels:
+        {{- include "hydrastream-tenant.selectorLabels" . | nindent 8 }}
+        component: sql-gateway
+    spec:
+      serviceAccountName: {{ include "hydrastream-tenant.serviceAccountName" . }}
+      containers:
+        - name: sql-gateway
+          image: {{ .Values.flink.image }}
+          command: ["/opt/flink/bin/sql-gateway.sh", "start-foreground"]
+          ports:
+            - name: http
+              containerPort: 8083
+              protocol: TCP
+          env:
+            - name: FLINK_PROPERTIES
+              value: |
+                jobmanager.rpc.address: {{ include "hydrastream-tenant.fullname" . }}-flink-rest
+                sql-gateway.endpoint.rest.address: 0.0.0.0
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "hydrastream-tenant.fullname" . }}-sql-gateway
+  labels:
+    {{- include "hydrastream-tenant.labels" . | nindent 4 }}
+    component: sql-gateway
+spec:
+  type: {{ .Values.flink.sqlGateway.service.type }}
+  ports:
+    - port: {{ .Values.flink.sqlGateway.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "hydrastream-tenant.selectorLabels" . | nindent 4 }}
+    component: sql-gateway

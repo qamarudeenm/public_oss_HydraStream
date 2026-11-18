@@ -11,7 +11,7 @@ from ..models import Tenant, TenantCreate, TenantUpdate
 router = APIRouter(prefix="/tenants", tags=["tenants"])
 
 # In-memory store. Replace with a real database for production.
-_store: dict[UUID, Tenant] = {}
+_store: dict[str, Tenant] = {}
 
 
 def _reset_store() -> None:
@@ -31,7 +31,7 @@ async def create_tenant(
     body: TenantCreate,
     _user: dict[str, Any] = Depends(get_current_user),
 ) -> Tenant:
-    tenant = Tenant(id=uuid4(), **body.model_dump())
+    tenant = Tenant(id=str(uuid4()), **body.model_dump())
     _store[tenant.id] = tenant
     return tenant
 
@@ -41,7 +41,7 @@ async def get_tenant(
     tenant_id: UUID,
     _user: dict[str, Any] = Depends(get_current_user),
 ) -> Tenant:
-    tenant = _store.get(tenant_id)
+    tenant = _store.get(str(tenant_id))
     if tenant is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
     return tenant
@@ -53,11 +53,12 @@ async def update_tenant(
     body: TenantUpdate,
     _user: dict[str, Any] = Depends(get_current_user),
 ) -> Tenant:
-    tenant = _store.get(tenant_id)
+    key = str(tenant_id)
+    tenant = _store.get(key)
     if tenant is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
     updated = tenant.model_copy(update=body.model_dump(exclude_unset=True))
-    _store[tenant_id] = updated
+    _store[key] = updated
     return updated
 
 
@@ -66,6 +67,7 @@ async def delete_tenant(
     tenant_id: UUID,
     _user: dict[str, Any] = Depends(get_current_user),
 ) -> None:
-    if tenant_id not in _store:
+    key = str(tenant_id)
+    if key not in _store:
         raise HTTPException(status_code=404, detail="Tenant not found")
-    del _store[tenant_id]
+    del _store[key]

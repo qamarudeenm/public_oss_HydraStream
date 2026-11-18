@@ -15,6 +15,22 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Onboarding Flow', () => {
+  test.beforeEach(async ({ context }) => {
+    // Bypass OIDC auth in tests: set a session cookie so proxy.ts lets the request through.
+    // The backend must run with CONTROL_PLANE_AUTH_DISABLED=true for the token value to be irrelevant.
+    await context.addCookies([
+      {
+        name: 'hs_session',
+        value: 'e2e-test-bypass-token',
+        domain: 'localhost',
+        path: '/',
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+      },
+    ]);
+  });
+
   test('should allow a user to create a new tenant through the wizard', async ({ page }) => {
     console.log('Navigating to home page...');
     await page.goto('/', { waitUntil: 'networkidle' });

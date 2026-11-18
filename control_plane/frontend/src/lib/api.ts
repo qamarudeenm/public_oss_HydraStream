@@ -16,20 +16,40 @@ import { Tenant, TenantCreate, TenantRunHistory, TenantUpdate } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export const fetcher = (url: string) => fetch(`${API_BASE_URL}${url}`).then((res) => {
-  if (!res.ok) {
-    throw new Error('An error occurred while fetching the data.');
+let _authToken: string | null = null;
+
+export function setAuthToken(token: string | null): void {
+  _authToken = token;
+}
+
+function authHeaders(): Record<string, string> {
+  return _authToken ? { Authorization: `Bearer ${_authToken}` } : {};
+}
+
+function handleUnauthorized(res: Response): void {
+  if (res.status === 401 && typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('auth:unauthorized'));
   }
-  return res.json();
-});
+}
+
+export const fetcher = (url: string) =>
+  fetch(`${API_BASE_URL}${url}`, { headers: authHeaders() }).then((res) => {
+    if (!res.ok) {
+      handleUnauthorized(res);
+      throw new Error('An error occurred while fetching the data.');
+    }
+    return res.json();
+  });
 
 export const getTenants = async (): Promise<Tenant[]> => {
-  const res = await fetch(`${API_BASE_URL}/tenants`);
+  const res = await fetch(`${API_BASE_URL}/tenants`, { headers: authHeaders() });
+  handleUnauthorized(res);
   return res.json();
 };
 
 export const getTenant = async (id: string): Promise<Tenant> => {
-  const res = await fetch(`${API_BASE_URL}/tenants/${id}`);
+  const res = await fetch(`${API_BASE_URL}/tenants/${id}`, { headers: authHeaders() });
+  handleUnauthorized(res);
   return res.json();
 };
 
@@ -38,9 +58,11 @@ export const createTenant = async (tenant: TenantCreate): Promise<Tenant> => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...authHeaders(),
     },
     body: JSON.stringify(tenant),
   });
+  handleUnauthorized(res);
   return res.json();
 };
 
@@ -49,22 +71,27 @@ export const updateTenant = async (id: string, tenant: TenantUpdate): Promise<Te
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
+      ...authHeaders(),
     },
     body: JSON.stringify(tenant),
   });
+  handleUnauthorized(res);
   return res.json();
 };
 
 export const deleteTenant = async (id: string): Promise<{ status: string; message: string }> => {
   const res = await fetch(`${API_BASE_URL}/tenants/${id}`, {
     method: 'DELETE',
+    headers: authHeaders(),
   });
+  handleUnauthorized(res);
   return res.json();
 };
 
 export const getTenantRunHistory = async (id: string): Promise<TenantRunHistory> => {
-  const res = await fetch(`${API_BASE_URL}/tenants/${id}/runs`);
+  const res = await fetch(`${API_BASE_URL}/tenants/${id}/runs`, { headers: authHeaders() });
   if (!res.ok) {
+    handleUnauthorized(res);
     throw new Error('Failed to load tenant run history.');
   }
   const payload = await res.json();

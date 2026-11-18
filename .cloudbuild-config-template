@@ -1,0 +1,18 @@
+# Cloud Build Configuration Template
+# Copy to .cloudbuild-custom and modify as needed
+
+# Environment selection
+USE_MINISKY_CLOUD_BUILD=true  # Set to false for real GCP Cloud Build
+
+# Minisky configuration (when USE_MINISKY_CLOUD_BUILD=true)
+MINISKY_API_URL=http://localhost:8080
+MINISKY_PROJECT_ID=local-dev
+MINISKY_DASHBOARD_URL=http://localhost:8081
+
+# Real GCP configuration (when USE_MINISKY_CLOUD_BUILD=false)
+# GCP_PROJECT_ID=your-gcp-project-id
+# GCP_REGION=us-central1
+
+# Build configuration
+CLOUD_BUILD_TIMEOUT=1200  # 20 minutes in seconds
+CLOUD_BUILD_MACHINE_TYPE=E2_HIGHCPU_8

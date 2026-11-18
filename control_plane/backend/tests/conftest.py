@@ -1,17 +1,39 @@
 """Test fixtures for the control plane API."""
 
+from contextlib import asynccontextmanager
+
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 import app.auth as auth_mod
 from app.auth import get_current_user
-from app.main import app
-from app.routes.tenants import _reset_store
+from app.routes.tenants import router, _reset_store
 
 TEST_USER = {"sub": "test-user-123", "email": "user@example.com", "scope": "admin"}
 
 _OIDC_ISSUER = "https://oidc.example.com"
 _OIDC_AUDIENCE = "control-plane-api"
+
+
+@asynccontextmanager
+async def _noop_lifespan(app: FastAPI):
+    yield
+
+
+def _make_app() -> FastAPI:
+    """Standalone test app using only the tenants router — no database needed."""
+    test_app = FastAPI(lifespan=_noop_lifespan)
+    test_app.include_router(router)
+
+    @test_app.get("/health")
+    async def health():
+        return {"status": "healthy"}
+
+    return test_app
+
+
+app = _make_app()
 
 
 @pytest.fixture(autouse=True)
@@ -23,9 +45,9 @@ def reset_store():
 
 @pytest.fixture(autouse=True)
 def reset_jwks_cache():
-    auth_mod._jwks_cache = None
+    auth_mod._jwks_cache = {}
     yield
-    auth_mod._jwks_cache = None
+    auth_mod._jwks_cache = {}
 
 
 @pytest.fixture

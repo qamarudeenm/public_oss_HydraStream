@@ -17,6 +17,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import { LayoutDashboard, Users, Settings, Activity } from "lucide-react";
+import { AuthProvider } from "@/components/AuthProvider";
+import { LogoutButton } from "@/components/LogoutButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,42 +35,45 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="app-container">
-          <aside className="sidebar">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem' }}>
-              <Activity color="#0070f3" size={32} />
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 700 }}>HydraStream</h1>
-            </div>
-            <nav>
-              <ul className="nav-list">
-                <li key="nav-dashboard" className="nav-item">
-                  <Link href="/" className="nav-link">
-                    <LayoutDashboard size={20} />
-                    <span>Dashboard</span>
-                  </Link>
-                </li>
-                <li key="nav-tenants" className="nav-item">
-                  <Link href="/tenants" className="nav-link">
-                    <Users size={20} />
-                    <span>Tenants</span>
-                  </Link>
-                </li>
-                <li key="nav-settings" className="nav-item">
-                  <Link href="/settings" className="nav-link">
-                    <Settings size={20} />
-                    <span>Settings</span>
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-            <div style={{ marginTop: 'auto', padding: '1rem', borderTop: '1px solid var(--gray-200)' }}>
-              <p style={{ fontSize: '0.75rem', color: 'var(--gray-300)' }}>Version 0.1.0-alpha</p>
-            </div>
-          </aside>
-          <main className="main-content">
-            {children}
-          </main>
-        </div>
+        <AuthProvider>
+          <div className="app-container">
+            <aside className="sidebar">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem' }}>
+                <Activity color="#0070f3" size={32} />
+                <h1 style={{ fontSize: '1.25rem', fontWeight: 700 }}>HydraStream</h1>
+              </div>
+              <nav>
+                <ul className="nav-list">
+                  <li key="nav-dashboard" className="nav-item">
+                    <Link href="/" className="nav-link">
+                      <LayoutDashboard size={20} />
+                      <span>Dashboard</span>
+                    </Link>
+                  </li>
+                  <li key="nav-tenants" className="nav-item">
+                    <Link href="/tenants" className="nav-link">
+                      <Users size={20} />
+                      <span>Tenants</span>
+                    </Link>
+                  </li>
+                  <li key="nav-settings" className="nav-item">
+                    <Link href="/settings" className="nav-link">
+                      <Settings size={20} />
+                      <span>Settings</span>
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
+              <div style={{ marginTop: 'auto', padding: '1rem', borderTop: '1px solid var(--gray-200)' }}>
+                <LogoutButton />
+                <p style={{ fontSize: '0.75rem', color: 'var(--gray-300)', marginTop: '0.5rem' }}>Version 0.1.0-alpha</p>
+              </div>
+            </aside>
+            <main className="main-content">
+              {children}
+            </main>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
