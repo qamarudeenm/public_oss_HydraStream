@@ -1,10 +1,10 @@
 # HydraStream Production Deployment Guide
 
-**Version:** 1.0.1
+**Version:** 1.0.2
 **Date:** 2026-11-18
 **Author:** Product Manager (BLUAA-296, WI-4)
-**Reviewed by:** DevOps Engineer (BLUAA-316)
-**Status:** Reviewed — corrections applied by DevOps Engineer for technical accuracy
+**Reviewed by:** DevOps Engineer (BLUAA-301, BLUAA-316)
+**Status:** Reviewed — corrections applied by DevOps Engineer for technical accuracy (v1.0.2: Helm value key fixes, service name corrections, section 2.2 column header, section 6.1 no-op removed)
 
 ---
 
@@ -142,8 +142,8 @@ gcloud container clusters get-credentials hydrastream-prod --zone=$ZONE
 
 ### 2.2 Node Pool Sizing
 
-| Component | CPU Request | Memory Request | Min Nodes |
-|-----------|------------|----------------|-----------|
+| Component | CPU Limit | Memory Limit | Min Nodes |
+|-----------|-----------|--------------|-----------|
 | Kafka (StatefulSet) | 1 CPU | 2 Gi | 1 (3 for HA) |
 | PostgreSQL | 1 CPU | 1 Gi | 1 |
 | Control Plane Backend | 500m | 512 Mi | 2 |
@@ -339,9 +339,9 @@ kafka:
     class: premium-rwo             # GKE SSD-backed
   autoCreateTopics: false          # Explicit topic governance
 
-controlPlane:
-  database:
-    urlSecretName: hydrastream-db-url
+# controlPlane.database.urlSecretName is not in this chart's templates;
+# the control plane is deployed via raw K8s manifests in section 7.
+# Reference the secret there via DATABASE_URL env var instead.
 ```
 
 ### 6.2 Deploy
@@ -608,8 +608,6 @@ Create `values-tenant-prod.yaml`:
 ```yaml
 # values-tenant-prod.yaml — hydrastream-tenant overrides
 
-tenantId: tenant-1
-
 flink:
   image: ${REGION}-docker.pkg.dev/${PROJECT_ID}/hydrastream/engine:flink1.19.1
   jobManager:
@@ -640,14 +638,8 @@ proxy:
       cpu: "1"
       memory: 1Gi
 
-sqlGateway:
-  resources:
-    requests:
-      cpu: 500m
-      memory: 1Gi
-    limits:
-      cpu: "1"
-      memory: 2Gi
+# Note: SQL gateway resources are hard-coded in the chart template (cpu: 500m/250m, memory: 1Gi/512Mi).
+# To change them, patch the chart template directly.
 
 kafka:
   bootstrapServers: "hydrastream-infra-kafka.default:9092"
@@ -655,7 +647,9 @@ kafka:
 clickhouse:
   jdbcUrl: "jdbc:mysql://<clickhouse-host>:9004/clickstream"
   user: flink_user
-  passwordSecret: hydrastream-clickhouse
+  # WARNING: chart passes this as a plain-text env var; use Sealed Secrets or
+  # External Secrets Operator to inject from GCP Secret Manager if required.
+  password: "<clickhouse-password>"
 ```
 
 ### 9.3 Deploy Tenant
@@ -691,12 +685,14 @@ kubectl get pods -n $TENANT_NS
 kubectl get flinkdeployment -n $TENANT_NS
 
 # Proxy gateway responding
-kubectl port-forward -n $TENANT_NS svc/flink-proxy-gateway 8080:8080 &
+# Service name is derived from the Helm release: <release>-hydrastream-tenant-proxy
+# When using deploy-tenant.sh with TENANT_ID=tenant-1, release=tenant-1:
+kubectl port-forward -n $TENANT_NS svc/${TENANT_ID}-hydrastream-tenant-proxy 8080:8080 &
 curl -s http://localhost:8080/health
 # Expected: {"status":"ok"}
 
 # SQL Gateway responding
-kubectl port-forward -n $TENANT_NS svc/flink-sql-gateway 8083:8083 &
+kubectl port-forward -n $TENANT_NS svc/${TENANT_ID}-hydrastream-tenant-sql-gateway 8083:8083 &
 curl -s http://localhost:8083/v1/info
 ```
 
@@ -894,8 +890,8 @@ Use this checklist when deploying a new production tenant:
 | Chart | Key | Production Override |
 |-------|-----|-------------------|
 | `hydrastream-infra` | `postgresql.auth.existingSecret` | K8s secret name |
-| `hydrastream-infra` | `kafka.replicas` | `3` (HA) |
-| `hydrastream-infra` | `kafka.config.autoCreateTopics` | `"false"` |
+| `hydrastream-infra` | `kafka.replicaCount` | `3` (HA) |
+| `hydrastream-infra` | `kafka.autoCreateTopics` | `false` |
 | `hydrastream-tenant` | `proxy.image.tag` | Git SHA tag (required) |
 | `hydrastream-tenant` | `proxy.auth.mode` | `oidc_jwt` |
 | `hydrastream-tenant` | `proxy.auth.issuerUrl` | OIDC provider URL |
