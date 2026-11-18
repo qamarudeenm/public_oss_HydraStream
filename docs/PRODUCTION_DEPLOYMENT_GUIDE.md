@@ -1,9 +1,10 @@
 # HydraStream Production Deployment Guide
 
-**Version:** 1.0.0
-**Date:** 2026-11-17
+**Version:** 1.0.1
+**Date:** 2026-11-18
 **Author:** Product Manager (BLUAA-296, WI-4)
-**Status:** Ready for review — pending DevOps Engineer technical accuracy review
+**Reviewed by:** DevOps Engineer (BLUAA-316)
+**Status:** Reviewed — corrections applied by DevOps Engineer for technical accuracy
 
 ---
 
@@ -320,9 +321,12 @@ postgresql:
         memory: 4Gi
 
 kafka:
-  image: apache/kafka
-  imageTag: "3.9.0"
-  replicas: 3                      # HA: 3 brokers minimum
+  replicaCount: 1                  # NOTE: included chart is single-node KRaft only.
+                                   # For HA (3+ brokers), replace with Bitnami Kafka chart
+                                   # and configure multi-node KRaft quorum separately.
+  image:
+    repository: apache/kafka
+    tag: "3.9.0"
   resources:
     requests:
       cpu: "1"
@@ -330,14 +334,10 @@ kafka:
     limits:
       cpu: "2"
       memory: 8Gi
-  persistence:
+  storage:
     size: 100Gi
-    storageClass: premium-rwo
-  config:
-    autoCreateTopics: "false"      # Explicit topic governance
-    defaultReplicationFactor: "3"
-    minInsyncReplicas: "2"
-    logRetentionHours: "168"       # 7 days
+    class: premium-rwo             # GKE SSD-backed
+  autoCreateTopics: false          # Explicit topic governance
 
 controlPlane:
   database:
@@ -611,19 +611,17 @@ Create `values-tenant-prod.yaml`:
 tenantId: tenant-1
 
 flink:
-  image: ${REGION}-docker.pkg.dev/${PROJECT_ID}/hydrastream/engine
-  imageTag: flink1.19.1
+  image: ${REGION}-docker.pkg.dev/${PROJECT_ID}/hydrastream/engine:flink1.19.1
   jobManager:
-    replicas: 1
-    resources:
-      cpu: "2"
-      memory: 4Gi
+    replicaCount: 1
+    resource:
+      cpu: 2
+      memory: "4Gi"
   taskManager:
-    replicas: 2
-    resources:
-      cpu: "2"
-      memory: 4Gi
-    taskSlots: 2
+    replicaCount: 2
+    resource:
+      cpu: 2
+      memory: "4Gi"
 
 proxy:
   image:
@@ -668,7 +666,9 @@ Use the production deploy script which enforces immutable image tags:
 # Get the proxy image SHA from your build
 PROXY_TAG="proxy-abc1234"  # Replace with actual SHORT_SHA
 
-./streaming_infra/deploy-tenant.sh $TENANT_ID $TENANT_NS $PROXY_TAG
+# Script must be run from streaming_infra/ — it uses relative chart paths
+cd streaming_infra
+./deploy-tenant.sh $TENANT_ID $TENANT_NS $PROXY_TAG
 ```
 
 Or deploy directly with Helm:
