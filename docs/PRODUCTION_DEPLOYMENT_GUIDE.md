@@ -3,7 +3,7 @@
 **Version:** 1.0.0
 **Date:** 2026-11-17
 **Author:** Product Manager (BLUAA-296, WI-4)
-**Status:** Draft — pending DevOps Engineer review
+**Status:** Ready for review — pending DevOps Engineer technical accuracy review
 
 ---
 
@@ -27,6 +27,8 @@ Transformations: dbt Worker pods (ephemeral)
 ---
 
 ## 1. GCP Prerequisites
+
+> **Terraform alternative:** Sections 1 and 2 can be provisioned via Terraform instead of manual `gcloud` commands. See `gcp/terraform/` — `main.tf` provisions Artifact Registry, GCS bucket, VPC, GKE cluster, Cloud Run, and Cloud Build trigger. Run with `terraform apply -var="project_id=hydrastream-prod"`. The manual steps below are equivalent and shown for clarity.
 
 ### 1.1 Project Setup
 

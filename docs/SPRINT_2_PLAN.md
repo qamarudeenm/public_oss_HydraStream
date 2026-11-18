@@ -79,7 +79,7 @@ Sprint 1 (BLUAA-286) delivered all 5 P0 production readiness fixes:
 
 1. **WI-0 added:** Merge Sprint 1 commits to remote is a prerequisite before Sprint 2 work begins.
 2. **WI-1 scope clarified:** This is a full frontend build (OIDC login flow, token management, API header injection), not adding auth to an existing working frontend.
-3. **Deployment tooling confirmed:** Helm charts are the deployment mechanism (no Terraform found). K8s manifests exist only for proxy gateway component.
+3. **Deployment tooling confirmed:** Helm charts are the K8s application deployment mechanism. Terraform (`gcp/terraform/`) provisions GCP infrastructure (GKE cluster, VPC, Artifact Registry, GCS bucket, Cloud Build trigger). Standalone K8s manifests exist for proxy gateway and GCP-specific resources (`gcp/k8s/`). All three are complementary.
 4. **Critical path warning:** WI-2 → WI-3 → WI-5 (5 days) is tight. Flag early if WI-2 hits K8s environment setup issues.
 
 ---
