@@ -10,21 +10,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# ── Stage 1: install dependencies ────────────────────────────────
-FROM node:22-alpine AS deps
+# ── Stage 1: install all dependencies (dev+prod needed for next build) ──
+# Use debian-based node for glibc (required by @next/swc native bindings)
+FROM node:22 AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
 # ── Stage 2: build ────────────────────────────────────────────────
-FROM node:22-alpine AS builder
+FROM node:22 AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Provide build-time env stubs so `next build` doesn't fail on missing vars.
 # Real values are injected at runtime via K8s ConfigMap/Secret.
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+# Use --webpack because Turbopack requires glibc native bindings not available on Alpine
+RUN npx next build --webpack
 
 # ── Stage 3: production runtime ───────────────────────────────────
 FROM node:22-alpine AS runner

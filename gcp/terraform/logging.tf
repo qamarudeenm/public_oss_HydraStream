@@ -7,6 +7,7 @@
 # ─────────────────────────────────────────────────────────────────
 
 resource "google_logging_project_bucket_config" "default_retention" {
+  count          = local.minisky == null ? 1 : 0
   project        = var.project_id
   location       = "global"
   bucket_id      = "_Default"
@@ -19,6 +20,7 @@ resource "google_logging_project_bucket_config" "default_retention" {
 # ─────────────────────────────────────────────────────────────────
 
 resource "google_logging_metric" "app_errors" {
+  count       = local.minisky == null ? 1 : 0
   name        = "hydrastream_app_errors"
   description = "Count of ERROR-level log entries from HydraStream GKE containers"
   filter      = "resource.type=\"k8s_container\" AND resource.labels.cluster_name=\"${var.gke_cluster_name}\" AND severity=\"ERROR\""
@@ -40,6 +42,7 @@ resource "google_logging_metric" "app_errors" {
 }
 
 resource "google_logging_metric" "flink_checkpoint_failure" {
+  count       = local.minisky == null ? 1 : 0
   name        = "flink_checkpoint_failure"
   description = "Count of Flink checkpoint failure log entries"
   filter      = "resource.type=\"k8s_container\" AND resource.labels.cluster_name=\"${var.gke_cluster_name}\" AND textPayload=~\"(?i)(checkpoint.*fail|fail.*checkpoint)\""
@@ -52,6 +55,7 @@ resource "google_logging_metric" "flink_checkpoint_failure" {
 }
 
 resource "google_logging_metric" "oom_kills" {
+  count       = local.minisky == null ? 1 : 0
   name        = "hydrastream_oom_kills"
   description = "Count of OOMKilled container events"
   filter      = "resource.type=\"k8s_node\" AND jsonPayload.reason=\"OOMKilling\""
@@ -64,6 +68,7 @@ resource "google_logging_metric" "oom_kills" {
 }
 
 resource "google_logging_metric" "pod_evictions" {
+  count       = local.minisky == null ? 1 : 0
   name        = "hydrastream_pod_evictions"
   description = "Count of pod eviction events in HydraStream namespace"
   filter      = "resource.type=\"k8s_cluster\" AND jsonPayload.reason=\"Evicted\" AND jsonPayload.metadata.namespace=\"hydrastream\""
@@ -76,6 +81,7 @@ resource "google_logging_metric" "pod_evictions" {
 }
 
 resource "google_logging_metric" "kafka_consumer_lag_errors" {
+  count       = local.minisky == null ? 1 : 0
   name        = "hydrastream_kafka_consumer_lag_errors"
   description = "Count of Kafka consumer lag or connection error log entries"
   filter      = "resource.type=\"k8s_container\" AND resource.labels.cluster_name=\"${var.gke_cluster_name}\" AND textPayload=~\"(?i)(kafka.*error|consumer.*lag|connection.*refused.*kafka)\""

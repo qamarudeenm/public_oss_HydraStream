@@ -24,13 +24,15 @@ locals {
   minisky = var.minisky_endpoint != "" ? var.minisky_endpoint : null
 
   # MiniSky routes GCP API calls by path prefix on its gateway
-  ar_endpoint       = local.minisky != null ? "${local.minisky}/artifactregistry/" : null
-  build_endpoint    = local.minisky != null ? "${local.minisky}/cloudbuild/" : null
-
-  container_endpoint = local.minisky != null ? "${local.minisky}/container/" : null
-  run_endpoint      = local.minisky != null ? "${local.minisky}/run/" : null
-  storage_endpoint  = local.minisky != null ? "${local.minisky}/storage/" : null
-  iam_endpoint      = local.minisky != null ? "${local.minisky}/iam/" : null
+  ar_endpoint         = local.minisky != null ? "${local.minisky}/artifactregistry/" : null
+  build_endpoint      = local.minisky != null ? "${local.minisky}/cloudbuild/" : null
+  compute_endpoint    = local.minisky != null ? "${local.minisky}/compute/" : null
+  container_endpoint  = local.minisky != null ? "${local.minisky}/container/" : null
+  run_endpoint        = local.minisky != null ? "${local.minisky}/run/" : null
+  storage_endpoint    = local.minisky != null ? "${local.minisky}/storage/v1/" : null
+  iam_endpoint        = local.minisky != null ? "${local.minisky}/iam/" : null
+  logging_endpoint    = local.minisky != null ? "${local.minisky}/logging/" : null
+  monitoring_endpoint = local.minisky != null ? "${local.minisky}/monitoring/" : null
 }
 
 provider "google" {
@@ -40,10 +42,13 @@ provider "google" {
   # Custom endpoints — only set when using MiniSky
   artifact_registry_custom_endpoint = local.ar_endpoint
   cloud_build_custom_endpoint       = local.build_endpoint
+  compute_custom_endpoint           = local.compute_endpoint
   container_custom_endpoint         = local.container_endpoint
   cloud_run_v2_custom_endpoint      = local.run_endpoint
   storage_custom_endpoint           = local.storage_endpoint
   iam_credentials_custom_endpoint   = local.iam_endpoint
+  logging_custom_endpoint           = local.logging_endpoint
+  monitoring_custom_endpoint        = local.monitoring_endpoint
 }
 
 # ─────────────────────────────────────────────────────────────────
@@ -78,9 +83,15 @@ resource "google_storage_bucket" "flink_state" {
 resource "google_compute_network" "hydrastream_vpc" {
   name                    = "hydrastream-vpc"
   auto_create_subnetworks = false
+
+  lifecycle {
+    # MiniSky compute shim returns 405 on PATCH; this field is a computed default
+    ignore_changes = [network_firewall_policy_enforcement_order]
+  }
 }
 
 resource "google_compute_subnetwork" "hydrastream_subnet" {
+  count         = local.minisky == null ? 1 : 0
   name          = "hydrastream-subnet"
   ip_cidr_range = "10.0.0.0/16"
   network       = google_compute_network.hydrastream_vpc.id
@@ -107,15 +118,15 @@ resource "google_container_cluster" "hydrastream" {
   location = var.zone
 
   network    = google_compute_network.hydrastream_vpc.name
-  subnetwork = google_compute_subnetwork.hydrastream_subnet.name
+  subnetwork = length(google_compute_subnetwork.hydrastream_subnet) > 0 ? google_compute_subnetwork.hydrastream_subnet[0].name : null
 
   # Separate node pool; remove default
   remove_default_node_pool = true
   initial_node_count       = 1
 
   ip_allocation_policy {
-    cluster_secondary_range_name  = "pods"
-    services_secondary_range_name = "services"
+    cluster_secondary_range_name  = length(google_compute_subnetwork.hydrastream_subnet) > 0 ? "pods" : null
+    services_secondary_range_name = length(google_compute_subnetwork.hydrastream_subnet) > 0 ? "services" : null
   }
 
   # Workload Identity — allows GKE pods to authenticate as GCP service accounts
@@ -189,12 +200,15 @@ resource "google_cloud_run_v2_service" "flink_proxy" {
       }
     }
 
-    vpc_access {
-      network_interfaces {
-        network    = google_compute_network.hydrastream_vpc.name
-        subnetwork = google_compute_subnetwork.hydrastream_subnet.name
+    dynamic "vpc_access" {
+      for_each = local.minisky == null ? [1] : []
+      content {
+        network_interfaces {
+          network    = google_compute_network.hydrastream_vpc.name
+          subnetwork = google_compute_subnetwork.hydrastream_subnet[0].name
+        }
+        egress = "PRIVATE_RANGES_ONLY"
       }
-      egress = "PRIVATE_RANGES_ONLY"
     }
   }
 

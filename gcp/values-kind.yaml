@@ -1,0 +1,125 @@
+# Kind cluster override values for HydraStream deployment
+# Used in place of values-prod.yaml for the local kind environment
+# (hydrastream-cluster via kind, MiniSky GCP emulator)
+
+# ── hydrastream-infra overrides ───────────────────────────────────
+
+# Enable in-cluster PostgreSQL (no Cloud SQL in kind)
+postgresql:
+  enabled: true
+  auth:
+    username: hydra
+    password: hydra
+    database: hydrastream
+  primary:
+    persistence:
+      size: 2Gi
+      storageClass: "standard"
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    containerSecurityContext:
+      readOnlyRootFilesystem: false
+    extraVolumes:
+      - name: run-postgresql
+        emptyDir: {}
+    extraVolumeMounts:
+      - name: run-postgresql
+        mountPath: /var/run/postgresql
+
+controlPlane:
+  database:
+    urlSecretName: ""
+    host: "hydrastream-infra-postgresql"
+    port: 5432
+    name: hydrastream
+    user: hydra
+
+kafka:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  storage:
+    size: 2Gi
+    class: "standard"
+  advertisedListeners: "PLAINTEXT://hydrastream-infra-kafka:29092,EXTERNAL://localhost:9092"
+
+# ── hydrastream-tenant overrides ─────────────────────────────────
+
+replicaCount: 1
+
+image:
+  repository: "blue2berry/hydrastream"
+  pullPolicy: IfNotPresent
+  tag: "engine-flink1.19.1"
+
+proxy:
+  image:
+    repository: "blue2berry/hydrastream"
+    pullPolicy: IfNotPresent
+    tag: "proxy-latest"
+  replicaCount: 1
+  auth:
+    mode: oidc_jwt
+    issuerUrl: "https://accounts.google.com"
+    audience: "hydrastream-proxy"
+    algorithms: RS256
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+flink:
+  version: v1_19
+  image: "blue2berry/hydrastream:engine-flink1.19.1"
+  jobManager:
+    replicaCount: 1
+    resource:
+      cpu: 1
+      memory: "2Gi"
+  taskManager:
+    replicaCount: 1
+    resource:
+      cpu: 1
+      memory: "2Gi"
+  sqlGateway:
+    replicaCount: 1
+    service:
+      type: ClusterIP
+      port: 8083
+
+kafka:
+  bootstrapServers: "hydrastream-infra-kafka:29092"
+  topic: "clickstream"
+
+clickhouse:
+  jdbcUrl: "jdbc:clickhouse://localhost:8123/default"
+  user: "admin"
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "hydrastream"
+
+podAnnotations:
+  deploy-timestamp: "20261121130000"
+
+podSecurityContext:
+  runAsNonRoot: false
+
+nodeSelector: {}

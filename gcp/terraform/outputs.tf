@@ -58,35 +58,35 @@ output "secret_manager_secrets" {
 
 output "cloudsql_private_ip" {
   description = "Cloud SQL private IP — reachable only from within hydrastream-vpc"
-  value       = google_sql_database_instance.hydrastream.private_ip_address
+  value       = length(google_sql_database_instance.hydrastream) > 0 ? google_sql_database_instance.hydrastream[0].private_ip_address : ""
 }
 
 output "cloudsql_connection_name" {
   description = "Cloud SQL connection name — for Cloud SQL Auth Proxy if needed"
-  value       = google_sql_database_instance.hydrastream.connection_name
+  value       = length(google_sql_database_instance.hydrastream) > 0 ? google_sql_database_instance.hydrastream[0].connection_name : ""
 }
 
 output "redis_host" {
   description = "Memorystore Redis host — reachable only from within hydrastream-vpc"
-  value       = google_redis_instance.hydrastream.host
+  value       = length(google_redis_instance.hydrastream) > 0 ? google_redis_instance.hydrastream[0].host : ""
 }
 
 output "redis_port" {
   description = "Memorystore Redis port"
-  value       = google_redis_instance.hydrastream.port
+  value       = length(google_redis_instance.hydrastream) > 0 ? google_redis_instance.hydrastream[0].port : 0
 }
 
 output "secret_cp_database_url" {
   description = "Secret Manager secret ID for the control-plane DATABASE_URL"
-  value       = google_secret_manager_secret.cp_database_url.secret_id
+  value       = length(google_secret_manager_secret.cp_database_url) > 0 ? google_secret_manager_secret.cp_database_url[0].secret_id : ""
 }
 
 output "secret_sink_jdbc_url" {
   description = "Secret Manager secret ID for the Flink sink JDBC URL"
-  value       = google_secret_manager_secret.sink_jdbc_url.secret_id
+  value       = length(google_secret_manager_secret.sink_jdbc_url) > 0 ? google_secret_manager_secret.sink_jdbc_url[0].secret_id : ""
 }
 
 output "secret_redis_url" {
   description = "Secret Manager secret ID for the Redis URL"
-  value       = google_secret_manager_secret.redis_url.secret_id
+  value       = length(google_secret_manager_secret.redis_url) > 0 ? google_secret_manager_secret.redis_url[0].secret_id : ""
 }

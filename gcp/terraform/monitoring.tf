@@ -11,6 +11,7 @@ locals {
 # ─────────────────────────────────────────────────────────────────
 
 resource "google_monitoring_notification_channel" "email_ops" {
+  count = local.minisky == null ? 1 : 0
   display_name = "HydraStream Ops Email"
   type         = "email"
 
@@ -24,6 +25,7 @@ resource "google_monitoring_notification_channel" "email_ops" {
 # ─────────────────────────────────────────────────────────────────
 
 resource "google_monitoring_alert_policy" "pod_crash_loop" {
+  count = local.minisky == null ? 1 : 0
   display_name = "HydraStream: Pod CrashLoopBackOff or OOM"
   combiner     = "OR"
 
@@ -55,7 +57,7 @@ resource "google_monitoring_alert_policy" "pod_crash_loop" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email_ops.name]
+  notification_channels = length(google_monitoring_notification_channel.email_ops) > 0 ? [google_monitoring_notification_channel.email_ops[0].name] : []
 
   alert_strategy {
     auto_close = "604800s"
@@ -68,6 +70,7 @@ resource "google_monitoring_alert_policy" "pod_crash_loop" {
 }
 
 resource "google_monitoring_alert_policy" "high_5xx_error_rate" {
+  count = local.minisky == null ? 1 : 0
   display_name = "HydraStream: High 5xx Error Rate (>1%)"
   combiner     = "OR"
 
@@ -87,7 +90,7 @@ resource "google_monitoring_alert_policy" "high_5xx_error_rate" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email_ops.name]
+  notification_channels = length(google_monitoring_notification_channel.email_ops) > 0 ? [google_monitoring_notification_channel.email_ops[0].name] : []
 
   alert_strategy {
     auto_close = "604800s"
@@ -100,6 +103,7 @@ resource "google_monitoring_alert_policy" "high_5xx_error_rate" {
 }
 
 resource "google_monitoring_alert_policy" "flink_job_failure" {
+  count = local.minisky == null ? 1 : 0
   display_name = "HydraStream: Flink Job Failure or Checkpoint Failure"
   combiner     = "OR"
 
@@ -131,7 +135,7 @@ resource "google_monitoring_alert_policy" "flink_job_failure" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email_ops.name]
+  notification_channels = length(google_monitoring_notification_channel.email_ops) > 0 ? [google_monitoring_notification_channel.email_ops[0].name] : []
 
   alert_strategy {
     auto_close = "604800s"
@@ -144,6 +148,7 @@ resource "google_monitoring_alert_policy" "flink_job_failure" {
 }
 
 resource "google_monitoring_alert_policy" "cloudsql_connection_exhaustion" {
+  count = local.minisky == null ? 1 : 0
   display_name = "HydraStream: Cloud SQL Connection Pool Near Exhaustion"
   combiner     = "OR"
 
@@ -161,7 +166,7 @@ resource "google_monitoring_alert_policy" "cloudsql_connection_exhaustion" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email_ops.name]
+  notification_channels = length(google_monitoring_notification_channel.email_ops) > 0 ? [google_monitoring_notification_channel.email_ops[0].name] : []
 
   alert_strategy {
     auto_close = "604800s"
@@ -174,6 +179,7 @@ resource "google_monitoring_alert_policy" "cloudsql_connection_exhaustion" {
 }
 
 resource "google_monitoring_alert_policy" "gke_node_resource_pressure" {
+  count = local.minisky == null ? 1 : 0
   display_name = "HydraStream: GKE Node CPU/Memory/Disk Threshold Breach"
   combiner     = "OR"
 
@@ -219,7 +225,7 @@ resource "google_monitoring_alert_policy" "gke_node_resource_pressure" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email_ops.name]
+  notification_channels = length(google_monitoring_notification_channel.email_ops) > 0 ? [google_monitoring_notification_channel.email_ops[0].name] : []
 
   alert_strategy {
     auto_close = "604800s"
@@ -232,6 +238,7 @@ resource "google_monitoring_alert_policy" "gke_node_resource_pressure" {
 }
 
 resource "google_monitoring_alert_policy" "ssl_cert_expiry" {
+  count = local.minisky == null ? 1 : 0
   display_name = "HydraStream: SSL Certificate Expiring Within 30 Days"
   combiner     = "OR"
 
@@ -249,7 +256,7 @@ resource "google_monitoring_alert_policy" "ssl_cert_expiry" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email_ops.name]
+  notification_channels = length(google_monitoring_notification_channel.email_ops) > 0 ? [google_monitoring_notification_channel.email_ops[0].name] : []
 
   alert_strategy {
     auto_close = "604800s"
@@ -266,6 +273,7 @@ resource "google_monitoring_alert_policy" "ssl_cert_expiry" {
 # ─────────────────────────────────────────────────────────────────
 
 resource "google_monitoring_uptime_check_config" "frontend" {
+  count = local.minisky == null ? 1 : 0
   display_name = "HydraStream Frontend"
   timeout      = "10s"
   period       = "60s"
@@ -287,6 +295,7 @@ resource "google_monitoring_uptime_check_config" "frontend" {
 }
 
 resource "google_monitoring_uptime_check_config" "api_health" {
+  count = local.minisky == null ? 1 : 0
   display_name = "HydraStream API Health Endpoint"
   timeout      = "10s"
   period       = "60s"
@@ -312,6 +321,7 @@ resource "google_monitoring_uptime_check_config" "api_health" {
 }
 
 resource "google_monitoring_alert_policy" "uptime_check_failure" {
+  count = local.minisky == null ? 1 : 0
   display_name = "HydraStream: Uptime Check Failing"
   combiner     = "OR"
 
@@ -331,7 +341,7 @@ resource "google_monitoring_alert_policy" "uptime_check_failure" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email_ops.name]
+  notification_channels = length(google_monitoring_notification_channel.email_ops) > 0 ? [google_monitoring_notification_channel.email_ops[0].name] : []
 
   alert_strategy {
     auto_close = "604800s"
@@ -348,6 +358,7 @@ resource "google_monitoring_alert_policy" "uptime_check_failure" {
 # ─────────────────────────────────────────────────────────────────
 
 resource "google_monitoring_dashboard" "gke_cluster_health" {
+  count = local.minisky == null ? 1 : 0
   dashboard_json = jsonencode({
     displayName = "HydraStream — GKE Cluster Health"
     mosaicLayout = {
@@ -459,6 +470,7 @@ resource "google_monitoring_dashboard" "gke_cluster_health" {
 }
 
 resource "google_monitoring_dashboard" "application_metrics" {
+  count = local.minisky == null ? 1 : 0
   dashboard_json = jsonencode({
     displayName = "HydraStream — Application Metrics"
     mosaicLayout = {
@@ -584,6 +596,7 @@ resource "google_monitoring_dashboard" "application_metrics" {
 }
 
 resource "google_monitoring_dashboard" "flink_metrics" {
+  count = local.minisky == null ? 1 : 0
   dashboard_json = jsonencode({
     displayName = "HydraStream — Flink Job Metrics"
     mosaicLayout = {
@@ -693,6 +706,7 @@ resource "google_monitoring_dashboard" "flink_metrics" {
 }
 
 resource "google_monitoring_dashboard" "database_metrics" {
+  count = local.minisky == null ? 1 : 0
   dashboard_json = jsonencode({
     displayName = "HydraStream — Database and Cache Metrics"
     mosaicLayout = {

@@ -130,25 +130,29 @@ resource "google_sql_database_instance" "hydrastream" {
 
 # Control-plane database — used by HydraStream API
 resource "google_sql_database" "hydrastream_cp" {
+  count    = local.minisky == null ? 1 : 0
   name     = "hydrastream"
-  instance = google_sql_database_instance.hydrastream.name
+  instance = google_sql_database_instance.hydrastream[0].name
 }
 
 # Flink sink database — Flink JDBC connector writes results here
 resource "google_sql_database" "hydrastream_sink" {
+  count    = local.minisky == null ? 1 : 0
   name     = "hydrastream_sink"
-  instance = google_sql_database_instance.hydrastream.name
+  instance = google_sql_database_instance.hydrastream[0].name
 }
 
 resource "google_sql_user" "hydra_cp" {
+  count    = local.minisky == null ? 1 : 0
   name     = "hydra_cp"
-  instance = google_sql_database_instance.hydrastream.name
+  instance = google_sql_database_instance.hydrastream[0].name
   password = random_password.hydra_cp.result
 }
 
 resource "google_sql_user" "hydra_sink" {
+  count    = local.minisky == null ? 1 : 0
   name     = "hydra_sink"
-  instance = google_sql_database_instance.hydrastream.name
+  instance = google_sql_database_instance.hydrastream[0].name
   password = random_password.hydra_sink.result
 }
 
@@ -156,6 +160,7 @@ resource "google_sql_user" "hydra_sink" {
 # Memorystore Redis 7 — STANDARD_HA for Flink Proxy state
 # ─────────────────────────────────────────────────────────────────
 resource "google_redis_instance" "hydrastream" {
+  count          = local.minisky == null ? 1 : 0
   name           = var.redis_instance_name
   tier           = "STANDARD_HA"
   memory_size_gb = var.redis_memory_gb
@@ -163,7 +168,7 @@ resource "google_redis_instance" "hydrastream" {
 
   authorized_network = google_compute_network.hydrastream_vpc.id
   connect_mode       = "PRIVATE_SERVICE_ACCESS"
-  reserved_ip_range  = google_compute_global_address.private_service_access.name
+  reserved_ip_range  = google_compute_global_address.private_service_access[0].name
 
   redis_version = "REDIS_7_0"
   display_name  = "HydraStream Flink Proxy State"
@@ -195,58 +200,61 @@ resource "google_redis_instance" "hydrastream" {
 # Secret Manager — store all database credentials
 # ─────────────────────────────────────────────────────────────────
 resource "google_secret_manager_secret" "cp_database_url" {
+  count     = local.minisky == null ? 1 : 0
   secret_id = "hydrastream-cp-database-url"
   replication {
-    auto {
-    }
+    auto {}
   }
   depends_on = [google_project_service.secretmanager]
 }
 
 resource "google_secret_manager_secret_version" "cp_database_url" {
-  secret = google_secret_manager_secret.cp_database_url.id
+  count  = local.minisky == null ? 1 : 0
+  secret = google_secret_manager_secret.cp_database_url[0].id
   secret_data = join("", [
     "postgresql+asyncpg://",
-    google_sql_user.hydra_cp.name, ":",
+    google_sql_user.hydra_cp[0].name, ":",
     random_password.hydra_cp.result, "@",
-    google_sql_database_instance.hydrastream.private_ip_address,
+    google_sql_database_instance.hydrastream[0].private_ip_address,
     ":5432/",
-    google_sql_database.hydrastream_cp.name,
+    google_sql_database.hydrastream_cp[0].name,
   ])
 }
 
 resource "google_secret_manager_secret" "sink_jdbc_url" {
+  count     = local.minisky == null ? 1 : 0
   secret_id = "hydrastream-sink-jdbc-url"
   replication {
-    auto {
-    }
+    auto {}
   }
   depends_on = [google_project_service.secretmanager]
 }
 
 resource "google_secret_manager_secret_version" "sink_jdbc_url" {
-  secret = google_secret_manager_secret.sink_jdbc_url.id
+  count  = local.minisky == null ? 1 : 0
+  secret = google_secret_manager_secret.sink_jdbc_url[0].id
   secret_data = join("", [
     "jdbc:postgresql://",
-    google_sql_database_instance.hydrastream.private_ip_address,
+    google_sql_database_instance.hydrastream[0].private_ip_address,
     ":5432/",
-    google_sql_database.hydrastream_sink.name,
-    "?user=", google_sql_user.hydra_sink.name,
+    google_sql_database.hydrastream_sink[0].name,
+    "?user=", google_sql_user.hydra_sink[0].name,
     "&password=", random_password.hydra_sink.result,
     "&sslmode=require",
   ])
 }
 
 resource "google_secret_manager_secret" "redis_url" {
+  count     = local.minisky == null ? 1 : 0
   secret_id = "hydrastream-redis-url"
   replication {
-    auto {
-    }
+    auto {}
   }
   depends_on = [google_project_service.secretmanager]
 }
 
 resource "google_secret_manager_secret_version" "redis_url" {
-  secret      = google_secret_manager_secret.redis_url.id
-  secret_data = "redis://${google_redis_instance.hydrastream.host}:${google_redis_instance.hydrastream.port}"
+  count       = local.minisky == null ? 1 : 0
+  secret      = google_secret_manager_secret.redis_url[0].id
+  secret_data = "redis://${google_redis_instance.hydrastream[0].host}:${google_redis_instance.hydrastream[0].port}"
 }

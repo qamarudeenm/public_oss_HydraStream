@@ -7,12 +7,12 @@
 #   terraform apply -var-file="minisky.tfvars"
 # ─────────────────────────────────────────────────────────────────
 
-project_id       = "hydrastream-local"
+project_id       = "hydrastream-prod"
 region           = "us-central1"
 zone             = "us-central1-a"
 
-# MiniSky API gateway — routes all GCP API calls to local emulators
-minisky_endpoint = "http://localhost:2080"
+# MiniSky proxy — rewrites path-prefix routing to host-header routing
+minisky_endpoint = "http://localhost:2081"
 
 # Smaller resources for local testing
 gke_node_count   = 1
