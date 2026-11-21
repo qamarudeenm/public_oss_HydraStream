@@ -1,0 +1,96 @@
+# Kubernetes Ingress with TLS managed by cert-manager (Let's Encrypt).
+#
+# Prerequisites:
+#   1. cert-manager installed:
+#        kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+#   2. GKE Ingress controller (default) or nginx-ingress installed.
+#   3. DNS A records pointing to the LoadBalancer IP:
+#        hydrastream.example.com    → <LB_IP>
+#        api.hydrastream.example.com → <LB_IP>
+#
+# Replace "hydrastream.example.com" and "api.hydrastream.example.com"
+# with the production domains before applying.
+
+---
+# ClusterIssuer — Let's Encrypt production CA
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Replace with the ops team email for expiry notifications
+    email: ops@hydrastream.example.com
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+      - http01:
+          ingress:
+            class: gce   # GKE managed ingress; use "nginx" for nginx-ingress
+
+---
+# Certificate — covers frontend + API subdomains
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hydrastream-tls
+  namespace: hydrastream
+spec:
+  secretName: hydrastream-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - hydrastream.example.com
+    - api.hydrastream.example.com
+
+---
+# Ingress — routes external traffic to frontend and API
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hydrastream-ingress
+  namespace: hydrastream
+  annotations:
+    # GKE managed certificate alternative (comment out cert-manager Certificate above if using this):
+    # kubernetes.io/ingress.class: "gce"
+    # networking.gke.io/managed-certificates: "hydrastream-managed-cert"
+
+    # cert-manager annotation (use with the Certificate resource above):
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+    # Force HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Increase proxy timeouts for long-running API requests
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+spec:
+  tls:
+    - hosts:
+        - hydrastream.example.com
+        - api.hydrastream.example.com
+      secretName: hydrastream-tls-secret
+  rules:
+    # Frontend — public-facing Next.js UI
+    - host: hydrastream.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+    # Control Plane API
+    - host: api.hydrastream.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: control-plane
+                port:
+                  number: 80

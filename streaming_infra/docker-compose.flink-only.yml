@@ -1,0 +1,54 @@
+# Flink-only E2E overlay — Kafka already running on streaming_net
+name: hydrastream-flink
+
+networks:
+  streaming_net:
+    external: true
+
+services:
+  flink-jobmanager:
+    image: hydrastream-flink:local
+    command: jobmanager
+    networks:
+      - streaming_net
+    ports:
+      - "8032:8081"
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  flink-taskmanager:
+    image: hydrastream-flink:local
+    command: taskmanager
+    networks:
+      - streaming_net
+    depends_on:
+      - flink-jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        taskmanager.memory.process.size: 2048m
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  flink-sql-gateway:
+    image: hydrastream-flink:local
+    command: /opt/flink/bin/sql-gateway.sh start-foreground
+    networks:
+      - streaming_net
+    ports:
+      - "8083:8083"
+    depends_on:
+      - flink-jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        sql-gateway.endpoint.rest.address: 0.0.0.0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

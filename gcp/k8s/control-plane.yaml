@@ -1,0 +1,239 @@
+# ─────────────────────────────────────────────────────────────────
+# HydraStream Control Plane — GKE deployment
+#
+# Prerequisites:
+#   1. terraform apply (databases.tf) has completed
+#   2. Bootstrap script has created the hydrastream-credentials Secret:
+#        kubectl create secret generic hydrastream-credentials \
+#          --namespace hydrastream \
+#          --from-literal=DATABASE_URL="$(gcloud secrets versions access latest \
+#              --secret=hydrastream-cp-database-url)" \
+#          --from-literal=REDIS_URL="$(gcloud secrets versions access latest \
+#              --secret=hydrastream-redis-url)"
+# ─────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hydrastream
+---
+# ── Migration Job — runs alembic upgrade head before the API starts ──
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: control-plane-migrate
+  namespace: hydrastream
+  labels:
+    app: control-plane
+    component: migrate
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          # Replace with your Artifact Registry URL after terraform apply
+          image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/control-plane:latest
+          command: ["python", "-m", "alembic", "upgrade", "head"]
+          workingDir: /app
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-credentials
+                  key: DATABASE_URL
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+# ── Control Plane API Deployment ─────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: control-plane
+  namespace: hydrastream
+  labels:
+    app: control-plane
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: control-plane
+  template:
+    metadata:
+      labels:
+        app: control-plane
+    spec:
+      containers:
+        - name: api
+          image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/control-plane:latest
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-credentials
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-credentials
+                  key: REDIS_URL
+          readinessProbe:
+            httpGet:
+              path: /preflight
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /preflight
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: control-plane
+  namespace: hydrastream
+spec:
+  selector:
+    app: control-plane
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
+---
+# ── Frontend (Next.js) ────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: hydrastream
+  labels:
+    app: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      nodeSelector:
+        cloud.google.com/gke-nodepool: "app-pool"
+      containers:
+        - name: frontend
+          image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: OIDC_ISSUER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-oidc
+                  key: OIDC_ISSUER_URL
+            - name: OIDC_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-oidc
+                  key: OIDC_CLIENT_ID
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-oidc
+                  key: OIDC_CLIENT_SECRET
+            - name: OIDC_REDIRECT_URI
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-oidc
+                  key: OIDC_REDIRECT_URI
+            - name: PORT
+              value: "3000"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: hydrastream
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
+---
+# ── PodDisruptionBudgets ──────────────────────────────────────────
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: control-plane-pdb
+  namespace: hydrastream
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: control-plane
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+  namespace: hydrastream
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: frontend

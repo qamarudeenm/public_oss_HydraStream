@@ -99,6 +99,7 @@ resource "google_compute_subnetwork" "hydrastream_subnet" {
 # ─────────────────────────────────────────────────────────────────
 # 4. GKE Cluster — Stateful services: Kafka + full Flink cluster
 #    (JobManager, TaskManager, SQL Gateway)
+#    Workload Identity enabled for Secret Manager access
 # ─────────────────────────────────────────────────────────────────
 resource "google_container_cluster" "hydrastream" {
   name     = var.gke_cluster_name
@@ -115,6 +116,11 @@ resource "google_container_cluster" "hydrastream" {
     cluster_secondary_range_name  = "pods"
     services_secondary_range_name = "services"
   }
+
+  # Workload Identity — allows GKE pods to authenticate as GCP service accounts
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
+  }
 }
 
 resource "google_container_node_pool" "hydrastream_nodes" {
@@ -130,6 +136,11 @@ resource "google_container_node_pool" "hydrastream_nodes" {
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform",
     ]
+
+    # Use GKE metadata server for Workload Identity (required)
+    workload_metadata_config {
+      mode = "GKE_METADATA"
+    }
   }
 
   autoscaling {

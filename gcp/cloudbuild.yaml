@@ -45,7 +45,37 @@ steps:
       - 'streaming_infra/dbt'
 
   # ─────────────────────────────────────────────────────────────────
-  # 4. Push all images to Artifact Registry
+  # 4. Build: Control Plane API (FastAPI)
+  # ─────────────────────────────────────────────────────────────────
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-control-plane'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane:latest'
+      - '-t'
+      - '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane:${SHORT_SHA}'
+      - '-f'
+      - 'control_plane/backend/Dockerfile'
+      - 'control_plane/backend'
+
+  # ─────────────────────────────────────────────────────────────────
+  # 5. Build: Frontend (Next.js)
+  # ─────────────────────────────────────────────────────────────────
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGISTRY}/${PROJECT_ID}/hydrastream/frontend:latest'
+      - '-t'
+      - '${_REGISTRY}/${PROJECT_ID}/hydrastream/frontend:${SHORT_SHA}'
+      - '-f'
+      - 'control_plane/frontend/Dockerfile'
+      - 'control_plane/frontend'
+
+  # ─────────────────────────────────────────────────────────────────
+  # 6. Push all images to Artifact Registry
   # ─────────────────────────────────────────────────────────────────
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-flink-engine'
@@ -61,6 +91,16 @@ steps:
     id: 'push-dbt-worker'
     args: ['push', '--all-tags', '${_REGISTRY}/${PROJECT_ID}/hydrastream/dbt']
     waitFor: ['build-dbt-worker']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-control-plane'
+    args: ['push', '--all-tags', '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane']
+    waitFor: ['build-control-plane']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend'
+    args: ['push', '--all-tags', '${_REGISTRY}/${PROJECT_ID}/hydrastream/frontend']
+    waitFor: ['build-frontend']
 
 substitutions:
   # Artifact Registry host — override for MiniSky: localhost:2080
@@ -78,3 +118,7 @@ images:
   - '${_REGISTRY}/${PROJECT_ID}/hydrastream/proxy:${SHORT_SHA}'
   - '${_REGISTRY}/${PROJECT_ID}/hydrastream/dbt:latest'
   - '${_REGISTRY}/${PROJECT_ID}/hydrastream/dbt:${SHORT_SHA}'
+  - '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane:latest'
+  - '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane:${SHORT_SHA}'
+  - '${_REGISTRY}/${PROJECT_ID}/hydrastream/frontend:latest'
+  - '${_REGISTRY}/${PROJECT_ID}/hydrastream/frontend:${SHORT_SHA}'

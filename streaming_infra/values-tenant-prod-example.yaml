@@ -1,0 +1,87 @@
+# Production tenant values override — hydrastream-tenant chart
+# Usage:
+#   helm install tenant-1 ./charts/hydrastream-tenant \
+#     --namespace tenant-1 \
+#     --values values-tenant-prod-example.yaml \
+#     --set proxy.image.tag=proxy-<SHORT_SHA> \
+#     --wait --timeout 10m
+#
+# Replace all <PLACEHOLDER> values before deploying.
+
+flink:
+  # Use the Artifact Registry image (not Docker Hub blue2berry)
+  image: "us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/engine:flink1.19.1"
+  jobManager:
+    replicaCount: 1
+    resource:
+      cpu: 2
+      memory: "4Gi"
+  taskManager:
+    replicaCount: 2
+    resource:
+      cpu: 2
+      memory: "4Gi"
+  sqlGateway:
+    replicaCount: 1
+    service:
+      type: ClusterIP
+      port: 8083
+  # GCS checkpointing (bucket provisioned in WI-3)
+  checkpointStorage: "gs://hydrastream-prod-flink-checkpoints/tenant-1"
+  savepointStorage: "gs://hydrastream-prod-flink-checkpoints/tenant-1/savepoints"
+
+proxy:
+  image:
+    repository: "us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/proxy"
+    # tag: set via --set proxy.image.tag=proxy-<SHORT_SHA> at deploy time (never use 'latest')
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  auth:
+    mode: oidc_jwt
+    issuerUrl: "https://<OIDC_ISSUER_URL>"    # e.g. https://accounts.google.com or Keycloak realm URL
+    audience: flink-proxy
+    algorithms: RS256
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+kafka:
+  bootstrapServers: "hydrastream-infra-kafka.default:9092"
+  topic: "clickstream-tenant-1"
+
+# Note: sink.password should come from a K8s Secret via External Secrets Operator
+# pointing to GCP Secret Manager, not plain text here.
+clickhouse:
+  jdbcUrl: "jdbc:postgresql://<POSTGRES_HOST>:5432/hydrastream"
+  user: "hydra"
+  password: "<POSTGRES_PASSWORD_FROM_SECRET_MANAGER>"
+  targetTable: "tenant_1_metrics"
+
+image:
+  repository: "us-central1-docker.pkg.dev/hydrastream-prod/hydrastream"
+  pullPolicy: IfNotPresent
+  tag: "engine-flink1.19.1"
+
+podAnnotations:
+  # Workload Identity annotation (must match SA configured in WI-2)
+  iam.gke.io/workload-identity: "hydrastream-prod.svc.id.goog[tenant-1/tenant-1-hydrastream-tenant]"
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL

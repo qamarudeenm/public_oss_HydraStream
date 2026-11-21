@@ -1,0 +1,141 @@
+# Production Helm values for hydrastream-infra + hydrastream-tenant on GCP.
+#
+# Usage (after terraform apply and image push):
+#   helm upgrade --install hydrastream-infra ./streaming_infra/charts/hydrastream-infra \
+#     -n hydrastream --create-namespace \
+#     -f gcp/values-prod.yaml \
+#     --set-string imageTag=$GIT_SHA
+#
+#   helm upgrade --install hydrastream-tenant ./streaming_infra/charts/hydrastream-tenant \
+#     -n hydrastream \
+#     -f gcp/values-prod.yaml \
+#     --set-string proxy.image.tag=proxy-$GIT_SHA \
+#     --set-string flink.image="$REGISTRY/hydrastream/engine:flink1.19.1"
+#
+# Variables to substitute before first deploy:
+#   PROJECT_ID       - GCP project, e.g. hydrastream-prod
+#   DOMAIN           - production domain, e.g. hydrastream.example.com
+#   OIDC_ISSUER_URL  - e.g. https://accounts.google.com
+#   OIDC_CLIENT_ID   - client ID registered with the OIDC provider
+#   GIT_SHA          - short git SHA of the deployed commit
+
+# ============================================================
+# Registry prefix (Artifact Registry)
+# ============================================================
+_registryBase: &registryBase "us-central1-docker.pkg.dev/hydrastream-prod/hydrastream"
+
+# ============================================================
+# hydrastream-infra overrides
+# ============================================================
+
+# Disable in-cluster PostgreSQL — use Cloud SQL (provisioned in WI-3).
+postgresql:
+  enabled: false
+
+controlPlane:
+  database:
+    # Cloud SQL connection string injected from Secret Manager via ESO/Workload Identity.
+    urlSecretName: "hydrastream-db-url"
+
+kafka:
+  storage:
+    size: 100Gi
+    class: "premium-rwo"
+  resources:
+    limits:
+      cpu: 4
+      memory: 8Gi
+    requests:
+      cpu: 2
+      memory: 4Gi
+  advertisedListeners: "PLAINTEXT://hydrastream-infra-kafka:29092,EXTERNAL://localhost:9092"
+
+# ============================================================
+# hydrastream-tenant overrides
+# ============================================================
+
+replicaCount: 2
+
+image:
+  repository: "us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/engine"
+  pullPolicy: IfNotPresent
+  tag: "flink1.19.1"
+
+proxy:
+  image:
+    repository: "us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/proxy"
+    pullPolicy: IfNotPresent
+    # Set at deploy time: helm ... --set-string proxy.image.tag=proxy-<sha>
+    tag: ""
+  replicaCount: 2
+  auth:
+    mode: oidc_jwt
+    # Populated from WI-2 OIDC setup. Override at deploy time:
+    #   --set proxy.auth.issuerUrl=<OIDC_ISSUER_URL>
+    #   --set proxy.auth.audience=hydrastream-proxy
+    issuerUrl: "https://accounts.google.com"
+    audience: "hydrastream-proxy"
+    algorithms: RS256
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+flink:
+  version: v1_19
+  image: "us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/engine:flink1.19.1"
+  jobManager:
+    replicaCount: 1
+    resource:
+      cpu: 2
+      memory: "4Gi"
+  taskManager:
+    replicaCount: 3
+    resource:
+      cpu: 2
+      memory: "4Gi"
+  sqlGateway:
+    replicaCount: 1
+    service:
+      type: ClusterIP
+      port: 8083
+
+kafka:
+  bootstrapServers: "hydrastream-infra-kafka:29092"
+  topic: "clickstream"
+
+# ClickHouse — override at deploy time with Cloud SQL or ClickHouse Cloud URL
+clickhouse:
+  jdbcUrl: "jdbc:clickhouse://clickhouse.hydrastream.svc.cluster.local:8123/default"
+  user: "admin"
+  # password injected via Secret Manager; do NOT hardcode here
+
+serviceAccount:
+  create: true
+  annotations:
+    # Workload Identity — binds K8s SA to GCP SA for GCS/Secret Manager access
+    iam.gke.io/gcp-service-account: "hydrastream@hydrastream-prod.iam.gserviceaccount.com"
+  name: "hydrastream"
+
+podAnnotations:
+  # Trigger rolling update on new deploy
+  deploy-timestamp: "SET_AT_DEPLOY_TIME"
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+nodeSelector:
+  cloud.google.com/gke-nodepool: "app-pool"
+
+# PodDisruptionBudget — applied separately via gcp/k8s/pdb.yaml

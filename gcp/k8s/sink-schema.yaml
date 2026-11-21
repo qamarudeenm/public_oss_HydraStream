@@ -1,0 +1,114 @@
+# ─────────────────────────────────────────────────────────────────
+# Flink Sink Schema Setup
+# One-time Job to create the clickstream_metrics table in
+# the hydrastream_sink PostgreSQL database.
+#
+# Run after terraform apply and before deploying Flink jobs.
+# Prerequisites: hydrastream-sink-credentials Secret must exist:
+#   kubectl create secret generic hydrastream-sink-credentials \
+#     --namespace hydrastream \
+#     --from-literal=PGPASSWORD="$(gcloud secrets versions access latest \
+#         --secret=hydrastream-sink-jdbc-url | \
+#         grep -oP '(?<=password=)[^&]+')" \
+#     --from-literal=PGHOST="<cloudsql_private_ip from terraform output>" \
+#     --from-literal=PGUSER="hydra_sink" \
+#     --from-literal=PGDATABASE="hydrastream_sink"
+# ─────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sink-schema-sql
+  namespace: hydrastream
+data:
+  schema.sql: |
+    -- Flink JDBC sink target table: aggregated clickstream metrics
+    -- Matches the output schema of the Flink tumbling-window job.
+    CREATE TABLE IF NOT EXISTS clickstream_metrics (
+        event_type   TEXT        NOT NULL,
+        session_id   TEXT        NOT NULL,
+        event_count  BIGINT      NOT NULL,
+        window_start TIMESTAMPTZ NOT NULL,
+        window_end   TIMESTAMPTZ NOT NULL,
+        created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (event_type, session_id, window_start)
+    );
+
+    -- Raw clickstream events table for append-only Flink sink
+    CREATE TABLE IF NOT EXISTS clickstream_events (
+        event_id     TEXT        NOT NULL PRIMARY KEY,
+        event_type   TEXT        NOT NULL,
+        page_url     TEXT,
+        user_id      TEXT,
+        session_id   TEXT        NOT NULL,
+        element_id   TEXT,
+        element_text TEXT,
+        product_id   TEXT,
+        event_time   TIMESTAMPTZ NOT NULL,
+        created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_clickstream_events_session
+        ON clickstream_events (session_id, event_time);
+    CREATE INDEX IF NOT EXISTS idx_clickstream_events_event_type
+        ON clickstream_events (event_type, event_time);
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sink-schema-setup
+  namespace: hydrastream
+  labels:
+    app: flink-sink
+    component: schema-setup
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      volumes:
+        - name: schema-sql
+          configMap:
+            name: sink-schema-sql
+      containers:
+        - name: psql
+          image: postgres:15-alpine
+          command:
+            - sh
+            - -c
+            - |
+              psql -h "$PGHOST" -U "$PGUSER" -d "$PGDATABASE" \
+                -f /schema/schema.sql && echo "Schema applied."
+          env:
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-sink-credentials
+                  key: PGHOST
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-sink-credentials
+                  key: PGUSER
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-sink-credentials
+                  key: PGDATABASE
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hydrastream-sink-credentials
+                  key: PGPASSWORD
+            - name: PGSSLMODE
+              value: require
+          volumeMounts:
+            - name: schema-sql
+              mountPath: /schema
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "128Mi"

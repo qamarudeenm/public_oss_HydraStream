@@ -13,9 +13,9 @@ data:
     jobmanager.rpc.address: flink-jobmanager
     taskmanager.numberOfTaskSlots: 2
     taskmanager.memory.process.size: 2048m
-    # Flink state checkpointing to GCS
+    # Flink state checkpointing to GCS (production bucket provisioned in WI-1)
     state.backend: filesystem
-    state.checkpoints.dir: gs://hydrastream-local-hydrastream-flink-state/checkpoints
+    state.checkpoints.dir: gs://hydrastream-prod-hydrastream-flink-state/checkpoints
     execution.checkpointing.interval: 60000
     # SQL Gateway
     sql-gateway.endpoint.rest.address: 0.0.0.0
@@ -42,7 +42,7 @@ spec:
       containers:
         - name: flink-jobmanager
           # Replace with your Artifact Registry URL after terraform apply
-          image: us-central1-docker.pkg.dev/hydrastream-local/hydrastream/engine:flink1.19.1
+          image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/engine:flink1.19.1
           command: ["jobmanager"]
           ports:
             - containerPort: 8081
@@ -98,7 +98,7 @@ spec:
     spec:
       containers:
         - name: flink-taskmanager
-          image: us-central1-docker.pkg.dev/hydrastream-local/hydrastream/engine:flink1.19.1
+          image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/engine:flink1.19.1
           command: ["taskmanager"]
           env:
             - name: FLINK_PROPERTIES
@@ -134,7 +134,7 @@ spec:
     spec:
       containers:
         - name: flink-sql-gateway
-          image: us-central1-docker.pkg.dev/hydrastream-local/hydrastream/engine:flink1.19.1
+          image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/engine:flink1.19.1
           command: ["/opt/flink/bin/sql-gateway.sh", "start-foreground"]
           ports:
             - containerPort: 8083
