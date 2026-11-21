@@ -1,0 +1,68 @@
+# One-shot Job to create production Kafka topics.
+# Run after Kafka is healthy, before deploying Flink jobs.
+# Topics are created with production retention and replication settings.
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-topics-setup
+  namespace: hydrastream
+  labels:
+    app: kafka
+    component: topics-setup
+spec:
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: kafka-topics
+          image: apache/kafka:3.9.0
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              KAFKA_BOOTSTRAP="${KAFKA_BOOTSTRAP_SERVERS:-kafka-0.kafka.hydrastream.svc.cluster.local:29092}"
+
+              echo "Waiting for Kafka broker..."
+              until /opt/kafka/bin/kafka-topics.sh \
+                --bootstrap-server "$KAFKA_BOOTSTRAP" --list 2>/dev/null; do
+                sleep 5
+              done
+
+              echo "Creating topic: clickstream"
+              /opt/kafka/bin/kafka-topics.sh \
+                --bootstrap-server "$KAFKA_BOOTSTRAP" \
+                --create --if-not-exists \
+                --topic clickstream \
+                --partitions 12 \
+                --replication-factor 1 \
+                --config retention.ms=604800000 \
+                --config segment.ms=86400000
+
+              echo "Creating topic: clickstream-dlq"
+              /opt/kafka/bin/kafka-topics.sh \
+                --bootstrap-server "$KAFKA_BOOTSTRAP" \
+                --create --if-not-exists \
+                --topic clickstream-dlq \
+                --partitions 3 \
+                --replication-factor 1 \
+                --config retention.ms=2592000000
+
+              echo "Topic list:"
+              /opt/kafka/bin/kafka-topics.sh \
+                --bootstrap-server "$KAFKA_BOOTSTRAP" --list
+
+              echo "Done."
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-0.kafka.hydrastream.svc.cluster.local:29092"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

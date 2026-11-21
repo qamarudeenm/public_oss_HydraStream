@@ -71,6 +71,7 @@ spec:
         - hydrastream.example.com
         - api.hydrastream.example.com
       secretName: hydrastream-tls-secret
+
   rules:
     # Frontend — public-facing Next.js UI
     - host: hydrastream.example.com
@@ -80,7 +81,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: frontend
+                name: control-plane-frontend
                 port:
                   number: 80
     # Control Plane API
@@ -91,6 +92,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: control-plane
+                name: control-plane-backend
                 port:
-                  number: 80
+                  number: 8000

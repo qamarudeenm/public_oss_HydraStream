@@ -61,15 +61,24 @@ gcloud container clusters get-credentials "${CLUSTER_NAME}" \
 kubectl config set-context --current --namespace="${NAMESPACE}"
 kubectl create namespace "${NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
 
-# ── Step 4: Install cert-manager (idempotent) ────────────────────
-echo "[4/8] Installing cert-manager..."
+# ── Step 4: Install External Secrets Operator (idempotent) ───────
+echo "[4/9] Installing External Secrets Operator..."
+helm repo add external-secrets https://charts.external-secrets.io 2>/dev/null || true
+helm repo update
+helm upgrade --install external-secrets external-secrets/external-secrets \
+  --namespace external-secrets-system \
+  --create-namespace \
+  --wait --timeout=3m
+
+# ── Step 5: Install cert-manager (idempotent) ────────────────────
+echo "[5/9] Installing cert-manager..."
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
 echo "  Waiting for cert-manager webhooks to be ready..."
 kubectl rollout status deployment/cert-manager -n cert-manager --timeout=120s
 kubectl rollout status deployment/cert-manager-webhook -n cert-manager --timeout=120s
 
-# ── Step 5: Deploy Flink Kubernetes Operator ─────────────────────
-echo "[5/8] Deploying Flink Kubernetes Operator..."
+# ── Step 6: Deploy Flink Kubernetes Operator ─────────────────────
+echo "[6/9] Deploying Flink Kubernetes Operator..."
 helm repo add flink-operator-repo \
   https://downloads.apache.org/flink/flink-kubernetes-operator-1.9.0/ 2>/dev/null || true
 helm repo update
@@ -80,8 +89,8 @@ helm upgrade --install flink-kubernetes-operator \
   --set "watchNamespaces={${NAMESPACE}}" \
   --wait
 
-# ── Step 6: Deploy core infrastructure via Helm ──────────────────
-echo "[6/8] Deploying hydrastream-infra (Kafka)..."
+# ── Step 7: Deploy core infrastructure via Helm ──────────────────
+echo "[7/9] Deploying hydrastream-infra (Kafka)..."
 helm upgrade --install hydrastream-infra \
   "${REPO_ROOT}/streaming_infra/charts/hydrastream-infra" \
   --namespace="${NAMESPACE}" \
@@ -89,8 +98,8 @@ helm upgrade --install hydrastream-infra \
   --values="${SCRIPT_DIR}/values-prod.yaml" \
   --wait --timeout=5m
 
-# ── Step 7: Deploy tenant services (Flink, Proxy) via Helm ───────
-echo "[7/8] Deploying hydrastream-tenant (Flink + Proxy)..."
+# ── Step 8: Deploy tenant services (Flink, Proxy) via Helm ───────
+echo "[8/9] Deploying hydrastream-tenant (Flink + Proxy)..."
 helm upgrade --install hydrastream-tenant \
   "${REPO_ROOT}/streaming_infra/charts/hydrastream-tenant" \
   --namespace="${NAMESPACE}" \
@@ -100,15 +109,21 @@ helm upgrade --install hydrastream-tenant \
   --set "podAnnotations.deploy-timestamp=$(date -u +%Y%m%d%H%M%S)" \
   --wait --timeout=10m
 
-# ── Step 8: Apply control-plane + Flink + Kafka + Ingress k8s manifests
-echo "[8/8] Applying Kubernetes manifests (control-plane, Flink, Kafka, Ingress)..."
+# ── Step 9: Apply control-plane + Flink + Kafka + Ingress k8s manifests
+echo "[9/9] Applying Kubernetes manifests (control-plane, Flink, Kafka, Ingress)..."
 
 # Substitute image tags in control-plane manifest
 sed "s|:latest|:${GIT_SHA}|g" "${SCRIPT_DIR}/k8s/control-plane.yaml" \
   | kubectl apply -f -
 
 kubectl apply -f "${SCRIPT_DIR}/k8s/kafka.yaml"
+kubectl apply -f "${SCRIPT_DIR}/k8s/pdb.yaml"
 kubectl apply -f "${SCRIPT_DIR}/k8s/flink.yaml"
+
+# Wait for Kafka to be ready, then create production topics
+echo "  Waiting for Kafka..."
+kubectl rollout status statefulset/kafka -n "${NAMESPACE}" --timeout=5m
+kubectl apply -f "${SCRIPT_DIR}/k8s/kafka-topics.yaml"
 
 # Apply ingress after substituting domain
 sed -e "s|hydrastream.example.com|${DOMAIN}|g" \
@@ -119,10 +134,10 @@ sed -e "s|hydrastream.example.com|${DOMAIN}|g" \
 # ── Verification ──────────────────────────────────────────────────
 echo ""
 echo "=== Waiting for rollouts to complete ==="
-kubectl rollout status deployment/control-plane -n "${NAMESPACE}" --timeout=5m
-kubectl rollout status deployment/frontend           -n "${NAMESPACE}" --timeout=5m
-kubectl rollout status deployment/flink-jobmanager   -n "${NAMESPACE}" --timeout=5m
-kubectl rollout status deployment/flink-taskmanager  -n "${NAMESPACE}" --timeout=5m
+kubectl rollout status deployment/control-plane-backend  -n "${NAMESPACE}" --timeout=5m
+kubectl rollout status deployment/control-plane-frontend -n "${NAMESPACE}" --timeout=5m
+kubectl rollout status deployment/flink-jobmanager       -n "${NAMESPACE}" --timeout=5m
+kubectl rollout status deployment/flink-taskmanager      -n "${NAMESPACE}" --timeout=5m
 
 echo ""
 echo "=== Pod status ==="

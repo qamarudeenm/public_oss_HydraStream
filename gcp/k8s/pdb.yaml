@@ -1,0 +1,41 @@
+# PodDisruptionBudgets — keep at least one pod of each service live during node maintenance.
+# Applied separately so rollbacks to Helm values don't affect PDB lifecycle.
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: control-plane-backend-pdb
+  namespace: hydrastream
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: control-plane
+      component: backend
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: control-plane-frontend-pdb
+  namespace: hydrastream
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: control-plane
+      component: frontend
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: flink-taskmanager-pdb
+  namespace: hydrastream
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: flink
+      component: taskmanager

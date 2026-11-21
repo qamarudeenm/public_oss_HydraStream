@@ -39,6 +39,7 @@ spec:
         app: flink
         component: jobmanager
     spec:
+      serviceAccountName: hydrastream
       containers:
         - name: flink-jobmanager
           # Replace with your Artifact Registry URL after terraform apply
@@ -96,6 +97,7 @@ spec:
         app: flink
         component: taskmanager
     spec:
+      serviceAccountName: hydrastream
       containers:
         - name: flink-taskmanager
           image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/engine:flink1.19.1
@@ -132,6 +134,7 @@ spec:
         app: flink
         component: sql-gateway
     spec:
+      serviceAccountName: hydrastream
       containers:
         - name: flink-sql-gateway
           image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/engine:flink1.19.1
