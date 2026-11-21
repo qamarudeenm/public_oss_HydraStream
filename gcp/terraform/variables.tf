@@ -67,6 +67,24 @@ variable "github_pat" {
   default     = ""
 }
 
+variable "k8s_namespace" {
+  description = "Kubernetes namespace where HydraStream pods run (used for Workload Identity binding)"
+  type        = string
+  default     = "hydrastream"
+}
+
+variable "production_domain" {
+  description = "Production domain for the HydraStream control plane (used in OIDC redirect URI)"
+  type        = string
+  default     = "control-plane.hydrastream.dev"
+}
+
+variable "oidc_client_id" {
+  description = "GCP OAuth2 client ID for Google Identity Platform OIDC (create in GCP Console → APIs & Services → Credentials)"
+  type        = string
+  default     = ""
+}
+
 variable "alert_email" {
   description = "Email address for Cloud Monitoring alert notifications"
   type        = string

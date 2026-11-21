@@ -24,10 +24,7 @@ resource "google_project_service" "redis" {
   disable_on_destroy = false
 }
 
-resource "google_project_service" "secretmanager" {
-  service            = "secretmanager.googleapis.com"
-  disable_on_destroy = false
-}
+# google_project_service.secretmanager is declared in main.tf with a MiniSky count guard.
 
 # ─────────────────────────────────────────────────────────────────
 # VPC Private Service Access

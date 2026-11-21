@@ -26,6 +26,7 @@ locals {
   # MiniSky routes GCP API calls by path prefix on its gateway
   ar_endpoint       = local.minisky != null ? "${local.minisky}/artifactregistry/" : null
   build_endpoint    = local.minisky != null ? "${local.minisky}/cloudbuild/" : null
+
   container_endpoint = local.minisky != null ? "${local.minisky}/container/" : null
   run_endpoint      = local.minisky != null ? "${local.minisky}/run/" : null
   storage_endpoint  = local.minisky != null ? "${local.minisky}/storage/" : null
@@ -38,7 +39,7 @@ provider "google" {
 
   # Custom endpoints — only set when using MiniSky
   artifact_registry_custom_endpoint = local.ar_endpoint
-  cloudbuild_custom_endpoint        = local.build_endpoint
+  cloud_build_custom_endpoint       = local.build_endpoint
   container_custom_endpoint         = local.container_endpoint
   cloud_run_v2_custom_endpoint      = local.run_endpoint
   storage_custom_endpoint           = local.storage_endpoint
@@ -231,4 +232,110 @@ resource "google_cloudbuild_trigger" "hydrastream_build" {
     _REGISTRY = "${var.region}-docker.pkg.dev"
     _REGION   = var.region
   }
+}
+
+# ─────────────────────────────────────────────────────────────────
+# 7. Required GCP APIs
+#    Not provisioned in MiniSky mode (no emulator for these)
+# ─────────────────────────────────────────────────────────────────
+resource "google_project_service" "secretmanager" {
+  count   = local.minisky == null ? 1 : 0
+  service = "secretmanager.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "identitytoolkit" {
+  count   = local.minisky == null ? 1 : 0
+  service = "identitytoolkit.googleapis.com"
+
+  disable_on_destroy = false
+}
+
+# ─────────────────────────────────────────────────────────────────
+# 8. GCP Service Account — control plane pods (Workload Identity)
+# ─────────────────────────────────────────────────────────────────
+resource "google_service_account" "control_plane" {
+  count        = local.minisky == null ? 1 : 0
+  account_id   = "hydrastream-control-plane"
+  display_name = "HydraStream Control Plane (Workload Identity)"
+}
+
+# Allow the GKE Kubernetes service account to impersonate this GCP SA
+resource "google_service_account_iam_member" "control_plane_workload_identity" {
+  count              = local.minisky == null ? 1 : 0
+  service_account_id = google_service_account.control_plane[0].name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:${var.project_id}.svc.id.goog[${var.k8s_namespace}/hydrastream-control-plane]"
+}
+
+# Grant the control plane SA access to read secrets from Secret Manager
+resource "google_project_iam_member" "control_plane_secretmanager" {
+  count   = local.minisky == null ? 1 : 0
+  project = var.project_id
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:${google_service_account.control_plane[0].email}"
+
+  depends_on = [google_project_service.secretmanager]
+}
+
+# ─────────────────────────────────────────────────────────────────
+# 9. GCP Secret Manager — sensitive credentials
+#    Secrets are created empty; populate values via:
+#      gcloud secrets versions add <secret-id> --data-file=-
+#    or via the GCP Console before deploying pods.
+# ─────────────────────────────────────────────────────────────────
+resource "google_secret_manager_secret" "db_password" {
+  count     = local.minisky == null ? 1 : 0
+  secret_id = "hydrastream-db-password"
+
+  replication {
+    auto {}
+  }
+
+  depends_on = [google_project_service.secretmanager]
+}
+
+resource "google_secret_manager_secret" "redis_password" {
+  count     = local.minisky == null ? 1 : 0
+  secret_id = "hydrastream-redis-password"
+
+  replication {
+    auto {}
+  }
+
+  depends_on = [google_project_service.secretmanager]
+}
+
+resource "google_secret_manager_secret" "oidc_client_secret" {
+  count     = local.minisky == null ? 1 : 0
+  secret_id = "hydrastream-oidc-client-secret"
+
+  replication {
+    auto {}
+  }
+
+  depends_on = [google_project_service.secretmanager]
+}
+
+resource "google_secret_manager_secret" "kafka_credentials" {
+  count     = local.minisky == null ? 1 : 0
+  secret_id = "hydrastream-kafka-credentials"
+
+  replication {
+    auto {}
+  }
+
+  depends_on = [google_project_service.secretmanager]
+}
+
+resource "google_secret_manager_secret" "database_url" {
+  count     = local.minisky == null ? 1 : 0
+  secret_id = "hydrastream-database-url"
+
+  replication {
+    auto {}
+  }
+
+  depends_on = [google_project_service.secretmanager]
 }

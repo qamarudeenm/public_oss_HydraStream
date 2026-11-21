@@ -23,6 +23,37 @@ output "vpc_name" {
   value       = google_compute_network.hydrastream_vpc.name
 }
 
+output "control_plane_service_account_email" {
+  description = "GCP service account email for control plane pods (use in K8s ServiceAccount annotation)"
+  value       = length(google_service_account.control_plane) > 0 ? google_service_account.control_plane[0].email : ""
+}
+
+output "oidc_issuer_url" {
+  description = "OIDC issuer URL for Google Identity Platform — set as CONTROL_PLANE_OIDC_ISSUER_URL on the backend"
+  value       = "https://accounts.google.com"
+}
+
+output "oidc_audience" {
+  description = "OIDC audience (= GCP OAuth2 client ID) — set as CONTROL_PLANE_OIDC_AUDIENCE on the backend and OIDC_CLIENT_ID on the frontend"
+  value       = var.oidc_client_id
+}
+
+output "oidc_redirect_uri" {
+  description = "Production OIDC redirect URI — register this in GCP Console → APIs & Services → Credentials"
+  value       = "https://${var.production_domain}/api/auth/callback"
+}
+
+output "secret_manager_secrets" {
+  description = "Secret Manager secret IDs — populate values before deploying pods"
+  value = length(google_secret_manager_secret.db_password) > 0 ? {
+    database_url       = google_secret_manager_secret.database_url[0].secret_id
+    db_password        = google_secret_manager_secret.db_password[0].secret_id
+    redis_password     = google_secret_manager_secret.redis_password[0].secret_id
+    oidc_client_secret = google_secret_manager_secret.oidc_client_secret[0].secret_id
+    kafka_credentials  = google_secret_manager_secret.kafka_credentials[0].secret_id
+  } : {}
+}
+
 # ── Database outputs (WI-3) ───────────────────────────────────────
 
 output "cloudsql_private_ip" {

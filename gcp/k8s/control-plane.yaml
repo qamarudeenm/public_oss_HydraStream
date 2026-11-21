@@ -2,46 +2,126 @@
 # HydraStream Control Plane — GKE deployment
 #
 # Prerequisites:
-#   1. terraform apply (databases.tf) has completed
-#   2. Bootstrap script has created the hydrastream-credentials Secret:
-#        kubectl create secret generic hydrastream-credentials \
-#          --namespace hydrastream \
-#          --from-literal=DATABASE_URL="$(gcloud secrets versions access latest \
-#              --secret=hydrastream-cp-database-url)" \
-#          --from-literal=REDIS_URL="$(gcloud secrets versions access latest \
-#              --secret=hydrastream-redis-url)"
+#   1. GKE Workload Identity enabled (via Terraform)
+#   2. External Secrets Operator installed:
+#        helm repo add external-secrets https://charts.external-secrets.io
+#        helm install external-secrets external-secrets/external-secrets \
+#          -n external-secrets-system --create-namespace
+#   3. Secrets populated in GCP Secret Manager:
+#        gcloud secrets versions add hydrastream-database-url --data-file=-
+#        gcloud secrets versions add hydrastream-oidc-client-secret --data-file=-
+#
+# Substitution required: replace hydrastream-prod and
+#   <GCP_OAUTH2_CLIENT_ID> with actual values before applying.
 # ─────────────────────────────────────────────────────────────────
 apiVersion: v1
-kind: Namespace
+kind: ServiceAccount
 metadata:
-  name: hydrastream
----
-# ── Migration Job — runs alembic upgrade head before the API starts ──
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: control-plane-migrate
+  name: hydrastream-control-plane
   namespace: hydrastream
-  labels:
-    app: control-plane
-    component: migrate
+  annotations:
+    # Bind to the GCP service account created by Terraform
+    iam.gke.io/gcp-service-account: hydrastream-control-plane@hydrastream-prod.iam.gserviceaccount.com
+---
+# ── External Secrets Operator: GCP Secret Manager store ──────────
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterSecretStore
+metadata:
+  name: gcp-secret-store
 spec:
-  ttlSecondsAfterFinished: 600
-  backoffLimit: 3
+  provider:
+    gcpsm:
+      projectID: hydrastream-prod
+      auth:
+        workloadIdentity:
+          clusterLocation: us-central1
+          clusterName: hydrastream-cluster
+          serviceAccountRef:
+            name: hydrastream-control-plane
+            namespace: hydrastream
+---
+# ── Sync Secret Manager secrets to a K8s Secret ──────────────────
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: hydrastream-backend
+  namespace: hydrastream
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: gcp-secret-store
+    kind: ClusterSecretStore
+  target:
+    name: hydrastream-backend-env
+    creationPolicy: Owner
+  data:
+    - secretKey: DATABASE_URL
+      remoteRef:
+        key: hydrastream-database-url
+    - secretKey: OIDC_CLIENT_SECRET
+      remoteRef:
+        key: hydrastream-oidc-client-secret
+---
+# ── OIDC / non-sensitive config ───────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hydrastream-oidc-config
+  namespace: hydrastream
+data:
+  # Google Identity Platform — standard Google OIDC issuer
+  OIDC_ISSUER_URL: "https://accounts.google.com"
+  # OAuth2 Client ID from GCP Console → APIs & Services → Credentials
+  # Replace with the actual Web Application client ID
+  OIDC_CLIENT_ID: "<GCP_OAUTH2_CLIENT_ID>.apps.googleusercontent.com"
+  OIDC_REDIRECT_URI: "https://control-plane.hydrastream.dev/api/auth/callback"
+  # Backend audience must match the client ID for Google-issued ID tokens
+  CONTROL_PLANE_OIDC_ISSUER_URL: "https://accounts.google.com"
+  CONTROL_PLANE_OIDC_AUDIENCE: "<GCP_OAUTH2_CLIENT_ID>.apps.googleusercontent.com"
+---
+# ── Control Plane Backend — FastAPI ──────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: control-plane-backend
+  namespace: hydrastream
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: control-plane
+      component: backend
   template:
+    metadata:
+      labels:
+        app: control-plane
+        component: backend
     spec:
-      restartPolicy: OnFailure
+      serviceAccountName: hydrastream-control-plane
       containers:
-        - name: migrate
+        - name: backend
           # Replace with your Artifact Registry URL after terraform apply
           image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/control-plane:latest
-          command: ["python", "-m", "alembic", "upgrade", "head"]
-          workingDir: /app
+          ports:
+            - containerPort: 8000
+              name: http
           env:
+            # OIDC config from ConfigMap (non-sensitive)
+            - name: CONTROL_PLANE_OIDC_ISSUER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: hydrastream-oidc-config
+                  key: CONTROL_PLANE_OIDC_ISSUER_URL
+            - name: CONTROL_PLANE_OIDC_AUDIENCE
+              valueFrom:
+                configMapKeyRef:
+                  name: hydrastream-oidc-config
+                  key: CONTROL_PLANE_OIDC_AUDIENCE
+            # Credentials from Secret Manager via External Secrets (no plaintext)
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: hydrastream-credentials
+                  name: hydrastream-backend-env
                   key: DATABASE_URL
           resources:
             requests:
@@ -50,190 +130,99 @@ spec:
             limits:
               cpu: "500m"
               memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
 ---
-# ── Control Plane API Deployment ─────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: control-plane-backend
+  namespace: hydrastream
+spec:
+  selector:
+    app: control-plane
+    component: backend
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+---
+# ── Control Plane Frontend — Next.js ─────────────────────────────
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: control-plane
+  name: control-plane-frontend
   namespace: hydrastream
-  labels:
-    app: control-plane
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: control-plane
+      component: frontend
   template:
     metadata:
       labels:
         app: control-plane
+        component: frontend
     spec:
-      containers:
-        - name: api
-          image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/control-plane:latest
-          ports:
-            - containerPort: 8000
-              name: http
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: hydrastream-credentials
-                  key: DATABASE_URL
-            - name: REDIS_URL
-              valueFrom:
-                secretKeyRef:
-                  name: hydrastream-credentials
-                  key: REDIS_URL
-          readinessProbe:
-            httpGet:
-              path: /preflight
-              port: 8000
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /preflight
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 30
-          resources:
-            requests:
-              cpu: "250m"
-              memory: "256Mi"
-            limits:
-              cpu: "1"
-              memory: "512Mi"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: control-plane
-  namespace: hydrastream
-spec:
-  selector:
-    app: control-plane
-  ports:
-    - name: http
-      port: 80
-      targetPort: 8000
-  type: ClusterIP
----
-# ── Frontend (Next.js) ────────────────────────────────────────────
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: frontend
-  namespace: hydrastream
-  labels:
-    app: frontend
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: frontend
-  template:
-    metadata:
-      labels:
-        app: frontend
-    spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1001
-        runAsGroup: 1001
-        fsGroup: 1001
-        seccompProfile:
-          type: RuntimeDefault
-      nodeSelector:
-        cloud.google.com/gke-nodepool: "app-pool"
+      serviceAccountName: hydrastream-control-plane
       containers:
         - name: frontend
-          image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/frontend:latest
-          imagePullPolicy: Always
+          image: us-central1-docker.pkg.dev/hydrastream-prod/hydrastream/control-plane-frontend:latest
           ports:
             - containerPort: 3000
               name: http
           env:
+            # OIDC config from ConfigMap
             - name: OIDC_ISSUER_URL
               valueFrom:
-                secretKeyRef:
-                  name: hydrastream-oidc
+                configMapKeyRef:
+                  name: hydrastream-oidc-config
                   key: OIDC_ISSUER_URL
             - name: OIDC_CLIENT_ID
               valueFrom:
-                secretKeyRef:
-                  name: hydrastream-oidc
+                configMapKeyRef:
+                  name: hydrastream-oidc-config
                   key: OIDC_CLIENT_ID
+            - name: OIDC_REDIRECT_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: hydrastream-oidc-config
+                  key: OIDC_REDIRECT_URI
+            # OIDC client secret from Secret Manager via External Secrets
             - name: OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: hydrastream-oidc
+                  name: hydrastream-backend-env
                   key: OIDC_CLIENT_SECRET
-            - name: OIDC_REDIRECT_URI
-              valueFrom:
-                secretKeyRef:
-                  name: hydrastream-oidc
-                  key: OIDC_REDIRECT_URI
-            - name: PORT
-              value: "3000"
+                  optional: true  # Not required for PKCE-only public clients
+            - name: NEXT_PUBLIC_API_URL
+              value: "http://control-plane-backend.hydrastream.svc.cluster.local:8000"
+            - name: NODE_ENV
+              value: "production"
           resources:
             requests:
               cpu: "250m"
               memory: "256Mi"
             limits:
-              cpu: "1"
+              cpu: "500m"
               memory: "512Mi"
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: [ALL]
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 3000
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 3000
-            initialDelaySeconds: 30
-            periodSeconds: 30
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
+  name: control-plane-frontend
   namespace: hydrastream
 spec:
   selector:
-    app: frontend
+    app: control-plane
+    component: frontend
+  type: LoadBalancer
   ports:
     - name: http
       port: 80
       targetPort: 3000
-  type: ClusterIP
----
-# ── PodDisruptionBudgets ──────────────────────────────────────────
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: control-plane-pdb
-  namespace: hydrastream
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app: control-plane
----
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: frontend-pdb
-  namespace: hydrastream
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app: frontend
