@@ -18,6 +18,10 @@ postgresql:
   enabled: true
   auth:
     username: hydra
+    # Development only — in production override with:
+    #   --set postgresql.auth.existingSecret=hydrastream-backend-env
+    #   --set postgresql.auth.secretKeys.adminPasswordKey=DATABASE_PASSWORD
+    # The K8s secret is synced from GCP Secret Manager via External Secrets Operator.
     password: hydra
     database: hydrastream
   primary:

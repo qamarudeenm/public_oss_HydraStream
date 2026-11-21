@@ -67,9 +67,9 @@ steps:
     args:
       - 'build'
       - '-t'
-      - '${_REGISTRY}/${PROJECT_ID}/hydrastream/frontend:latest'
+      - '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane-frontend:latest'
       - '-t'
-      - '${_REGISTRY}/${PROJECT_ID}/hydrastream/frontend:${SHORT_SHA}'
+      - '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane-frontend:${SHORT_SHA}'
       - '-f'
       - 'control_plane/frontend/Dockerfile'
       - 'control_plane/frontend'
@@ -99,7 +99,7 @@ steps:
 
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-frontend'
-    args: ['push', '--all-tags', '${_REGISTRY}/${PROJECT_ID}/hydrastream/frontend']
+    args: ['push', '--all-tags', '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane-frontend']
     waitFor: ['build-frontend']
 
 substitutions:
@@ -120,5 +120,5 @@ images:
   - '${_REGISTRY}/${PROJECT_ID}/hydrastream/dbt:${SHORT_SHA}'
   - '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane:latest'
   - '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane:${SHORT_SHA}'
-  - '${_REGISTRY}/${PROJECT_ID}/hydrastream/frontend:latest'
-  - '${_REGISTRY}/${PROJECT_ID}/hydrastream/frontend:${SHORT_SHA}'
+  - '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane-frontend:latest'
+  - '${_REGISTRY}/${PROJECT_ID}/hydrastream/control-plane-frontend:${SHORT_SHA}'

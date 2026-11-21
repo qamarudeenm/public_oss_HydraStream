@@ -56,6 +56,43 @@ OIDC_REDIRECT_URI=http://localhost:3000/api/auth/callback
 
 ## Provider-Specific Notes
 
+### Google Identity Platform (Production)
+
+Google Identity Platform is the production OIDC provider for HydraStream. It uses standard
+Google OAuth 2.0 endpoints, so no Firebase SDK is required.
+
+**Setup steps:**
+
+1. In GCP Console → APIs & Services → Credentials → Create OAuth client ID
+2. Application type: **Web application**
+3. Name: `hydrastream-frontend`
+4. Authorized redirect URIs: `https://control-plane.hydrastream.dev/api/auth/callback`
+   - Also add `http://localhost:3000/api/auth/callback` for local development
+5. Note the **Client ID** (format: `<numbers>-<hash>.apps.googleusercontent.com`)
+
+**Environment variables:**
+
+```bash
+OIDC_ISSUER_URL=https://accounts.google.com
+OIDC_CLIENT_ID=<numbers>-<hash>.apps.googleusercontent.com
+OIDC_CLIENT_SECRET=   # leave empty for PKCE-only public client
+OIDC_REDIRECT_URI=https://control-plane.hydrastream.dev/api/auth/callback
+```
+
+**Backend variables** (must match the same client ID):
+
+```bash
+CONTROL_PLANE_OIDC_ISSUER_URL=https://accounts.google.com
+CONTROL_PLANE_OIDC_AUDIENCE=<numbers>-<hash>.apps.googleusercontent.com
+```
+
+Google ID tokens have `aud = client_id`, so the backend audience must equal `OIDC_CLIENT_ID`.
+
+**Google Identity Platform in GCP Console:**
+- Navigate to: APIs & Services → Identity Platform (or Firebase Auth in Firebase Console)
+- Enable Email/Password and Google Sign-In providers as needed
+- The OAuth consent screen must be configured (OAuth consent screen → External or Internal)
+
 ### Keycloak
 
 1. Create a realm (e.g., `hydrastream`)

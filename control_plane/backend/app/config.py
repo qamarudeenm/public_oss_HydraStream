@@ -17,6 +17,8 @@ class ControlPlaneConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="CONTROL_PLANE_", env_file=".env", extra="ignore")
 
     oidc_issuer_url: str = ""
+    # Production (Google Identity Platform): set to the GCP OAuth2 client ID
+    # e.g. CONTROL_PLANE_OIDC_AUDIENCE=<numbers>-<hash>.apps.googleusercontent.com
     oidc_audience: str = "hydrastream-control-plane"
     auth_disabled: bool = False
 

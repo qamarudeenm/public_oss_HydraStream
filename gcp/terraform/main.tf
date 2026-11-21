@@ -214,6 +214,7 @@ resource "google_cloud_run_v2_service_iam_member" "flink_proxy_invoker" {
 # 6. Cloud Build Trigger — builds Docker images on push to main
 # ─────────────────────────────────────────────────────────────────
 resource "google_cloudbuild_trigger" "hydrastream_build" {
+  count       = local.minisky == null ? 1 : 0
   name        = "hydrastream-build-push"
   description = "Build and push HydraStream Docker images on push to main"
 

@@ -10,16 +10,19 @@
 # Required GCP APIs
 # ─────────────────────────────────────────────────────────────────
 resource "google_project_service" "sqladmin" {
+  count              = local.minisky == null ? 1 : 0
   service            = "sqladmin.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "servicenetworking" {
+  count              = local.minisky == null ? 1 : 0
   service            = "servicenetworking.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "redis" {
+  count              = local.minisky == null ? 1 : 0
   service            = "redis.googleapis.com"
   disable_on_destroy = false
 }
@@ -32,6 +35,7 @@ resource "google_project_service" "redis" {
 # services (Cloud SQL private IP, Memorystore).
 # ─────────────────────────────────────────────────────────────────
 resource "google_compute_global_address" "private_service_access" {
+  count         = local.minisky == null ? 1 : 0
   name          = "hydrastream-private-service-access"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
@@ -42,9 +46,10 @@ resource "google_compute_global_address" "private_service_access" {
 }
 
 resource "google_service_networking_connection" "private_vpc_connection" {
+  count                   = local.minisky == null ? 1 : 0
   network                 = google_compute_network.hydrastream_vpc.id
   service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_service_access.name]
+  reserved_peering_ranges = [google_compute_global_address.private_service_access[0].name]
 
   depends_on = [google_project_service.servicenetworking]
 }
@@ -66,6 +71,7 @@ resource "random_password" "hydra_sink" {
 # Cloud SQL PostgreSQL 15 — REGIONAL HA, private IP only
 # ─────────────────────────────────────────────────────────────────
 resource "google_sql_database_instance" "hydrastream" {
+  count            = local.minisky == null ? 1 : 0
   name             = var.cloudsql_instance_name
   database_version = "POSTGRES_15"
   region           = var.region
