@@ -20,3 +20,8 @@ gke_machine_type = "e2-standard-2"
 
 # Point to the local GitHub repo (Cloud Build pulls from GitHub via PAT)
 github_repo      = "qamarudeenm/agent_company_bluemoon"
+
+# Monitoring
+alert_email      = "ops@hydrastream.io"
+frontend_domain  = "app.hydrastream.io"
+api_domain       = "api.hydrastream.io"

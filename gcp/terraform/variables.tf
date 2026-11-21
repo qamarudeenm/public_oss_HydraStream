@@ -66,3 +66,47 @@ variable "github_pat" {
   sensitive   = true
   default     = ""
 }
+
+variable "alert_email" {
+  description = "Email address for Cloud Monitoring alert notifications"
+  type        = string
+  default     = "ops@hydrastream.io"
+}
+
+variable "frontend_domain" {
+  description = "Public domain for the HydraStream frontend (uptime check host)"
+  type        = string
+  default     = "app.hydrastream.io"
+}
+
+variable "api_domain" {
+  description = "Public domain for the HydraStream API (uptime check host)"
+  type        = string
+  default     = "api.hydrastream.io"
+}
+
+# ── Database (WI-3) ───────────────────────────────────────────────
+
+variable "cloudsql_instance_name" {
+  description = "Cloud SQL PostgreSQL instance name"
+  type        = string
+  default     = "hydrastream-prod"
+}
+
+variable "cloudsql_tier" {
+  description = "Cloud SQL machine tier (db-g1-small for staging, db-custom-2-7680 for prod)"
+  type        = string
+  default     = "db-custom-2-7680"
+}
+
+variable "redis_instance_name" {
+  description = "Memorystore Redis instance name"
+  type        = string
+  default     = "hydrastream-redis"
+}
+
+variable "redis_memory_gb" {
+  description = "Memorystore Redis memory size in GB"
+  type        = number
+  default     = 1
+}
