@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import logging
 import threading
 from typing import Any
 
@@ -23,6 +24,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 
 from .config import settings
+
+security_logger = logging.getLogger("security")
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -45,6 +48,10 @@ def _get_jwks() -> dict:
             jwks_resp.raise_for_status()
             _jwks_cache.update(jwks_resp.json())
         except Exception as exc:
+            security_logger.error(
+                "auth_oidc_unreachable",
+                extra={"event": "auth_oidc_unreachable", "reason": str(exc)},
+            )
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail=f"Could not fetch JWKS from OIDC provider: {exc}",
@@ -65,6 +72,10 @@ async def get_current_user(
         return {"sub": "local-dev", "auth": "disabled"}
 
     if not credentials:
+        security_logger.warning(
+            "auth_missing_token",
+            extra={"event": "auth_missing_token"},
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Missing bearer token",
@@ -72,6 +83,10 @@ async def get_current_user(
         )
 
     if not settings.oidc_issuer_url:
+        security_logger.warning(
+            "auth_oidc_not_configured",
+            extra={"event": "auth_oidc_not_configured"},
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="OIDC issuer not configured",
@@ -89,6 +104,13 @@ async def get_current_user(
             options={"verify_at_hash": False},
         )
     except JWTError as exc:
+        security_logger.warning(
+            "auth_invalid_token",
+            extra={
+                "event": "auth_invalid_token",
+                "reason": str(exc),
+            },
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid token: {exc}",

@@ -23,11 +23,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import orchestrator
 from .auth import get_current_user
+from .config import settings
 from .database import AsyncSessionLocal, engine, get_db
 from .db_models import TenantRecord
 from .dbt_artifacts import ArtifactLoadError, load_dbt_artifacts
+from .middleware import BodySizeLimitMiddleware, SecurityHeadersMiddleware
 from .models import Tenant
 from .preflight import run_preflight
+from .rate_limit import RateLimitMiddleware
 
 TOKEN_MASK = "********"
 
@@ -90,15 +93,21 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="HydraStream Control Plane", lifespan=lifespan)
 
-_cors_origins_raw = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000")
-_allowed_origins = [o.strip() for o in _cors_origins_raw.split(",") if o.strip()]
-
+# Security middlewares — applied in reverse registration order (last added = outermost).
+# Order here: CORS → rate limit → body size → security headers (innermost).
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_body_size_bytes)
+app.add_middleware(
+    RateLimitMiddleware,
+    reads_per_minute=settings.rate_limit_per_minute,
+    writes_per_minute=settings.rate_limit_writes_per_minute,
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_allowed_origins,
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 

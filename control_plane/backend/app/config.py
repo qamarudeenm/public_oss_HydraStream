@@ -26,5 +26,21 @@ class ControlPlaneConfig(BaseSettings):
     listen_port: int = 8000
     log_level: str = "info"
 
+    # CORS — comma-separated list of allowed origins.
+    # Default: production domain only. Override in dev with localhost origins.
+    cors_origins: str = "https://hydrastream.imarasystems.com"
+
+    # Rate limiting — requests per minute per tenant (JWT sub) or IP.
+    rate_limit_per_minute: int = 120
+    # Stricter limit for mutation endpoints (POST/PATCH/DELETE).
+    rate_limit_writes_per_minute: int = 30
+
+    # Maximum request body size in bytes (default: 1 MiB).
+    max_body_size_bytes: int = 1_048_576
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
 
 settings = ControlPlaneConfig()
