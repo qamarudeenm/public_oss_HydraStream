@@ -11,8 +11,10 @@
 # limitations under the License.
 
 from datetime import datetime, timezone
+from typing import Optional
 
-from sqlalchemy import JSON, DateTime, String
+from sqlalchemy import DateTime, Index, Integer, String, Text
+from sqlalchemy import JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
@@ -36,4 +38,30 @@ class TenantRecord(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+
+class AuditLogRecord(Base):
+    __tablename__ = "audit_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    actor: Mapped[str] = mapped_column(String, nullable=False)
+    actor_role: Mapped[str] = mapped_column(String, nullable=False)
+    action: Mapped[str] = mapped_column(String, nullable=False)
+    resource: Mapped[str] = mapped_column(String, nullable=False)
+    tenant_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+    outcome: Mapped[str] = mapped_column(String, nullable=False)
+    ip_address: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    status_code: Mapped[int] = mapped_column(Integer, nullable=False)
+    denial_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    __table_args__ = (
+        Index("ix_audit_logs_tenant_id", "tenant_id"),
+        Index("ix_audit_logs_actor", "actor"),
+        Index("ix_audit_logs_timestamp", "timestamp"),
     )

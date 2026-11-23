@@ -10,7 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+from datetime import datetime
+from enum import Enum
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 class KafkaConfig(BaseModel):
@@ -73,3 +75,62 @@ class TenantCreate(BaseModel):
 class TenantUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+
+
+class WebhookEventType(str, Enum):
+    pipeline_error = "pipeline_error"
+    pipeline_recovered = "pipeline_recovered"
+    threshold_exceeded = "threshold_exceeded"
+    billing_event = "billing_event"
+    maintenance_notice = "maintenance_notice"
+
+
+class WebhookEndpoint(BaseModel):
+    id: str
+    tenant_id: str
+    url: str
+    event_types: List[WebhookEventType]
+    signing_secret: str
+    enabled: bool = True
+    created_at: datetime
+
+
+class WebhookEndpointCreate(BaseModel):
+    url: str
+    event_types: List[WebhookEventType]
+
+
+class WebhookEndpointUpdate(BaseModel):
+    url: Optional[str] = None
+    event_types: Optional[List[WebhookEventType]] = None
+    enabled: Optional[bool] = None
+
+
+class WebhookDeliveryStatus(str, Enum):
+    success = "success"
+    failed = "failed"
+
+
+class WebhookDeliveryLog(BaseModel):
+    id: str
+    webhook_id: str
+    tenant_id: str
+    event_type: WebhookEventType
+    payload: dict
+    status: WebhookDeliveryStatus
+    attempt: int
+    response_code: Optional[int] = None
+    latency_ms: Optional[int] = None
+    error: Optional[str] = None
+    delivered_at: datetime
+
+
+class WebhookDeadLetterEntry(BaseModel):
+    id: str
+    webhook_id: str
+    tenant_id: str
+    event_type: WebhookEventType
+    payload: dict
+    attempts: int
+    last_error: Optional[str] = None
+    created_at: datetime

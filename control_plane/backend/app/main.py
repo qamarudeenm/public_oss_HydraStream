@@ -22,15 +22,19 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import orchestrator
+from .audit import get_store
 from .auth import get_current_user
 from .config import settings
 from .database import AsyncSessionLocal, engine, get_db
 from .db_models import TenantRecord
 from .dbt_artifacts import ArtifactLoadError, load_dbt_artifacts
-from .middleware import BodySizeLimitMiddleware, SecurityHeadersMiddleware
+from .middleware import AuditMiddleware, BodySizeLimitMiddleware, SecurityHeadersMiddleware
 from .models import Tenant
 from .preflight import run_preflight
 from .rate_limit import RateLimitMiddleware
+from .rbac import CurrentUser, get_rbac_user, require_platform_admin, require_tenant_write
+from .routes.audit import router as audit_router
+from .routes.webhooks import router as webhooks_router
 
 TOKEN_MASK = "********"
 
@@ -110,13 +114,23 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
+app.include_router(audit_router)
+app.include_router(webhooks_router)
+
 
 @app.get("/tenants", response_model=List[Tenant])
 async def list_tenants(
     db: AsyncSession = Depends(get_db),
-    _user: dict = Depends(get_current_user),
+    user: CurrentUser = Depends(get_rbac_user),
 ):
-    result = await db.execute(select(TenantRecord))
+    from sqlalchemy import and_
+    from .rbac import UserRole
+    if user.role == UserRole.platform_admin:
+        result = await db.execute(select(TenantRecord))
+    elif user.tenant_id:
+        result = await db.execute(select(TenantRecord).where(TenantRecord.id == user.tenant_id))
+    else:
+        return []
     return [_record_to_tenant(r) for r in result.scalars().all()]
 
 
@@ -124,8 +138,10 @@ async def list_tenants(
 async def get_tenant(
     tenant_id: str,
     db: AsyncSession = Depends(get_db),
-    _user: dict = Depends(get_current_user),
+    user: CurrentUser = Depends(get_rbac_user),
 ):
+    if not user.can_access_tenant(tenant_id):
+        raise HTTPException(status_code=403, detail="Access to this tenant is forbidden")
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -136,7 +152,7 @@ async def get_tenant(
 async def create_tenant(
     tenant: Tenant,
     db: AsyncSession = Depends(get_db),
-    _user: dict = Depends(get_current_user),
+    _user: CurrentUser = Depends(require_platform_admin),
 ):
     existing = await db.get(TenantRecord, tenant.id)
     if existing is not None:
@@ -154,8 +170,10 @@ async def update_tenant(
     tenant_id: str,
     tenant_update: dict = Body(...),
     db: AsyncSession = Depends(get_db),
-    _user: dict = Depends(get_current_user),
+    user: CurrentUser = Depends(require_tenant_write),
 ):
+    if not user.can_write_tenant(tenant_id):
+        raise HTTPException(status_code=403, detail="Access to this tenant is forbidden")
     record = await db.get(TenantRecord, tenant_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -182,7 +200,7 @@ async def update_tenant(
 async def delete_tenant(
     tenant_id: str,
     db: AsyncSession = Depends(get_db),
-    _user: dict = Depends(get_current_user),
+    _user: CurrentUser = Depends(require_platform_admin),
 ):
     record = await db.get(TenantRecord, tenant_id)
     if record is not None:
